@@ -1,4 +1,4 @@
 package project.web.backend.entities;
 
-public class Event {
+public class Event extends AbstractEntity{
 }
