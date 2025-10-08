@@ -1,4 +1,4 @@
 package project.web.backend.configs;
 
-public class SecurityConfig {
+public class FileUploadConfig {
 }
