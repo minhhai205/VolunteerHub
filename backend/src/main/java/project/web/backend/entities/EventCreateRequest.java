@@ -1,6 +1,5 @@
 package project.web.backend.entities;
 
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,13 +9,13 @@ import java.util.Date;
 import java.util.Set;
 
 @Entity
-@Table(name = "events")
-@NoArgsConstructor
+@Table(name = "event_create_requests")
 @AllArgsConstructor
+@NoArgsConstructor
 @Setter
 @Getter
 @Builder
-public class Event extends AbstractEntity {
+public class EventCreateRequest extends AbstractEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -50,14 +49,8 @@ public class Event extends AbstractEntity {
             , inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<Category> categories;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manager_id")
     private User manager;
-
-    @OneToMany(mappedBy = "event")
-    private Set<EventMember> members;
-
-    @OneToMany(mappedBy = "event")
-    private Set<Post> posts;
 }
