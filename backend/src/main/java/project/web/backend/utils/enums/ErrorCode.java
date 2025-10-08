@@ -14,6 +14,8 @@ public enum ErrorCode {
     JWT_SIGN_ERROR(400, "There was an error when sign your token, please check out your token's format", HttpStatus.BAD_REQUEST),
     TOKEN_SIGNATURE_INVALID(400, "Your token signature was invalid, please login again to get your new access token", HttpStatus.BAD_REQUEST),
     TOKEN_EXPIRED(400, "Your token was expired, please login again", HttpStatus.BAD_REQUEST),
+    ACCOUNT_NOT_EXIST(401, "Can't find any account with your given email, please try others", HttpStatus.UNAUTHORIZED),
+    PASSWORD_INVALID(401, "Your password was invalid, please try again", HttpStatus.UNAUTHORIZED),
     TOKEN_INVALID(400, "Your token type was not allowed, please try again with others", HttpStatus.BAD_REQUEST);
     private final int code;
     private final String message;
