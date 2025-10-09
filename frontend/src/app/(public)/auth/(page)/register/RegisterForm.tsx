@@ -1,124 +1,178 @@
 "use client"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../../components/ui/card";
-import { Input } from "../../../../../components/ui/input";
-import { Label } from "../../../../../components/ui/label";
-import { Button } from "../../../../../components/ui/button";
-import { Eye, EyeOff, Lock, Mail, UserPlus } from "lucide-react";
-import { useState } from "react";
 
-export default function RegisterForm() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState("");
+import type React from "react"
+
+import { useState } from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
+import { User, Mail, Lock, ArrowRight, Phone } from "lucide-react"
+
+export function RegisterForm() {
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+    agreeToTerms: false,
+  })
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password !== confirm) {
-      setError("Mật khẩu xác nhận không khớp");
-      return;
-    }
-    setError("");
-    // TODO: gọi API đăng ký ở đây
-    console.log("Register with:", { password });
-  };
+    e.preventDefault()
+    // Handle registration logic here
+    console.log("[v0] Registration attempt:", formData)
+  }
+
+  const updateField = (field: string, value: string | boolean) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }
 
   return (
-    <Card className="w-full max-w-md shadow-2xl border-0 bg-white/95 backdrop-blur-md relative z-10">
-      <CardHeader className="space-y-1 text-center pb-6">
-        <div className="w-16 h-16 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-          <UserPlus className="w-8 h-8 text-white" />
+    <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Full name field */}
+      <div className="space-y-2">
+        <Label htmlFor="fullName" className="text-sm font-medium">
+          Họ và tên
+        </Label>
+        <div className="relative">
+          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Input
+            id="fullName"
+            type="text"
+            placeholder="Nguyễn Văn A"
+            value={formData.fullName}
+            onChange={(e) => updateField("fullName", e.target.value)}
+            className="pl-10 h-12"
+            required
+          />
         </div>
-        <CardTitle className="text-2xl text-gray-800">Đăng ký</CardTitle>
-        <CardDescription className="text-gray-600">
-          Tạo tài khoản mới để bắt đầu sử dụng
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email */}
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-gray-700">Email</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="email"
-                type="email"
-                placeholder="example@email.com"
-                className="pl-10 border-gray-200 focus:border-green-400 focus:ring-green-400/20"
-                required
-              />
-            </div>
-          </div>
+      </div>
 
-          {/* Password */}
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-gray-700">Mật khẩu</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 pr-10 border-gray-200 focus:border-green-400 focus:ring-green-400/20"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
-          </div>
+      {/* Email field */}
+      <div className="space-y-2">
+        <Label htmlFor="email" className="text-sm font-medium">
+          Email
+        </Label>
+        <div className="relative">
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Input
+            id="email"
+            type="email"
+            placeholder="your.email@example.com"
+            value={formData.email}
+            onChange={(e) => updateField("email", e.target.value)}
+            className="pl-10 h-12"
+            required
+          />
+        </div>
+      </div>
 
-          {/* Confirm Password */}
-          <div className="space-y-2">
-            <Label htmlFor="confirm" className="text-gray-700">Xác nhận mật khẩu</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="confirm"
-                type={showConfirm ? "text" : "password"}
-                placeholder="••••••••"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                className={`pl-10 pr-10 border-gray-200 focus:border-green-400 focus:ring-green-400/20 ${
-                  error ? "border-red-400" : ""
-                }`}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-              >
-                {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
-            {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
-          </div>
+      {/* Phone field */}
+      <div className="space-y-2">
+        <Label htmlFor="phone" className="text-sm font-medium">
+          Số điện thoại
+        </Label>
+        <div className="relative">
+          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Input
+            id="phone"
+            type="tel"
+            placeholder="0912 345 678"
+            value={formData.phone}
+            onChange={(e) => updateField("phone", e.target.value)}
+            className="pl-10 h-12"
+            required
+          />
+        </div>
+      </div>
 
-          {/* Submit */}
-          <Button
-            type="submit"
-            className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
-          >
-            Đăng ký
-          </Button>
+      {/* Password field */}
+      <div className="space-y-2">
+        <Label htmlFor="password" className="text-sm font-medium">
+          Mật khẩu
+        </Label>
+        <div className="relative">
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Input
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            value={formData.password}
+            onChange={(e) => updateField("password", e.target.value)}
+            className="pl-10 h-12"
+            required
+          />
+        </div>
+      </div>
 
-          <p className="text-center text-sm text-gray-600 mt-6">
-            Đã có tài khoản?{" "}
-            <a href="/auth/login" className="text-green-600 hover:text-green-500 underline">
-              Đăng nhập
-            </a>
-          </p>
-        </form>
-      </CardContent>
-    </Card>
-  );
+      {/* Confirm password field */}
+      <div className="space-y-2">
+        <Label htmlFor="confirmPassword" className="text-sm font-medium">
+          Xác nhận mật khẩu
+        </Label>
+        <div className="relative">
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Input
+            id="confirmPassword"
+            type="password"
+            placeholder="••••••••"
+            value={formData.confirmPassword}
+            onChange={(e) => updateField("confirmPassword", e.target.value)}
+            className="pl-10 h-12"
+            required
+          />
+        </div>
+      </div>
+
+      {/* Terms checkbox */}
+      <div className="flex items-start gap-2">
+        <Checkbox
+          id="terms"
+          checked={formData.agreeToTerms}
+          onCheckedChange={(checked) => updateField("agreeToTerms", checked as boolean)}
+          className="mt-1"
+          required
+        />
+        <Label htmlFor="terms" className="text-sm font-normal cursor-pointer leading-relaxed">
+          Tôi đồng ý với{" "}
+          <Link href="/terms" className="text-primary hover:underline font-medium">
+            Điều khoản dịch vụ
+          </Link>{" "}
+          và{" "}
+          <Link href="/privacy" className="text-primary hover:underline font-medium">
+            Chính sách bảo mật
+          </Link>
+        </Label>
+      </div>
+
+      {/* Submit button */}
+      <Button type="submit" className="w-full h-12 text-base group" size="lg">
+        Tạo tài khoản
+        <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+      </Button>
+
+      {/* Divider */}
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-border" />
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="px-4 bg-background text-muted-foreground">hoặc</span>
+        </div>
+      </div>
+
+      {/* Login link */}
+      <div className="text-center">
+        <p className="text-sm text-muted-foreground">
+          Đã có tài khoản?{" "}
+          <Link href="/auth/login" className="font-semibold text-primary hover:underline">
+            Đăng nhập
+          </Link>
+        </p>
+      </div>
+    </form>
+  )
 }
