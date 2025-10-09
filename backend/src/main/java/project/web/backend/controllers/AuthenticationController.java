@@ -29,4 +29,9 @@ public class AuthenticationController {
                 .data(authenticationService.login(dto))
                 .build();
     }
+
+    @PostMapping("/register")
+    public ApiResponse register() {
+        return null;
+    }
 }
