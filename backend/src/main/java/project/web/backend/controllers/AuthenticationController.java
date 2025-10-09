@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import project.web.backend.dtos.request.LoginRequestDTO;
+import project.web.backend.dtos.request.RefreshRequestDTO;
+import project.web.backend.dtos.request.RegisterRequestDTO;
 import project.web.backend.dtos.response.ApiResponse;
 import project.web.backend.dtos.response.ApiSuccessResponse;
 import project.web.backend.services.AuthenticationService;
@@ -31,7 +33,29 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ApiResponse register() {
-        return null;
+    public ApiResponse register(@RequestBody @Valid RegisterRequestDTO dto) {
+        return ApiSuccessResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Register successfully")
+                .data(authenticationService.register(dto))
+                .build();
+    }
+
+    @PostMapping("/refresh")
+    public ApiResponse refresh(@RequestBody @Valid RefreshRequestDTO dto) {
+        return ApiSuccessResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Refresh successfully")
+                .data(authenticationService.refresh(dto))
+                .build();
+    }
+
+    @PostMapping("/forgot-password")
+    public ApiResponse forgot() {
+        return ApiSuccessResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Forgot password successfully")
+                .data(null)
+                .build();
     }
 }
