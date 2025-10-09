@@ -99,7 +99,7 @@ public class JwtService {
         return extractFieldFromPayload(token, JWTClaimsSet::getExpirationTime);
     }
 
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         return extractFieldFromPayload(token, JWTClaimsSet::getSubject);
     }
 
