@@ -22,16 +22,16 @@ export function useLogin() {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:8080/auth/login", {
+      const response = await fetch("http://localhost:8080/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       const result = await response.json() as { message?: string; [key: string]: unknown };
-      if (response.status === 200) {
+      if (result.status === 200) {
         return { success: true, data: result };
       }
-      if (response.status === 401) {
+      if (result.status === 401) {
         const message = result.message ?? "Đăng nhập thất bại";
         setError(message);
         return { success: false, error: message };
