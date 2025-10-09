@@ -12,20 +12,22 @@ import org.springframework.web.bind.annotation.RestController;
 import project.web.backend.dtos.request.LoginRequestDTO;
 import project.web.backend.dtos.request.RefreshRequestDTO;
 import project.web.backend.dtos.request.RegisterRequestDTO;
-import project.web.backend.dtos.response.ApiResponse;
 import project.web.backend.dtos.response.ApiSuccessResponse;
+import project.web.backend.dtos.response.JwtResponseDTO;
+import project.web.backend.dtos.response.UserResponseDTO;
 import project.web.backend.services.AuthenticationService;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+
 @Validated
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    public ApiResponse login(@RequestBody @Valid LoginRequestDTO dto) {
-        return ApiSuccessResponse.builder()
+    public ApiSuccessResponse<JwtResponseDTO> login(@RequestBody @Valid LoginRequestDTO dto) {
+        return ApiSuccessResponse.<JwtResponseDTO>builder()
                 .status(HttpStatus.OK.value())
                 .message("Login successfully")
                 .data(authenticationService.login(dto))
@@ -33,8 +35,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ApiResponse register(@RequestBody @Valid RegisterRequestDTO dto) {
-        return ApiSuccessResponse.builder()
+    public ApiSuccessResponse<UserResponseDTO> register(@RequestBody @Valid RegisterRequestDTO dto) {
+        return ApiSuccessResponse.<UserResponseDTO>builder()
                 .status(HttpStatus.OK.value())
                 .message("Register successfully")
                 .data(authenticationService.register(dto))
@@ -42,8 +44,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh")
-    public ApiResponse refresh(@RequestBody @Valid RefreshRequestDTO dto) {
-        return ApiSuccessResponse.builder()
+    public ApiSuccessResponse<JwtResponseDTO> refresh(@RequestBody @Valid RefreshRequestDTO dto) {
+        return ApiSuccessResponse.<JwtResponseDTO>builder()
                 .status(HttpStatus.OK.value())
                 .message("Refresh successfully")
                 .data(authenticationService.refresh(dto))
@@ -51,7 +53,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/forgot-password")
-    public ApiResponse forgot() {
+    public ApiSuccessResponse<?> forgot() {
         return ApiSuccessResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("Forgot password successfully")

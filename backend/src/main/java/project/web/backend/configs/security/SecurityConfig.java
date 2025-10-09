@@ -28,6 +28,9 @@ public class SecurityConfig {
 
     private final String[] WHITE_LIST_URL = {
             "/api/auth/**",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
     };
 
     @Bean
@@ -76,4 +79,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
+    
 }
