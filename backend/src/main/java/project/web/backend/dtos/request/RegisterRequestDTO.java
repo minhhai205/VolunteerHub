@@ -7,9 +7,9 @@ import java.io.Serializable;
 @Setter
 @Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class EventCreationRequestDTO implements Serializable {
+@NoArgsConstructor
+public class RegisterRequestDTO implements Serializable {
     private String email;
     private String password;
     private String fullName;
