@@ -18,10 +18,9 @@ export default function LoginForm() {
     e.preventDefault();
     const result = await login({ email, password });
     if (result.success) {
-      console.log("Login successful:", result.data);
-      // TODO: redirect or save token
+      console.log("Login successful");
     } else {
-      console.error("Login failed:", result.error);
+      console.error("Login failed");
     }
   };
   return (
