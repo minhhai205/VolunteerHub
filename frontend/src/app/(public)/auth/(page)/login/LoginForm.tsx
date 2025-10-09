@@ -1,29 +1,60 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Mail, Lock, ArrowRight } from "lucide-react"
+import type React from "react";
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Mail, Lock, ArrowRight } from "lucide-react";
+import { saveTokens } from "@/lib/token";
 
 export function LoginForm() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [rememberMe, setRememberMe] = useState(false)
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle login logic here
-    console.log("[v0] Login attempt:", { email, rememberMe })
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const res = await fetch(`${apiUrl}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (data.status !== 200) {
+        throw new Error("Invalid email or password!");
+      }
+
+      saveTokens(data.accessToken, data.refreshToken);
+      console.log("✅ Login success:", data);
+
+      router.push("/"); // chuyển về trang chủ
+    } catch (err) {
+      console.error("❌ Login error:", err);
+      setError(err instanceof Error ? err.message : "Đăng nhập thất bại!");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Email field */}
+      {/* Email */}
       <div className="space-y-2">
         <Label htmlFor="email" className="text-sm font-medium">
           Email
@@ -42,7 +73,7 @@ export function LoginForm() {
         </div>
       </div>
 
-      {/* Password field */}
+      {/* Password */}
       <div className="space-y-2">
         <Label htmlFor="password" className="text-sm font-medium">
           Mật khẩu
@@ -61,7 +92,7 @@ export function LoginForm() {
         </div>
       </div>
 
-      {/* Remember me & Forgot password */}
+      {/* Remember & Forgot */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Checkbox
@@ -69,20 +100,33 @@ export function LoginForm() {
             checked={rememberMe}
             onCheckedChange={(checked) => setRememberMe(checked as boolean)}
           />
-          <Label htmlFor="remember" className="text-sm font-normal cursor-pointer">
+          <Label
+            htmlFor="remember"
+            className="text-sm font-normal cursor-pointer"
+          >
             Ghi nhớ đăng nhập
           </Label>
         </div>
-        <Link href="/forgot-password" className="text-sm font-medium text-primary hover:underline">
+        <Link
+          href="/forgot-password"
+          className="text-sm font-medium text-primary hover:underline"
+        >
           Quên mật khẩu?
         </Link>
       </div>
 
-      {/* Submit button */}
-      <Button type="submit" className="w-full h-12 text-base group" size="lg">
-        Đăng nhập
+      {/* Submit */}
+      <Button
+        type="submit"
+        className="w-full h-12 text-base group"
+        size="lg"
+        disabled={loading}
+      >
+        {loading ? "Đang đăng nhập..." : "Đăng nhập"}
         <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
       </Button>
+
+      {error && <p className="text-sm text-red-500 text-center">{error}</p>}
 
       {/* Divider */}
       <div className="relative">
@@ -98,11 +142,14 @@ export function LoginForm() {
       <div className="text-center">
         <p className="text-sm text-muted-foreground">
           Chưa có tài khoản?{" "}
-          <Link href="/auth/register" className="font-semibold text-primary hover:underline">
+          <Link
+            href="/auth/register"
+            className="font-semibold text-primary hover:underline"
+          >
             Đăng ký ngay
           </Link>
         </p>
       </div>
     </form>
-  )
+  );
 }

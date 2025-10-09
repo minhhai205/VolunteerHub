@@ -1,16 +1,18 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { User, Mail, Lock, ArrowRight, Phone } from "lucide-react"
+import type React from "react";
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { User, Mail, Lock, ArrowRight, Phone } from "lucide-react";
+import { saveTokens } from "@/lib/token";
 
 export function RegisterForm() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -18,21 +20,62 @@ export function RegisterForm() {
     password: "",
     confirmPassword: "",
     agreeToTerms: false,
-  })
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle registration logic here
-    console.log("[v0] Registration attempt:", formData)
-  }
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const updateField = (field: string, value: string | boolean) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Mật khẩu xác nhận không khớp");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const res = await fetch(`${apiUrl}/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          phoneNumber: formData.phone,
+          password: formData.password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.status !== 200) {
+        const errText = data.message;
+        throw new Error(errText || "Registration failed!");
+      }
+
+      saveTokens(data.accessToken, data.refreshToken);
+      console.log("✅ Register success:", data);
+
+      router.push("/"); // chuyển về trang chủ
+    } catch (err) {
+      console.error("❌ Register error:", err);
+      setError(err instanceof Error ? err.message : "Registration failed!");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Full name field */}
+      {/* Full name */}
       <div className="space-y-2">
         <Label htmlFor="fullName" className="text-sm font-medium">
           Họ và tên
@@ -51,7 +94,7 @@ export function RegisterForm() {
         </div>
       </div>
 
-      {/* Email field */}
+      {/* Email */}
       <div className="space-y-2">
         <Label htmlFor="email" className="text-sm font-medium">
           Email
@@ -70,7 +113,7 @@ export function RegisterForm() {
         </div>
       </div>
 
-      {/* Phone field */}
+      {/* Phone */}
       <div className="space-y-2">
         <Label htmlFor="phone" className="text-sm font-medium">
           Số điện thoại
@@ -89,7 +132,7 @@ export function RegisterForm() {
         </div>
       </div>
 
-      {/* Password field */}
+      {/* Password */}
       <div className="space-y-2">
         <Label htmlFor="password" className="text-sm font-medium">
           Mật khẩu
@@ -108,7 +151,7 @@ export function RegisterForm() {
         </div>
       </div>
 
-      {/* Confirm password field */}
+      {/* Confirm password */}
       <div className="space-y-2">
         <Label htmlFor="confirmPassword" className="text-sm font-medium">
           Xác nhận mật khẩu
@@ -127,32 +170,50 @@ export function RegisterForm() {
         </div>
       </div>
 
-      {/* Terms checkbox */}
+      {/* Terms */}
       <div className="flex items-start gap-2">
         <Checkbox
           id="terms"
           checked={formData.agreeToTerms}
-          onCheckedChange={(checked) => updateField("agreeToTerms", checked as boolean)}
+          onCheckedChange={(checked) =>
+            updateField("agreeToTerms", checked as boolean)
+          }
           className="mt-1"
           required
         />
-        <Label htmlFor="terms" className="text-sm font-normal cursor-pointer leading-relaxed">
+        <Label
+          htmlFor="terms"
+          className="text-sm font-normal cursor-pointer leading-relaxed"
+        >
           Tôi đồng ý với{" "}
-          <Link href="/terms" className="text-primary hover:underline font-medium">
+          <Link
+            href="/terms"
+            className="text-primary hover:underline font-medium"
+          >
             Điều khoản dịch vụ
           </Link>{" "}
           và{" "}
-          <Link href="/privacy" className="text-primary hover:underline font-medium">
+          <Link
+            href="/privacy"
+            className="text-primary hover:underline font-medium"
+          >
             Chính sách bảo mật
           </Link>
         </Label>
       </div>
 
-      {/* Submit button */}
-      <Button type="submit" className="w-full h-12 text-base group" size="lg">
-        Tạo tài khoản
+      {/* Submit */}
+      <Button
+        type="submit"
+        className="w-full h-12 text-base group"
+        size="lg"
+        disabled={loading}
+      >
+        {loading ? "Đang tạo tài khoản..." : "Tạo tài khoản"}
         <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
       </Button>
+
+      {error && <p className="text-sm text-red-500 text-center">{error}</p>}
 
       {/* Divider */}
       <div className="relative">
@@ -168,11 +229,14 @@ export function RegisterForm() {
       <div className="text-center">
         <p className="text-sm text-muted-foreground">
           Đã có tài khoản?{" "}
-          <Link href="/auth/login" className="font-semibold text-primary hover:underline">
+          <Link
+            href="/auth/login"
+            className="font-semibold text-primary hover:underline"
+          >
             Đăng nhập
           </Link>
         </p>
       </div>
     </form>
-  )
+  );
 }
