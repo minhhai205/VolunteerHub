@@ -54,15 +54,15 @@ export function RegisterForm() {
         }),
       });
 
-      const data = await res.json();
+      const result = await res.json();
 
-      if (data.status !== 200) {
-        const errText = data.message;
+      if (result.status !== 200) {
+        const errText = result.message;
         throw new Error(errText || "Registration failed!");
       }
 
-      saveTokens(data.accessToken, data.refreshToken);
-      console.log("✅ Register success:", data);
+      saveTokens(result.data.accessToken, result.data.refreshToken);
+      console.log("✅ Register success:", result);
 
       router.push("/"); // chuyển về trang chủ
     } catch (err) {

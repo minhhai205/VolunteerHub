@@ -34,14 +34,14 @@ export function LoginForm() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      const result = await res.json();
 
-      if (data.status !== 200) {
+      if (result.status !== 200) {
         throw new Error("Invalid email or password!");
       }
 
-      saveTokens(data.accessToken, data.refreshToken);
-      console.log("✅ Login success:", data);
+      saveTokens(result.data.accessToken, result.data.refreshToken);
+      console.log("✅ Login success:", result);
 
       router.push("/"); // chuyển về trang chủ
     } catch (err) {
