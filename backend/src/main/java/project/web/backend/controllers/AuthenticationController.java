@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import project.web.backend.dtos.request.LoginRequestDTO;
 import project.web.backend.dtos.request.RefreshRequestDTO;
 import project.web.backend.dtos.request.RegisterRequestDTO;
-import project.web.backend.dtos.response.ApiResponse;
 import project.web.backend.dtos.response.ApiSuccessResponse;
 import project.web.backend.dtos.response.JwtResponseDTO;
 import project.web.backend.dtos.response.UserResponseDTO;
@@ -21,6 +20,7 @@ import project.web.backend.services.AuthenticationService;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+
 @Validated
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
