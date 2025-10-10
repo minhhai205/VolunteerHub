@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 
 export interface EventCardData {
   id: number;
-  title: string;
-  date: string;
-  participants: number;
-  comments: number;
-  likes: number;
-  isNew?: boolean;
-  isTrending?: boolean;
-  image?: string;
+  name: string;
+  description: string;
+  location: string;
+  startDate: string;
+  endDate: string;
+  categoryNames: string[];
+  countMembers: number;
+  countPosts: number;
+  imageUrl: string
 }
 
 export function useEventList() {
@@ -21,8 +22,16 @@ export function useEventList() {
     const fetchEvents = async () => {
       setLoading(true);
       try {
+        const token = localStorage.getItem("access_token");
         const response = await fetch(
-          "http://localhost:8080/api/event/event-list"
+          "http://localhost:8080/api/event/event-list",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+          }
         );
         if (!response.ok) throw new Error("Không thể tải danh sách sự kiện");
 
@@ -41,5 +50,6 @@ export function useEventList() {
     };
     fetchEvents();
   }, []);
+
   return { events, loading, error };
 }
