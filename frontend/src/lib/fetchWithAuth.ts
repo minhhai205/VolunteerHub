@@ -1,8 +1,27 @@
 // /lib/fetchWithAuth.ts
-import { getAccessToken, getRefreshToken, saveTokens, clearTokens } from "@/lib/token";
+import {
+  getAccessToken,
+  getRefreshToken,
+  saveTokens,
+  clearTokens,
+} from "@/lib/token";
 
-export async function fetchWithAuth(input: RequestInfo, init?: RequestInit): Promise<Response> {
-  const accessToken = getAccessToken();
+export async function fetchWithAuth(
+  input: RequestInfo,
+  init?: RequestInit
+): Promise<Response> {
+  let accessToken = checkAndGetAccessToken() ?? "";
+
+  if (accessToken === "") {
+    const refreshed = await refreshAccessToken();
+
+    if (!refreshed) {
+      handleUnAuthorized();
+      return new Response(null, { status: 401 });
+    }
+
+    accessToken = getAccessToken() ?? "";
+  }
 
   const config: RequestInit = {
     ...init,
@@ -22,26 +41,26 @@ export async function fetchWithAuth(input: RequestInfo, init?: RequestInit): Pro
     return response;
   }
 
-  // Nếu backend trả status trong JSON khác 200 => token hết hạn
+  // Nếu backend trả status trong JSON khác 200 => token hết hạn or unauthorized
   if (result?.status !== 200) {
     const refreshed = await refreshAccessToken();
 
-    if (refreshed) {
-      // Gọi lại request với accessToken mới
-      const newAccessToken = getAccessToken();
-      const retryConfig: RequestInit = {
-        ...config,
-        headers: {
-          ...(config.headers || {}),
-          Authorization: `Bearer ${newAccessToken}`,
-        },
-      };
-
-      response = await fetch(input, retryConfig);
-    } else {
-      // Refresh thất bại → logout + chuyển về trang login
-      handleInvalidRefreshToken();
+    if (!refreshed) {
+      handleUnAuthorized();
+      return new Response(null, { status: 401 });
     }
+
+    // Gọi lại request với accessToken mới
+    const newAccessToken = getAccessToken();
+    const retryConfig: RequestInit = {
+      ...config,
+      headers: {
+        ...(config.headers || {}),
+        Authorization: `Bearer ${newAccessToken}`,
+      },
+    };
+
+    response = await fetch(input, retryConfig);
   }
 
   return response;
@@ -82,11 +101,27 @@ async function refreshAccessToken(): Promise<boolean> {
   }
 }
 
-function handleInvalidRefreshToken() {
+function handleUnAuthorized() {
   clearTokens();
 
-  // redirect về login
   if (typeof window !== "undefined") {
-    window.location.href = "/auth/login";
+    const currentPath = window.location.pathname + window.location.search;
+    const redirectUrl = `/auth/login?redirect=${encodeURIComponent(
+      currentPath
+    )}`;
+    window.location.replace(redirectUrl);
+  }
+}
+
+function checkAndGetAccessToken(): string {
+  const token = getAccessToken();
+  if (!token) return "";
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const isExpired = payload.exp * 1000 < Date.now();
+    return isExpired ? "" : token;
+  } catch {
+    return "";
   }
 }
