@@ -25,7 +25,13 @@ export default function EventCard({
   countPosts,
   imageUrl,
 }: EventCardProps) {
-  const formattedDate = new Date(startDate).toLocaleDateString("vi-VN", {
+  const formattedStartDate = new Date(startDate).toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
+  const formattedEndDate = new Date(endDate).toLocaleDateString("vi-VN", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -34,7 +40,11 @@ export default function EventCard({
   return (
     <div className={styles.eventCard}>
       {imageUrl && (
-        <img src={imageUrl} alt={name} className={styles.eventCardImage} />
+        <img
+          src={imageUrl || "/placeholder.svg"}
+          alt={name}
+          className={styles.eventCardImage}
+        />
       )}
 
       <div className={styles.eventCardContent}>
@@ -44,7 +54,11 @@ export default function EventCard({
         <div className={styles.eventCardInfo}>
           <div className={styles.eventCardDate}>
             <Calendar />
-            <span>{formattedDate}</span>
+            <span>Ngày bắt đầu: {formattedStartDate}</span>
+          </div>
+          <div className={styles.eventCardDate}>
+            <Calendar />
+            <span>Ngày kết thúc: {formattedEndDate}</span>
           </div>
           <div className={styles.eventCardLocation}>
             <MapPin />
@@ -54,17 +68,17 @@ export default function EventCard({
 
         <div className={styles.eventCardCategories}>
           <Tag />
-          <span>{categoryNames.join(", ")}</span>
+          <span>{categoryNames[0] || "Uncategorized"}</span>
         </div>
 
         <div className={styles.eventCardStats}>
           <div className={styles.eventCardStat}>
             <Users />
-            <span>{countMembers}</span>
+            <span>{countMembers} người tham gia</span>
           </div>
           <div className={styles.eventCardStat}>
             <MessageSquare />
-            <span>{countPosts}</span>
+            <span>{countPosts} bài viết</span>
           </div>
         </div>
       </div>
