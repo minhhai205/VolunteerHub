@@ -22,8 +22,8 @@ export async function fetchWithAuth(input: RequestInfo, init?: RequestInit): Pro
     return response;
   }
 
-  // Nếu backend trả status trong JSON là 401 => token hết hạn
-  if (result?.status === 401) {
+  // Nếu backend trả status trong JSON khác 200 => token hết hạn
+  if (result?.status !== 200) {
     const refreshed = await refreshAccessToken();
 
     if (refreshed) {
