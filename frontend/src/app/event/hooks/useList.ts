@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 export interface EventCardData {
   id: number;
@@ -23,7 +24,7 @@ export function useEventList() {
       setLoading(true);
       try {
         const token = localStorage.getItem("access_token");
-        const response = await fetch(
+        const response = await fetchWithAuth(
           "http://localhost:8080/api/event/event-list",
           {
             method: "GET",

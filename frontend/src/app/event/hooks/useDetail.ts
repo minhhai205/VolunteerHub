@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 export interface CommentData {
   id: number;
@@ -62,8 +63,8 @@ export const useDetail = (eventId: string): UseDetailResult => {
       try {
         setLoading(true);
         const [eventRes, postsRes] = await Promise.allSettled([
-          fetch(`http://localhost:8080/api/event/${eventId}`),
-          fetch(`http://localhost:8080/api/event/${eventId}/posts`),
+          fetchWithAuth(`http://localhost:8080/api/event/${eventId}`),
+          fetchWithAuth(`http://localhost:8080/api/event/${eventId}/posts`),
         ]);
 
         if (
