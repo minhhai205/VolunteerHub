@@ -17,7 +17,10 @@ import project.web.backend.repositories.UserRepository;
 import project.web.backend.utils.commons.SecurityUtil;
 import project.web.backend.utils.enums.ErrorCode;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,5 +48,33 @@ public class EventService {
         eventRepository.save(newEvent);
 
         return eventMapper.toResponseDTO(newEvent);
+    }
+
+    public List<EventResponseDTO> getAllEvents() {
+        log.info("------------ Get all events --------------");
+
+        List<Event> events = eventRepository.findAllWithCategories();
+        List<EventResponseDTO> eventResponses = events.stream().map(eventMapper::toResponseDTO).toList();
+
+        List<Long> eventsIds = events.stream().map(Event::getId).toList();
+
+        Map<Long, Long> memberCountMap = eventRepository.findCountMemberForEvents(eventsIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (Long) row[1]
+                ));
+
+        Map<Long, Long> postCountMap = eventRepository.findCountPostForEvents(eventsIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (Long) row[1]
+                ));
+
+        eventResponses.forEach(eventResponse -> {
+            eventResponse.setCountMembers(memberCountMap.get(eventResponse.getId()));
+            eventResponse.setCountPosts(postCountMap.get(eventResponse.getId()));
+        });
+
+        return eventResponses;
     }
 }
