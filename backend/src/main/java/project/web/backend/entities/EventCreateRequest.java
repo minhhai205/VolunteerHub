@@ -45,7 +45,7 @@ EventCreateRequest extends AbstractEntity {
     private Date endDate;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "events_categories"
+    @JoinTable(name = "events_create_categorys"
             , joinColumns = @JoinColumn(name = "event_id")
             , inverseJoinColumns = @JoinColumn(name = "category_id")
     )
