@@ -1,5 +1,5 @@
-import { RegisterForm } from "./RegisterForm"
-import { AuthLayout } from "../../AuthLayout"
+import { RegisterForm } from "./RegisterForm";
+import { AuthLayout } from "../../AuthLayout";
 
 export default function RegisterPage() {
   return (
@@ -11,5 +11,5 @@ export default function RegisterPage() {
     >
       <RegisterForm />
     </AuthLayout>
-  )
+  );
 }
