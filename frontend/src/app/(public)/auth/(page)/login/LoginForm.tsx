@@ -43,7 +43,9 @@ export function LoginForm() {
       saveTokens(result.data.accessToken, result.data.refreshToken);
       console.log("✅ Login success:", result);
 
-      router.push("/"); // chuyển về trang chủ
+      const params = new URLSearchParams(window.location.search); // chuyển về trang chủ hoặc trang trước đó
+      const redirectTo = params.get("redirect") || "/";
+      router.push(redirectTo);
     } catch (err) {
       console.error("❌ Login error:", err);
       setError(err instanceof Error ? err.message : "Đăng nhập thất bại!");
