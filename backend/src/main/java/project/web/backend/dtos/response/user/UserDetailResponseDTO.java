@@ -1,9 +1,7 @@
-package project.web.backend.dtos.response;
+package project.web.backend.dtos.response.user;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import project.web.backend.dtos.response.RoleResponseDTO;
 import project.web.backend.utils.enums.UserStatus;
 
 import java.io.Serializable;
@@ -13,9 +11,11 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserResponseDTO implements Serializable {
+public class UserDetailResponseDTO implements Serializable {
     private Long id;
     private String email;
     private String fullName;
     private UserStatus status;
+    private String phoneNumber;
+    private RoleResponseDTO role;
 }

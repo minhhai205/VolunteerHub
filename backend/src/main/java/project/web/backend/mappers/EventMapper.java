@@ -3,8 +3,8 @@ package project.web.backend.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import project.web.backend.dtos.request.EventRequestDTO;
-import project.web.backend.dtos.response.EventResponseDTO;
+import project.web.backend.dtos.request.event.EventRequestDTO;
+import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.entities.Category;
 import project.web.backend.entities.Event;
 

@@ -1,4 +1,4 @@
-package project.web.backend.dtos.response;
+package project.web.backend.dtos.response.event;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;

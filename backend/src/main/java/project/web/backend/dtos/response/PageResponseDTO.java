@@ -10,7 +10,9 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JwtResponseDTO implements Serializable {
-    private String accessToken;
-    private String refreshToken;
+public class PageResponseDTO<T> implements Serializable {
+    private int pageNo;
+    private int pageSize;
+    private int totalPage;
+    private T data;
 }
