@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import project.web.backend.utils.annotations.PhoneNumber;
 import project.web.backend.utils.enums.UserStatus;
 
 import java.util.Set;
@@ -38,6 +39,10 @@ public class User extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private UserStatus status;
+
+    @Column(name = "phone_number")
+    @PhoneNumber(message = "Phone number is invalid")
+    private String phoneNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
