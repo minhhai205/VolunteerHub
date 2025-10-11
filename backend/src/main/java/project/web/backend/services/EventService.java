@@ -3,19 +3,23 @@ package project.web.backend.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
 import org.springframework.stereotype.Service;
 import project.web.backend.dtos.request.event.EventRequestDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.entities.Category;
 import project.web.backend.entities.Event;
+import project.web.backend.entities.EventRegistration;
 import project.web.backend.entities.User;
 import project.web.backend.exceptions.AppException;
 import project.web.backend.mappers.EventMapper;
 import project.web.backend.repositories.CategoryRepository;
+import project.web.backend.repositories.EventRegistrationRepository;
 import project.web.backend.repositories.EventRepository;
 import project.web.backend.repositories.UserRepository;
 import project.web.backend.utils.commons.SecurityUtil;
 import project.web.backend.utils.enums.ErrorCode;
+import project.web.backend.utils.enums.EventRequestStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -30,6 +34,7 @@ public class EventService {
     private final EventMapper eventMapper;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final EventRegistrationRepository eventRegistrationRepository;
 
     public EventResponseDTO createEvent(EventRequestDTO eventRequestDTO) {
         log.info("------------ Create new event --------------");
@@ -76,5 +81,24 @@ public class EventService {
         });
 
         return eventResponses;
+    }
+
+    public String eventRegistration(Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+
+        String email = SecurityUtil.getCurrentEmail();
+        User currentUser = userRepository.findByEmailWithNoReferences(email)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXIST));
+
+        EventRegistration eventRegistration = EventRegistration.builder()
+                .user(currentUser)
+                .event(event)
+                .status(EventRequestStatus.PENDING)
+                .build();
+        eventRegistrationRepository.save(eventRegistration);
+
+        // send web push to all managers
+        return "Created registration request";
     }
 }

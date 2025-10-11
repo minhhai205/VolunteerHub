@@ -42,4 +42,15 @@ public class EventController {
                 .build();
     }
 
+    @PostMapping("/registration/{eventId}")
+    @PreAuthorize("hasRole('USER')")
+    public ApiSuccessResponse<String> eventRegistration(
+            @PathVariable Long eventId
+    ) {
+        return ApiSuccessResponse.<String>builder()
+                .data(eventService.eventRegistration(eventId))
+                .status(HttpStatus.OK.value())
+                .message("Register event successfully!")
+                .build();
+    }
 }
