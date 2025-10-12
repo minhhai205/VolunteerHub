@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Heart, Menu, LogOut, User, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
@@ -8,6 +9,7 @@ import styles from "./Header.module.css"
 import { clearTokens, getAccessToken, getRefreshToken } from "@/lib/token";
 
 export function Header() {
+  const pathname = usePathname()
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [user, setUser] = useState({
@@ -82,6 +84,14 @@ export function Header() {
     }
   }
 
+  // Helper function để kiểm tra active link
+  const isActive = (path: string) => {
+    if (path === '/home') {
+      return pathname === '/home' || pathname === '/'
+    }
+    return pathname.startsWith(path)
+  }
+
   return (
     <header className={styles.header}>
       <div className={styles.container}>
@@ -95,16 +105,28 @@ export function Header() {
 
         {/* Navigation */}
         <nav className={styles.nav}>
-          <Link href="/home" className={styles.navLink}>
+          <Link 
+            href="/home" 
+            className={`${styles.navLink} ${isActive('/home') ? styles.navLinkActive : ''}`}
+          >
             Trang chủ
           </Link>
-          <Link href="/event/list" className={styles.navLink}>
+          <Link 
+            href="/event/list" 
+            className={`${styles.navLink} ${isActive('/event') ? styles.navLinkActive : ''}`}
+          >
             Sự kiện
           </Link>
-          <Link href="/activity" className={styles.navLink}>
+          <Link 
+            href="/activity" 
+            className={`${styles.navLink} ${isActive('/activity') ? styles.navLinkActive : ''}`}
+          >
             Hoạt động
           </Link>
-          <Link href="/contact" className={styles.navLink}>
+          <Link 
+            href="/contact" 
+            className={`${styles.navLink} ${isActive('/contact') ? styles.navLinkActive : ''}`}
+          >
             Liên hệ
           </Link>
         </nav>

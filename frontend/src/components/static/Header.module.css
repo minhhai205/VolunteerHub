@@ -312,3 +312,43 @@
     min-width: 200px;
   }
 }
+
+/* Active Navigation Link */
+.navLinkActive {
+  color: #dc2626; /* Hoặc màu primary của bạn */
+  font-weight: 600;
+  position: relative;
+}
+
+.navLinkActive::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #dc2626; /* Hoặc màu primary của bạn */
+  border-radius: 2px;
+}
+
+/* Nếu bạn muốn hiệu ứng underline mượt hơn */
+.navLink {
+  position: relative;
+  transition: color 0.2s;
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: transparent;
+  border-radius: 2px;
+  transition: background-color 0.2s;
+}
+
+.navLink:hover::after {
+  background-color: rgba(220, 38, 38, 0.3);
+}
