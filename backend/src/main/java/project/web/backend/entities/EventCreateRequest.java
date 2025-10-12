@@ -34,6 +34,9 @@ EventCreateRequest extends AbstractEntity {
     @Column(name = "location", nullable = false)
     private String location;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @NotNull(message = "Start date must not be null")
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "start_date", nullable = false)

@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import project.web.backend.dtos.request.LoginRequestDTO;
-import project.web.backend.dtos.request.RefreshRequestDTO;
-import project.web.backend.dtos.request.RegisterRequestDTO;
+import project.web.backend.dtos.request.auth.LoginRequestDTO;
+import project.web.backend.dtos.request.auth.RefreshRequestDTO;
+import project.web.backend.dtos.request.auth.RegisterRequestDTO;
 import project.web.backend.dtos.response.ApiSuccessResponse;
-import project.web.backend.dtos.response.JwtResponseDTO;
-import project.web.backend.dtos.response.UserResponseDTO;
+import project.web.backend.dtos.response.auth.JwtResponseDTO;
+import project.web.backend.dtos.response.user.UserResponseDTO;
 import project.web.backend.services.AuthenticationService;
 
 @RestController

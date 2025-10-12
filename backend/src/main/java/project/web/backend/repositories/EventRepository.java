@@ -20,21 +20,21 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findAllWithCategories();
 
     @Query("""
-        SELECT e.id, COUNT(m.id)
-        FROM Event e
-        LEFT JOIN e.members m
-        WHERE e.id IN :eventIds
-        GROUP BY e.id
-    """)
+                SELECT e.id, COUNT(m.id)
+                FROM Event e
+                LEFT JOIN e.members m
+                WHERE e.id IN :eventIds
+                GROUP BY e.id
+            """)
     List<Object[]> findCountMemberForEvents(@Param("eventIds") List<Long> eventIds);
 
     @Query("""
-        SELECT e.id, COUNT(p.id)
-        FROM Event e
-        LEFT JOIN e.posts p
-        WHERE e.id IN :eventIds
-        GROUP BY e.id
-    """)
+                SELECT e.id, COUNT(p.id)
+                FROM Event e
+                LEFT JOIN e.posts p
+                WHERE e.id IN :eventIds
+                GROUP BY e.id
+            """)
     List<Object[]> findCountPostForEvents(@Param("eventIds") List<Long> eventIds);
 
 }

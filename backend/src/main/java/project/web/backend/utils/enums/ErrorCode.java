@@ -18,7 +18,9 @@ public enum ErrorCode {
     PASSWORD_INVALID(401, "Your password was invalid, please try again", HttpStatus.UNAUTHORIZED),
     TOKEN_INVALID(400, "Your token type was not allowed, please try again with others", HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED(400, "Email is existed, please choose other email and try again", HttpStatus.BAD_REQUEST),
-    ROLE_NOT_EXISTED(400, "Role was not existed in DB server", HttpStatus.BAD_REQUEST);;
+    ROLE_NOT_EXISTED(400, "Role was not existed in DB server", HttpStatus.BAD_REQUEST),
+    USER_NOT_EXISTED(400, "User not existed", HttpStatus.BAD_REQUEST),
+    EVENT_NOT_EXISTED(400, "Event was not existed", HttpStatus.BAD_REQUEST);
     private final int code;
     private final String message;
     private final HttpStatus httpStatus;
