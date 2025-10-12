@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.web.backend.dtos.request.event.EventRequestDTO;
 import project.web.backend.dtos.response.ApiSuccessResponse;
+import project.web.backend.dtos.response.event.EventCreateRequestResponseDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.services.EventService;
 
@@ -20,18 +21,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
-
-    @PostMapping("/create")
-    @PreAuthorize("hasAnyRole({'MANAGER'})")
-    public ApiSuccessResponse<EventResponseDTO> login(
-            @Valid @RequestBody EventRequestDTO eventRequestDTO
-    ) {
-        return ApiSuccessResponse.<EventResponseDTO>builder()
-                .data(eventService.createEvent(eventRequestDTO))
-                .message("Created!")
-                .status(HttpStatus.OK.value())
-                .build();
-    }
 
     @GetMapping("/event-list")
     public ApiSuccessResponse<List<EventResponseDTO>> getAllEvents() {

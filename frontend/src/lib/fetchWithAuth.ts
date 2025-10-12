@@ -41,8 +41,8 @@ export async function fetchWithAuth(
     return response;
   }
 
-  // Nếu backend trả status trong JSON khác 200 => token hết hạn or unauthorized
-  if (result?.status !== 200) {
+  // Nếu backend trả status trong JSON 401 => token hết hạn or unauthorized
+  if (result?.status === 401) {
     const refreshed = await refreshAccessToken();
 
     if (!refreshed) {
