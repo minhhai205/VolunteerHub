@@ -12,7 +12,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventResponseDTO implements Serializable {
+public class EventCreateRequestResponseDTO implements Serializable {
     private Long id;
 
     private String name;
@@ -29,10 +29,4 @@ public class EventResponseDTO implements Serializable {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Set<String> categoryNames;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long countMembers;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long countPosts;
 }
