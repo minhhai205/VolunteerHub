@@ -1,66 +1,45 @@
-import Link from "next/link";
-import { Heart, Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import Link from "next/link"
+import { Heart, Menu } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import styles from "./Header.module.css"
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+    <header className={styles.header}>
+      <div className={styles.container}>
         {/* Logo and Brand */}
-        <Link
-          href="/"
-          className="flex items-center gap-2 transition-opacity hover:opacity-80"
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary">
-            <Heart
-              className="h-5 w-5 text-primary-foreground"
-              fill="currentColor"
-            />
+        <Link href="/" className={styles.logo}>
+          <div className={styles.logoIcon}>
+            <Heart className={styles.logoIconSvg} fill="currentColor" />
           </div>
-          <span className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
-            UETVolunteer
-          </span>
+          <span className={styles.brandName}>UET Volunteer</span>
         </Link>
 
         {/* Navigation */}
-        <nav className="hidden items-center gap-6 md:flex">
-          <Link
-            href="/about"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Về chúng tôi
+        <nav className={styles.nav}>
+          <Link href="/home" className={styles.navLink}>
+            Trang chủ
           </Link>
-          <Link
-            href="/activities"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
+          <Link href="/event/list" className={styles.navLink}>
+            Sự kiện
+          </Link>
+          <Link href="/activity" className={styles.navLink}>
             Hoạt động
           </Link>
-          <Link
-            href="/volunteer"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Tình nguyện
-          </Link>
-          <Link
-            href="/contact"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
+          <Link href="/contact" className={styles.navLink}>
             Liên hệ
           </Link>
         </nav>
 
         {/* CTA and Mobile Menu */}
-        <div className="flex items-center gap-3">
-          <Button className="hidden bg-primary text-primary-foreground hover:bg-primary/90 md:inline-flex">
-            Đóng góp
-          </Button>
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Menu className="h-5 w-5" />
+        <div className={styles.actions}>
+          <Button className={styles.ctaButton}>Đăng nhập</Button>
+          <Button variant="ghost" size="icon" className={styles.menuButton}>
+            <Menu className={styles.menuIcon} />
             <span className="sr-only">Menu</span>
           </Button>
         </div>
       </div>
     </header>
-  );
+  )
 }
