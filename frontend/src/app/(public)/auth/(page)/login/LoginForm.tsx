@@ -44,7 +44,7 @@ export function LoginForm() {
       console.log("✅ Login success:", result);
 
       const params = new URLSearchParams(window.location.search); // chuyển về trang chủ hoặc trang trước đó
-      const redirectTo = params.get("redirect") || "/";
+      const redirectTo = params.get("redirect") || "/home";
       router.push(redirectTo);
     } catch (err) {
       console.error("❌ Login error:", err);

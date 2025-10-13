@@ -1,0 +1,495 @@
+/* Home Page - Standalone CSS Module */
+/* All styles are self-contained without relying on globals.css */
+
+.wrapper {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+}
+
+/* Hero Section */
+.heroSection {
+  margin: 0 auto;
+  padding: 4rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .heroSection {
+    padding: 6rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .heroSection {
+    padding: 8rem 1.5rem;
+  }
+}
+
+.heroContent {
+  max-width: 48rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #1a1a1a;
+  text-wrap: balance;
+}
+
+@media (min-width: 768px) {
+  .heroTitle {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .heroTitle {
+    font-size: 3.75rem;
+  }
+}
+
+.heroDescription {
+  margin-top: 1.5rem;
+  font-size: 1.125rem;
+  line-height: 1.625;
+  color: #6b7280;
+  text-wrap: pretty;
+}
+
+@media (min-width: 768px) {
+  .heroDescription {
+    font-size: 1.25rem;
+  }
+}
+
+.heroActions {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .heroActions {
+    flex-direction: row;
+  }
+}
+
+/* Updated primary button to light green with gradient */
+.heroPrimaryButton {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #ffffff;
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+}
+
+.heroPrimaryButton:hover {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+  transform: translateY(-1px);
+}
+
+.heroArrowIcon {
+  margin-left: 0.5rem;
+  height: 1rem;
+  width: 1rem;
+}
+
+/* Stats Section */
+.statsSection {
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(22, 163, 74, 0.05) 100%);
+  padding: 3rem 0;
+}
+
+.statsContainer {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .statsContainer {
+    padding: 0 1.5rem;
+  }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .statsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.statItem {
+  text-align: center;
+}
+
+/* Updated stat number color to light green with gradient text */
+.statNumber {
+  font-size: 1.875rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@media (min-width: 768px) {
+  .statNumber {
+    font-size: 2.25rem;
+  }
+}
+
+.statLabel {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Values Section */
+.valuesSection {
+  margin: 0 auto;
+  padding: 4rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .valuesSection {
+    padding: 6rem 1.5rem;
+  }
+}
+
+.valuesHeader {
+  max-width: 42rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.valuesTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #1a1a1a;
+  text-wrap: balance;
+}
+
+@media (min-width: 768px) {
+  .valuesTitle {
+    font-size: 2.25rem;
+  }
+}
+
+.valuesDescription {
+  margin-top: 1rem;
+  color: #6b7280;
+  text-wrap: pretty;
+}
+
+.valuesGrid {
+  max-width: 80rem;
+  margin: 3rem auto 0;
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .valuesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .valuesGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.valueCard {
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+/* Updated hover state with green shadow */
+.valueCard:hover {
+  box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.1), 0 4px 6px -2px rgba(34, 197, 94, 0.05);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+/* Updated icon background to light green */
+.valueIcon {
+  margin-bottom: 0.5rem;
+  display: flex;
+  height: 3rem;
+  width: 3rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.1) 100%);
+}
+
+.valueIconSvg {
+  height: 1.5rem;
+  width: 1.5rem;
+  color: #22c55e;
+}
+
+.valueTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.valueDescription {
+  line-height: 1.625;
+  color: #6b7280;
+}
+
+/* Activities Section */
+.activitiesSection {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.03) 0%, rgba(22, 163, 74, 0.03) 100%);
+  padding: 4rem 0;
+}
+
+@media (min-width: 768px) {
+  .activitiesSection {
+    padding: 6rem 0;
+  }
+}
+
+.activitiesContainer {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .activitiesContainer {
+    padding: 0 1.5rem;
+  }
+}
+
+.activitiesHeader {
+  max-width: 42rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.activitiesTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #1a1a1a;
+  text-wrap: balance;
+}
+
+@media (min-width: 768px) {
+  .activitiesTitle {
+    font-size: 2.25rem;
+  }
+}
+
+.activitiesDescription {
+  margin-top: 1rem;
+  color: #6b7280;
+  text-wrap: pretty;
+}
+
+.activitiesGrid {
+  max-width: 80rem;
+  margin: 3rem auto 0;
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .activitiesGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.activityCard {
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+/* Added hover effect with green shadow */
+.activityCard:hover {
+  box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.1), 0 4px 6px -2px rgba(34, 197, 94, 0.05);
+  border-color: rgba(34, 197, 94, 0.3);
+  transform: translateY(-2px);
+}
+
+.activityImage {
+  margin-bottom: 0.75rem;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background-color: #f3f4f6;
+}
+
+.activityImageElement {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.activityTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.activityDate {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Updated calendar icon color to green */
+.activityDateIcon {
+  height: 1rem;
+  width: 1rem;
+  color: #22c55e;
+}
+
+.activityDescription {
+  line-height: 1.625;
+  color: #6b7280;
+}
+
+/* CTA Section */
+.ctaSection {
+  margin: 0 auto;
+  padding: 4rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .ctaSection {
+    padding: 6rem 1.5rem;
+  }
+}
+
+/* Updated CTA box background to light green gradient */
+.ctaBox {
+  max-width: 48rem;
+  margin: 0 auto;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.1) 100%);
+  padding: 3rem 1.5rem;
+  text-align: center;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+@media (min-width: 768px) {
+  .ctaBox {
+    padding: 4rem 3rem;
+  }
+}
+
+.ctaTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #1a1a1a;
+  text-wrap: balance;
+}
+
+@media (min-width: 768px) {
+  .ctaTitle {
+    font-size: 2.25rem;
+  }
+}
+
+.ctaDescription {
+  margin-top: 1rem;
+  font-size: 1.125rem;
+  color: #6b7280;
+  text-wrap: pretty;
+}
+
+.ctaActions {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .ctaActions {
+    flex-direction: row;
+  }
+}
+
+/* Updated CTA button to light green with gradient */
+.ctaPrimaryButton {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #ffffff;
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+}
+
+.ctaPrimaryButton:hover {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+  transform: translateY(-1px);
+}
+
+.heroSection {
+  background: #f3fbf5;
+}
+
+.statsSection {
+  background-color: #e0ebe1;
+}
+
+.valuesSection {
+  background-color: #edf7f0;
+}
+
+.activitiesSection {
+  background-color: #e0ebe1;
+}
+
+.ctaSection {
+  background: #edf7f0;
+}
+
+

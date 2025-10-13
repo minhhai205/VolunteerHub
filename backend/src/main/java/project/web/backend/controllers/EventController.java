@@ -2,15 +2,15 @@ package project.web.backend.controllers;
 
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import project.web.backend.dtos.request.EventRequestDTO;
+import project.web.backend.dtos.request.event.EventRequestDTO;
 import project.web.backend.dtos.response.ApiSuccessResponse;
-import project.web.backend.dtos.response.EventResponseDTO;
+import project.web.backend.dtos.response.event.EventCreateRequestResponseDTO;
+import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.services.EventService;
 
 import java.util.List;
@@ -22,18 +22,6 @@ import java.util.List;
 public class EventController {
     private final EventService eventService;
 
-    @PostMapping("/create")
-    @PreAuthorize("hasAnyRole({'MANAGER'})")
-    public ApiSuccessResponse<EventResponseDTO> login(
-            @Valid @RequestBody EventRequestDTO eventRequestDTO
-    ) {
-        return ApiSuccessResponse.<EventResponseDTO>builder()
-                .data(eventService.createEvent(eventRequestDTO))
-                .message("Created!")
-                .status(HttpStatus.OK.value())
-                .build();
-    }
-
     @GetMapping("/event-list")
     public ApiSuccessResponse<List<EventResponseDTO>> getAllEvents() {
         return ApiSuccessResponse.<List<EventResponseDTO>>builder()
@@ -43,4 +31,15 @@ public class EventController {
                 .build();
     }
 
+    @PostMapping("/registration/{eventId}")
+    @PreAuthorize("hasRole('USER')")
+    public ApiSuccessResponse<String> eventRegistration(
+            @PathVariable Long eventId
+    ) {
+        return ApiSuccessResponse.<String>builder()
+                .data(eventService.eventRegistration(eventId))
+                .status(HttpStatus.OK.value())
+                .message("Register event successfully!")
+                .build();
+    }
 }
