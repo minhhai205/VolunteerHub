@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { NotificationsDropdown } from "./Notification";
 
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
@@ -27,8 +28,8 @@ const Navbar = () => {
       </Button> */}
       {/* RIGHT */}
       <div className="flex items-center gap-4">
-        <Link href="/">Dashboard</Link>
         {/* THEME MENU */}
+        <NotificationsDropdown />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon">
