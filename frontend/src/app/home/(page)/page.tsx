@@ -1,23 +1,37 @@
-import { Header } from "@/components/static/Header"
-import { Footer } from "@/components/static/Footer"
-import { Button } from "@/components/ui/button"
-import Image from "next/image"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Heart, Users, Target, Award, ArrowRight, Calendar } from "lucide-react"
-import styles from "./page.module.css"
+import { Header } from "@/components/static/Header";
+import { Footer } from "@/components/static/Footer";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Heart,
+  Users,
+  Target,
+  Award,
+  ArrowRight,
+  Calendar,
+} from "lucide-react";
+import styles from "./page.module.css";
 
 export default function Home() {
   return (
     <div className={styles.wrapper}>
-      <Header />
-
       <main className={styles.main}>
         {/* Hero Section */}
         <section className={styles.heroSection}>
           <div className={styles.heroContent}>
-            <h1 className={styles.heroTitle}>Chào mừng đến với UET Volunteer</h1>
+            <h1 className={styles.heroTitle}>
+              Chào mừng đến với UET Volunteer
+            </h1>
             <p className={styles.heroDescription}>
-              Nơi kết nối những trái tim yêu thương, cùng nhau tạo nên những giá trị ý nghĩa cho cộng đồng.
+              Nơi kết nối những trái tim yêu thương, cùng nhau tạo nên những giá
+              trị ý nghĩa cho cộng đồng.
             </p>
             <div className={styles.heroActions}>
               <Button size="lg" className={styles.heroPrimaryButton}>
@@ -59,7 +73,9 @@ export default function Home() {
         <section className={styles.valuesSection}>
           <div className={styles.valuesHeader}>
             <h2 className={styles.valuesTitle}>Giá trị cốt lõi</h2>
-            <p className={styles.valuesDescription}>Những giá trị định hướng mọi hoạt động của chúng tôi</p>
+            <p className={styles.valuesDescription}>
+              Những giá trị định hướng mọi hoạt động của chúng tôi
+            </p>
           </div>
 
           <div className={styles.valuesGrid}>
@@ -126,7 +142,9 @@ export default function Home() {
           <div className={styles.activitiesContainer}>
             <div className={styles.activitiesHeader}>
               <h2 className={styles.activitiesTitle}>Hoạt động gần đây</h2>
-              <p className={styles.activitiesDescription}>Những hoạt động từ thiện ý nghĩa mà chúng tôi đã thực hiện</p>
+              <p className={styles.activitiesDescription}>
+                Những hoạt động từ thiện ý nghĩa mà chúng tôi đã thực hiện
+              </p>
             </div>
 
             <div className={styles.activitiesGrid}>
@@ -141,7 +159,9 @@ export default function Home() {
                       height={38}
                     />
                   </div>
-                  <CardTitle className={styles.activityTitle}>Trao học bổng cho học sinh nghèo</CardTitle>
+                  <CardTitle className={styles.activityTitle}>
+                    Trao học bổng cho học sinh nghèo
+                  </CardTitle>
                   <div className={styles.activityDate}>
                     <Calendar className={styles.activityDateIcon} />
                     <span>15/03/2024</span>
@@ -149,7 +169,8 @@ export default function Home() {
                 </CardHeader>
                 <CardContent>
                   <CardDescription className={styles.activityDescription}>
-                    Trao 50 suất học bổng cho học sinh có hoàn cảnh khó khăn tại vùng cao
+                    Trao 50 suất học bổng cho học sinh có hoàn cảnh khó khăn tại
+                    vùng cao
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -165,7 +186,9 @@ export default function Home() {
                       height={38}
                     />
                   </div>
-                  <CardTitle className={styles.activityTitle}>Chăm sóc người cao tuổi</CardTitle>
+                  <CardTitle className={styles.activityTitle}>
+                    Chăm sóc người cao tuổi
+                  </CardTitle>
                   <div className={styles.activityDate}>
                     <Calendar className={styles.activityDateIcon} />
                     <span>08/03/2024</span>
@@ -173,7 +196,8 @@ export default function Home() {
                 </CardHeader>
                 <CardContent>
                   <CardDescription className={styles.activityDescription}>
-                    Tổ chức hoạt động thăm hỏi và chăm sóc người cao tuổi tại viện dưỡng lão
+                    Tổ chức hoạt động thăm hỏi và chăm sóc người cao tuổi tại
+                    viện dưỡng lão
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -189,7 +213,9 @@ export default function Home() {
                       height={38}
                     />
                   </div>
-                  <CardTitle className={styles.activityTitle}>Trồng cây xanh bảo vệ môi trường</CardTitle>
+                  <CardTitle className={styles.activityTitle}>
+                    Trồng cây xanh bảo vệ môi trường
+                  </CardTitle>
                   <div className={styles.activityDate}>
                     <Calendar className={styles.activityDateIcon} />
                     <span>01/03/2024</span>
@@ -197,7 +223,8 @@ export default function Home() {
                 </CardHeader>
                 <CardContent>
                   <CardDescription className={styles.activityDescription}>
-                    Trồng 200 cây xanh tại khu vực công viên và trường học trong khu vực
+                    Trồng 200 cây xanh tại khu vực công viên và trường học trong
+                    khu vực
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -208,9 +235,12 @@ export default function Home() {
         {/* CTA Section */}
         <section className={styles.ctaSection}>
           <div className={styles.ctaBox}>
-            <h2 className={styles.ctaTitle}>Cùng chúng tôi tạo nên sự khác biệt</h2>
+            <h2 className={styles.ctaTitle}>
+              Cùng chúng tôi tạo nên sự khác biệt
+            </h2>
             <p className={styles.ctaDescription}>
-              Mỗi hành động nhỏ đều có thể tạo nên những thay đổi lớn. Hãy tham gia cùng chúng tôi!
+              Mỗi hành động nhỏ đều có thể tạo nên những thay đổi lớn. Hãy tham
+              gia cùng chúng tôi!
             </p>
             <div className={styles.ctaActions}>
               <Button size="lg" className={styles.ctaPrimaryButton}>
@@ -223,8 +253,6 @@ export default function Home() {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
-  )
+  );
 }
