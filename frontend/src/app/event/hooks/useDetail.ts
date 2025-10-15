@@ -63,9 +63,11 @@ export const useDetail = (eventId: string): UseDetailResult => {
       try {
         setLoading(true);
         const [eventRes, postsRes] = await Promise.allSettled([
-          fetchWithAuth(`http://localhost:8080/api/event/${eventId}`),
-          fetchWithAuth(`http://localhost:8080/api/event/${eventId}/posts`),
+          fetchWithAuth(`http://localhost:8080/api/events/${eventId}`),
+          fetchWithAuth(`http://localhost:8080/api/events/${eventId}/posts`),
         ]);
+
+        console.log("eventRes.status: ", eventRes.status)
 
         if (
           eventRes.status === "rejected" ||
