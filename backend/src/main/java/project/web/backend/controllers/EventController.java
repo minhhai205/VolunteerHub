@@ -54,4 +54,17 @@ public class EventController {
                 .message("Get event details successfully!")
                 .build();
     }
+
+    @PatchMapping("/update/{eventId}")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ApiSuccessResponse<EventResponseDTO> updateEvent(
+            @PathVariable Long eventId,
+            @Valid @RequestBody EventRequestDTO eventRequestDTO
+    ) {
+        return ApiSuccessResponse.<EventResponseDTO>builder()
+                .data(eventService.updateEvent(eventId, eventRequestDTO))
+                .status(HttpStatus.OK.value())
+                .message("Update event successfully!")
+                .build();
+    }
 }

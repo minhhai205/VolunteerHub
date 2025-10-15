@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.web.backend.dtos.request.event.EventRequestDTO;
 import project.web.backend.dtos.response.event.EventCreateRequestResponseDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
@@ -30,6 +31,7 @@ public class EventService {
     private final EventMapper eventMapper;
     private final UserRepository userRepository;
     private final EventRegistrationRepository eventRegistrationRepository;
+    private final CategoryRepository categoryRepository;
 
     public List<EventResponseDTO> getAllEvents() {
         log.info("------------ Get all events --------------");
@@ -83,6 +85,33 @@ public class EventService {
 
         Event event = eventRepository.findEventById(eventId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+
+        return eventMapper.toResponseDTO(event);
+    }
+
+//    @Transactional
+    public EventResponseDTO updateEvent(Long eventId, EventRequestDTO eventRequestDTO) {
+        log.info("------------ Update event --------------");
+
+        Event event = eventRepository.findEventByIdWithManager(eventId)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+
+        String email = SecurityUtil.getCurrentEmail();
+
+        if(!event.getManager().getEmail().equals(email)) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
+
+        event.setName(eventRequestDTO.getName());
+        event.setDescription(eventRequestDTO.getDescription());
+        event.setLocation(eventRequestDTO.getLocation());
+        event.setStartDate(eventRequestDTO.getStartDate());
+        event.setEndDate(eventRequestDTO.getEndDate());
+
+        Set<Category> categories = categoryRepository.findByNameIn(eventRequestDTO.getCategoryNames());
+        event.setCategories(categories);
+
+        eventRepository.save(event);
 
         return eventMapper.toResponseDTO(event);
     }

@@ -21,6 +21,13 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Optional<Event> findEventById(@Param("eventId") Long eventId);
 
     @EntityGraph(attributePaths = {
+            "categories",
+            "manager",
+    })
+    @Query("SELECT e FROM Event e WHERE e.id = :eventId")
+    Optional<Event> findEventByIdWithManager(@Param("eventId") Long eventId);
+
+    @EntityGraph(attributePaths = {
             "categories"
     })
     @Query("SELECT DISTINCT e FROM Event e")
