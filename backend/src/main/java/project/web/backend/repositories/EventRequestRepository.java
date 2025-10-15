@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import project.web.backend.entities.EventCreateRequest;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,4 +18,9 @@ public interface EventRequestRepository extends CrudRepository<EventCreateReques
             "manager"
     })
     Optional<EventCreateRequest> findById(Long requestId);
+
+    @EntityGraph(attributePaths = {
+            "categories",
+    })
+    List<EventCreateRequest> findAll();
 }

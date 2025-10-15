@@ -1,5 +1,6 @@
 package project.web.backend.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -10,12 +11,16 @@ import org.springframework.web.bind.annotation.*;
 import project.web.backend.dtos.request.event.EventRequestDTO;
 import project.web.backend.dtos.response.ApiSuccessResponse;
 import project.web.backend.dtos.response.event.EventRequestResponseDTO;
+import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.services.EventRequestService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/event-request")
 @Validated
 @RequiredArgsConstructor
+@Tag(name = "event request controller")
 public class EventRequestController {
     private final EventRequestService eventRequestService;
 
@@ -28,6 +33,15 @@ public class EventRequestController {
                 .data(eventRequestService.createEventRequest(eventRequestDTO))
                 .message("Created!")
                 .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @GetMapping("/request-list")
+    public ApiSuccessResponse<List<EventRequestResponseDTO>> getAllEventRequest() {
+        return ApiSuccessResponse.<List<EventRequestResponseDTO>>builder()
+                .data(eventRequestService.getAllEventRequest())
+                .status(HttpStatus.OK.value())
+                .message("Get all event request successfully!")
                 .build();
     }
 

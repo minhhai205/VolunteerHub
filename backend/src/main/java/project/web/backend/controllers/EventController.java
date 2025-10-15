@@ -1,6 +1,7 @@
 package project.web.backend.controllers;
 
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.List;
 @RequestMapping("/api/event")
 @Validated
 @RequiredArgsConstructor
+@Tag(name = "event controller")
 public class EventController {
     private final EventService eventService;
 

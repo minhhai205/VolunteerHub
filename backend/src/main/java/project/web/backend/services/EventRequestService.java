@@ -1,5 +1,6 @@
 package project.web.backend.services;
 
+import com.sun.jdi.request.EventRequest;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,10 @@ import project.web.backend.utils.commons.SecurityUtil;
 import project.web.backend.utils.enums.ErrorCode;
 import project.web.backend.utils.enums.EventRequestStatus;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +50,15 @@ public class EventRequestService {
         eventRequestRepository.save(newRequest);
 
         return eventRequestMapper.toResponseDTO(newRequest);
+    }
+
+    public List<EventRequestResponseDTO> getAllEventRequest() {
+        log.info("------------ Get all events request --------------");
+
+        List<EventCreateRequest> eventRequests = eventRequestRepository.findAll();
+
+        return eventRequests.stream()
+                .map(eventRequestMapper::toResponseDTO).toList();
     }
 
     @Transactional
