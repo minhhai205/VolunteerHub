@@ -31,7 +31,7 @@ public class EventRequestController {
                 .build();
     }
 
-    @PatchMapping("/approved/{requestId}")
+    @PatchMapping("/approve/{requestId}")
     @PreAuthorize("hasAnyRole({'ADMIN'})")
     public ApiSuccessResponse<EventRequestResponseDTO> approveEventRequest(
             @PathVariable @Min(value = 1, message = "Request id must be greater than 0") Long requestId
@@ -39,6 +39,18 @@ public class EventRequestController {
         return ApiSuccessResponse.<EventRequestResponseDTO>builder()
                 .data(eventRequestService.approveEventRequest(requestId))
                 .message("Approved!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @PatchMapping("/reject/{requestId}")
+    @PreAuthorize("hasAnyRole({'ADMIN'})")
+    public ApiSuccessResponse<EventRequestResponseDTO> rejectEventRequest(
+            @PathVariable @Min(value = 1, message = "Request id must be greater than 0") Long requestId
+    ) {
+        return ApiSuccessResponse.<EventRequestResponseDTO>builder()
+                .data(eventRequestService.rejectEventRequest(requestId))
+                .message("Rejected!")
                 .status(HttpStatus.OK.value())
                 .build();
     }

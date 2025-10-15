@@ -67,4 +67,24 @@ public class EventRequestService {
 
         return eventRequestMapper.toResponseDTO(request);
     }
+
+    @Transactional
+    public EventRequestResponseDTO rejectEventRequest(Long requestId) {
+        log.info("------------ Reject event request --------------");
+
+        EventCreateRequest request = eventRequestRepository.findById(requestId)
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_EXISTED));
+
+        if(request.getStatus() != EventRequestStatus.PENDING) {
+            throw new AppException(ErrorCode.REQUEST_INVALID);
+        }
+
+        request.setStatus(EventRequestStatus.REJECTED);
+
+        eventRequestRepository.save(request);
+
+        // send web push to manager
+
+        return eventRequestMapper.toResponseDTO(request);
+    }
 }
