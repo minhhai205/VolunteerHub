@@ -10,7 +10,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.web.backend.dtos.request.event.EventRequestDTO;
 import project.web.backend.dtos.response.ApiSuccessResponse;
-import project.web.backend.dtos.response.event.EventCreateRequestResponseDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.services.EventService;
 
