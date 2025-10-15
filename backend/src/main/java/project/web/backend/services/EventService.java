@@ -77,4 +77,13 @@ public class EventService {
         // send web push to all managers
         return "Created registration request";
     }
+
+    public EventResponseDTO getEventDetails(Long eventId) {
+        log.info("------------ Get event details --------------");
+
+        Event event = eventRepository.findEventById(eventId)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+
+        return eventMapper.toResponseDTO(event);
+    }
 }

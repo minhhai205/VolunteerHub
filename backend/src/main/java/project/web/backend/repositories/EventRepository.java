@@ -9,9 +9,16 @@ import org.springframework.stereotype.Repository;
 import project.web.backend.entities.Event;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
+
+    @EntityGraph(attributePaths = {
+            "categories"
+    })
+    @Query("SELECT e FROM Event e WHERE e.id = :eventId")
+    Optional<Event> findEventById(@Param("eventId") Long eventId);
 
     @EntityGraph(attributePaths = {
             "categories"

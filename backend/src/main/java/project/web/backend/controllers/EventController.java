@@ -2,6 +2,7 @@ package project.web.backend.controllers;
 
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,6 +41,17 @@ public class EventController {
                 .data(eventService.eventRegistration(eventId))
                 .status(HttpStatus.OK.value())
                 .message("Register event successfully!")
+                .build();
+    }
+
+    @GetMapping("/{eventId}")
+    public ApiSuccessResponse<EventResponseDTO> getEventDetails(
+            @PathVariable @Min(value = 1, message = "Event id must be greater than 0") Long eventId
+    ) {
+        return ApiSuccessResponse.<EventResponseDTO>builder()
+                .data(eventService.getEventDetails(eventId))
+                .status(HttpStatus.OK.value())
+                .message("Get event details successfully!")
                 .build();
     }
 }
