@@ -1,15 +1,15 @@
 package project.web.backend.services;
 
 
-import com.fasterxml.jackson.databind.introspect.PotentialCreator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.web.backend.dtos.request.post.CreatePostRequestDTO;
+import project.web.backend.dtos.request.post.UpdatePostRequestDTO;
 import project.web.backend.dtos.response.PageResponseDTO;
-import project.web.backend.dtos.response.post.PostCreateResponseDTO;
+import project.web.backend.dtos.response.post.PostBasicResponseDTO;
 import project.web.backend.dtos.response.post.PostResponseDTO;
 import project.web.backend.entities.Event;
 import project.web.backend.entities.Post;
@@ -40,7 +40,7 @@ public class PostService {
     private final PostMapper postMapper;
 
     @Transactional
-    public PostCreateResponseDTO create(CreatePostRequestDTO dto) {
+    public PostBasicResponseDTO create(CreatePostRequestDTO dto) {
         Event event = eventRepository.findById(dto.getEventId())
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
         User currentUser = userRepository.findByEmailWithNoReferences(SecurityUtil.getCurrentEmail())
@@ -68,7 +68,40 @@ public class PostService {
         } else {
             postRepository.save(post);
         }
-        return postMapper.toCreateDTO(post);
+        return postMapper.toBasicDTO(post);
+    }
+
+    public PostBasicResponseDTO updatePost(Long postId, UpdatePostRequestDTO dto) {
+        User currentUser = userRepository.findByEmailWithNoReferences(SecurityUtil.getCurrentEmail())
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXIST));
+        Post post = postRepository.findByIdWithCreatedUserAndPostMedia(postId)
+                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXISTED));
+
+        if (!post.getUser().getId().equals(currentUser.getId())) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
+
+        post.setTitle(dto.getTitle());
+        post.setContent(dto.getContent());
+        if (dto.getMedias() == null || dto.getMedias().isEmpty()) {
+            postRepository.save(post);
+        } else {
+            List<PostMedia> medias = new ArrayList<>();
+            dto.getMedias().forEach(
+                    s -> medias.add(
+                            PostMedia.builder()
+                                    .fileUrl(s)
+                                    .post(post)
+                                    .build()
+                    )
+            );
+            // delete old records
+            postMediaRepository.deleteAllByIds(post.getMedias().stream().map(PostMedia::getId).toList());
+            post.setMedias(new HashSet<>(medias));
+            postRepository.save(post);
+            postMediaRepository.saveAll(medias);
+        }
+        return postMapper.toBasicDTO(post);
     }
 
     public PageResponseDTO<List<PostResponseDTO>> getPosts(Pageable pageable) {

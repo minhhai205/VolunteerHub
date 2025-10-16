@@ -22,7 +22,8 @@ public enum ErrorCode {
     USER_NOT_EXISTED(400, "User not existed", HttpStatus.BAD_REQUEST),
     REQUEST_INVALID(400, "Request invalid", HttpStatus.BAD_REQUEST),
     REQUEST_NOT_EXISTED(400, "Request not existed", HttpStatus.BAD_REQUEST),
-    EVENT_NOT_EXISTED(400, "Event was not existed", HttpStatus.BAD_REQUEST);
+    EVENT_NOT_EXISTED(400, "Event was not existed", HttpStatus.BAD_REQUEST),
+    POST_NOT_EXISTED(400, "Post was not existed, please try again", HttpStatus.BAD_REQUEST);
     private final int code;
     private final String message;
     private final HttpStatus httpStatus;
