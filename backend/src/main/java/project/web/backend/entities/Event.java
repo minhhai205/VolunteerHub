@@ -34,6 +34,9 @@ public class Event extends AbstractEntity {
     @Column(name = "location", nullable = false)
     private String location;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @NotNull(message = "Start date must not be null")
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "start_date", nullable = false)
@@ -50,7 +53,7 @@ public class Event extends AbstractEntity {
             , inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<Category> categories;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manager_id")
     private User manager;

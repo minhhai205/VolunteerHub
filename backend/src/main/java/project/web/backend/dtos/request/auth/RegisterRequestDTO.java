@@ -1,4 +1,4 @@
-package project.web.backend.dtos.request;
+package project.web.backend.dtos.request.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

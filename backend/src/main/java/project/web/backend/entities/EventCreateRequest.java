@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import project.web.backend.utils.annotations.EnumPattern;
+import project.web.backend.utils.enums.EventRequestStatus;
 
 import java.util.Date;
 import java.util.Set;
@@ -34,6 +36,9 @@ EventCreateRequest extends AbstractEntity {
     @Column(name = "location", nullable = false)
     private String location;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @NotNull(message = "Start date must not be null")
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "start_date", nullable = false)
@@ -45,7 +50,7 @@ EventCreateRequest extends AbstractEntity {
     private Date endDate;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "events_categories"
+    @JoinTable(name = "events_create_categories"
             , joinColumns = @JoinColumn(name = "event_id")
             , inverseJoinColumns = @JoinColumn(name = "category_id")
     )
@@ -54,4 +59,10 @@ EventCreateRequest extends AbstractEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manager_id")
     private User manager;
+
+    @EnumPattern(name = "event request status", regexp = "PENDING|APPROVED|REJECTED")
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private EventRequestStatus status;
 }

@@ -27,7 +27,6 @@ public class EventRegistration extends AbstractEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-
     @EnumPattern(name = "event request status", regexp = "PENDING|APPROVED|REJECTED")
     @NotNull
     @Enumerated(EnumType.STRING)
