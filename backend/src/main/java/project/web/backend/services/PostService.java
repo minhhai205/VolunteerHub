@@ -68,16 +68,16 @@ public class PostService {
         } else {
             postRepository.save(post);
         }
+        // web push api
         return postMapper.toBasicDTO(post);
     }
 
     public PostBasicResponseDTO updatePost(Long postId, UpdatePostRequestDTO dto) {
-        User currentUser = userRepository.findByEmailWithNoReferences(SecurityUtil.getCurrentEmail())
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXIST));
+        String email = SecurityUtil.getCurrentEmail();
         Post post = postRepository.findByIdWithCreatedUserAndPostMedia(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXISTED));
 
-        if (!post.getUser().getId().equals(currentUser.getId())) {
+        if (!post.getUser().getEmail().equals(email)) {
             throw new AppException(ErrorCode.ACCESS_DENIED);
         }
 

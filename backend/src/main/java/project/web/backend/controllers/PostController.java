@@ -26,8 +26,7 @@ import java.util.List;
 @Validated
 public class PostController {
     private final PostService postService;
-
-
+    
     @PostMapping("/create-post")
     @PreAuthorize("hasRole('USER') OR hasRole('MANAGER')")
     public ApiSuccessResponse<PostBasicResponseDTO> createPost(
