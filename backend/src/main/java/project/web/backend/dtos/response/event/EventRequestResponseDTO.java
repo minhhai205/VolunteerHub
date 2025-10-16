@@ -2,6 +2,7 @@ package project.web.backend.dtos.response.event;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
+import project.web.backend.utils.enums.EventRequestStatus;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,7 +13,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventCreateRequestResponseDTO implements Serializable {
+public class EventRequestResponseDTO implements Serializable {
     private Long id;
 
     private String name;
@@ -29,4 +30,6 @@ public class EventCreateRequestResponseDTO implements Serializable {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Set<String> categoryNames;
+
+    private EventRequestStatus status;
 }

@@ -23,6 +23,8 @@ public class EventRequestDTO implements Serializable {
     @NotBlank(message = "Location must not be blank")
     private String location;
 
+    private String imageUrl;
+
     @NotNull(message = "Start date must not be null")
     private Date startDate;
 
