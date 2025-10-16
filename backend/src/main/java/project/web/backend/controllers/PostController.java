@@ -26,7 +26,7 @@ import java.util.List;
 @Validated
 public class PostController {
     private final PostService postService;
-    
+
     @PostMapping("/create-post")
     @PreAuthorize("hasRole('USER') OR hasRole('MANAGER')")
     public ApiSuccessResponse<PostBasicResponseDTO> createPost(
@@ -39,13 +39,14 @@ public class PostController {
                 .build();
     }
 
-    @GetMapping("/post-list")
+    @GetMapping("/post-list/{eventId}")
     @PreAuthorize("hasRole('USER') OR hasRole('MANAGER')")
     public ApiSuccessResponse<PageResponseDTO<List<PostResponseDTO>>> getPosts(
-            Pageable pageable
+            Pageable pageable,
+            @PathVariable @Min(value = 1, message = "Event id must be greater than 0") Long eventId
     ) {
         return ApiSuccessResponse.<PageResponseDTO<List<PostResponseDTO>>>builder()
-                .data(postService.getPosts(pageable))
+                .data(postService.getPosts(pageable, eventId))
                 .status(HttpStatus.OK.value())
                 .message("Get all posts successfully")
                 .build();

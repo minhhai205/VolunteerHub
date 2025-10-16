@@ -12,7 +12,7 @@ import lombok.*;
 @Setter
 @Getter
 @Builder
-public class Comment extends AbstractEntity{
+public class Comment extends AbstractEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -26,6 +26,6 @@ public class Comment extends AbstractEntity{
     @JoinColumn(name = "user_id")
     private User user;
 
-    @NotBlank(message = "Content ")
+    @NotBlank(message = "Content must not be blank")
     private String content;
 }

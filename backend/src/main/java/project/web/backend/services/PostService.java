@@ -106,9 +106,9 @@ public class PostService {
         return postMapper.toBasicDTO(post);
     }
 
-    public PageResponseDTO<List<PostResponseDTO>> getPosts(Pageable pageable) {
+    public PageResponseDTO<List<PostResponseDTO>> getPosts(Pageable pageable, Long eventId) {
 
-        Page<Post> posts = postRepository.findAllPostsWithNoFetch(pageable);
+        Page<Post> posts = postRepository.findAllPostsWithNoFetch(pageable, eventId);
 
         List<Long> postIds = posts.stream()
                 .map(Post::getId).toList();

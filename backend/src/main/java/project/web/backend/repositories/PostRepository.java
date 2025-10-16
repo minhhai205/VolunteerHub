@@ -15,9 +15,10 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("""
             SELECT p FROM Post p
+            WHERE p.event.id=:eventId
             ORDER BY p.createdAt DESC
             """)
-    Page<Post> findAllPostsWithNoFetch(Pageable pageable);
+    Page<Post> findAllPostsWithNoFetch(Pageable pageable, @Param("eventId") Long eventId);
 
 
     @Query("""
