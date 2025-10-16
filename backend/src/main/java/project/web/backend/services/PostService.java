@@ -72,6 +72,8 @@ public class PostService {
         return postMapper.toBasicDTO(post);
     }
 
+
+    @Transactional
     public PostBasicResponseDTO updatePost(Long postId, UpdatePostRequestDTO dto) {
         String email = SecurityUtil.getCurrentEmail();
         Post post = postRepository.findByIdWithCreatedUserAndPostMedia(postId)
