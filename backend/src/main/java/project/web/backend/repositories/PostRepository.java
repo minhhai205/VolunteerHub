@@ -9,14 +9,16 @@ import org.springframework.stereotype.Repository;
 import project.web.backend.entities.Post;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("""
             SELECT p FROM Post p
+            WHERE p.event.id=:eventId
             ORDER BY p.createdAt DESC
             """)
-    Page<Post> findAllPostsWithNoFetch(Pageable pageable);
+    Page<Post> findAllPostsWithNoFetch(Pageable pageable, @Param("eventId") Long eventId);
 
 
     @Query("""
@@ -27,7 +29,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             WHERE p.id IN :ids
             """)
     List<Post> findAllPostsWithReferencesByIds(@Param("ids") List<Long> ids);
-    
+
 
     @Query("""
             SELECT p.id, COUNT(c.id) FROM Post p
@@ -45,4 +47,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             GROUP BY p.id
             """)
     List<Object[]> findAllPostsWithLikeCountByIds(@Param("ids") List<Long> ids);
+
+
+    @Query("""
+            SELECT p FROM Post p
+            JOIN FETCH p.user u
+            JOIN FETCH p.medias pm
+            WHERE p.id=:id
+            """)
+    Optional<Post> findByIdWithCreatedUserAndPostMedia(@Param("id") Long id);
 }

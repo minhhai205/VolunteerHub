@@ -2,8 +2,7 @@ package project.web.backend.dtos.response.post;
 
 
 import lombok.*;
-import project.web.backend.entities.Event;
-import project.web.backend.entities.User;
+
 
 import java.io.Serializable;
 import java.util.Date;
@@ -14,7 +13,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostCreateResponseDTO implements Serializable {
+public class PostBasicResponseDTO implements Serializable {
     private Long id;
     private Long eventId;
     private Long userId;
