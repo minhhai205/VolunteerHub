@@ -67,7 +67,7 @@ public class PushNotificationService {
                 .findByEndpoint(endpoint)
                 .orElse(new PushSubscription());
 
-        subscription.setId(currentUser.getId());
+        subscription.setUser(currentUser);
         subscription.setEndpoint(endpoint);
         subscription.setP256dh(p256dh);
         subscription.setAuth(auth);
