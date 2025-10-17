@@ -45,5 +45,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
             """)
     Page<User> getAllUsersAndManagers(Pageable pageable);
 
-
+    @Query("""
+            SELECT u FROM User u
+            LEFT JOIN u.role r
+            WHERE r.name='ADMIN'
+            """)
+    List<User> findAllAdmin();
 }

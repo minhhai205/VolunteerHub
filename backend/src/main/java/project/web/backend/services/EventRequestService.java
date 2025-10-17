@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.web.backend.dtos.request.event.EventRequestDTO;
+import project.web.backend.dtos.request.notification.NotificationPayload;
 import project.web.backend.dtos.response.event.EventRequestResponseDTO;
 import project.web.backend.entities.Category;
 import project.web.backend.entities.EventCreateRequest;
@@ -31,6 +32,7 @@ public class EventRequestService {
     private final EventRequestMapper eventRequestMapper;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final PushNotificationService pushNotificationService;
 
     public EventRequestResponseDTO createEventRequest(EventRequestDTO eventRequestDTO) {
         log.info("------------ Create new event request --------------");
@@ -48,6 +50,17 @@ public class EventRequestService {
         newRequest.setManager(currentUser);
 
         eventRequestRepository.save(newRequest);
+
+        // Send notification
+        NotificationPayload payload = NotificationPayload.builder()
+                .title("Yêu cầu tạo event!")
+                .body(String.format("%s đã gửi yêu cầu tạo event mới!", currentUser.getFullName()))
+                .url("http://localhost:3000/event/list")
+                .build();
+
+        List<User> admins = userRepository.findAllAdmin();
+        List<Long> adminIds = admins.stream().map(User::getId).toList();
+        pushNotificationService.sendNotificationToAll(payload, adminIds);
 
         return eventRequestMapper.toResponseDTO(newRequest);
     }
