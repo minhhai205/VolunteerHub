@@ -14,7 +14,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Builder
-public class Post extends AbstractEntity{
+public class Post extends AbstractEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -37,14 +37,11 @@ public class Post extends AbstractEntity{
     private String content;
 
     @OneToMany(mappedBy = "post")
-    private Set<Comment>comments;
+    private Set<Comment> comments;
 
     @OneToMany(mappedBy = "post")
-    private Set<PostMedia>medias;
+    private Set<PostMedia> medias;
 
     @OneToMany(mappedBy = "post")
-    private Set<PostMedia> postMedias;
-
-    @OneToMany(mappedBy = "post")
-    private Set<Like>likes;
+    private Set<Like> likes;
 }

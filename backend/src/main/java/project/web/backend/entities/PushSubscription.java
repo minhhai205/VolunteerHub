@@ -1,31 +1,33 @@
 package project.web.backend.entities;
 
-
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
-@Table(name = "comments")
+@Table(name = "push_subscriptions")
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
 @Getter
 @Builder
-public class Comment extends AbstractEntity {
+public class PushSubscription extends AbstractEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @NotBlank(message = "Content must not be blank")
-    private String content;
+    @Column(nullable = false, unique = true)
+    private String endpoint;
+
+    @Column(nullable = false)
+    private String p256dh;
+
+    @Column(nullable = false)
+    private String auth;
+
+    @Column(nullable = false)
+    private boolean active = true;
 }
