@@ -6,15 +6,53 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Users, UserCog } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import UserDetailDialog from "./components/UserDetailDialog";
+import LockDialog from "./components/LockDialog";
+import { User } from "@/lib/mockData";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { UsersModalProvider, useUsersModal } from "./UserModelContext";
 
-export default function UsersLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function UsersInnerLayout({ children }: { children: React.ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
   const router = useRouter();
+  // const [showDetailDialog, setShowDetailDialog] = useState(false);
+  // const [showLockDialog, setShowLockDialog] = useState(false);
+  // const [lockAction, setLockAction] = useState<"lock" | "unlock">("lock");
+  // const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const {
+    selectedUser,
+    lockAction,
+    showDetailDialog,
+    showLockDialog,
+    closeDetail,
+    closeLock,
+  } = useUsersModal();
+
+  const getStatusBadge = (status: User["status"]) =>
+    status === "active" ? (
+      <Badge className="bg-accent text-accent-foreground">Hoạt động</Badge>
+    ) : (
+      <Badge variant="destructive">Đã khóa</Badge>
+    );
+
+  const handleLockToggle = () => {
+    if (selectedUser) {
+      const newStatus = lockAction === "lock" ? "locked" : "active";
+      toast(
+        lockAction === "lock" ? "Đã khóa tài khoản" : "Đã mở khóa tài khoản",
+        {
+          description:
+            lockAction === "lock"
+              ? "Người dùng không thể đăng nhập vào hệ thống"
+              : "Người dùng có thể đăng nhập trở lại",
+        }
+      );
+      // server call should go here
+      closeLock();
+    }
+  };
 
   return (
     <div className="flex h-screen bg-background">
@@ -63,7 +101,35 @@ export default function UsersLayout({
           {/* tab content */}
           {children}
         </main>
+
+        <UserDetailDialog
+          open={showDetailDialog}
+          onOpenChange={(v) => (v ? null : closeDetail())}
+          user={selectedUser}
+          // getRoleBadge={() => {}}
+          getStatusBadge={getStatusBadge}
+        />
+
+        <LockDialog
+          open={showLockDialog}
+          onOpenChange={(v) => (v ? null : closeLock())}
+          user={selectedUser}
+          lockAction={lockAction}
+          onConfirm={handleLockToggle}
+        />
       </div>
     </div>
+  );
+}
+
+export default function UsersLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <UsersModalProvider>
+      <UsersInnerLayout>{children}</UsersInnerLayout>
+    </UsersModalProvider>
   );
 }

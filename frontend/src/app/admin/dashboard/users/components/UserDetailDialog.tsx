@@ -14,7 +14,7 @@ type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   user: User | null;
-  getRoleBadge: (role: User["role"]) => React.ReactNode;
+  // getRoleBadge: (role: User["role"]) => React.ReactNode;
   getStatusBadge: (status: User["status"]) => React.ReactNode;
 };
 
@@ -22,7 +22,7 @@ export default function UserDetailDialog({
   open,
   onOpenChange,
   user,
-  getRoleBadge,
+  // getRoleBadge,
   getStatusBadge,
 }: Props) {
   return (
@@ -38,22 +38,21 @@ export default function UserDetailDialog({
           <div className="space-y-6">
             <div className="flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-2xl font-semibold text-primary-foreground">
-                {user.name.charAt(0)}
+                {user.fullName}
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  {user.name}
+                  {user.fullName}
                 </h3>
                 <p className="text-muted-foreground">{user.email}</p>
               </div>
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
                   Vai trò
                 </p>
-                <div className="mt-1">{getRoleBadge(user.role)}</div>
+                {/* <div className="mt-1">{getRoleBadge(user.role.name)}</div> */}
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
@@ -65,41 +64,41 @@ export default function UserDetailDialog({
                 <p className="text-sm font-medium text-muted-foreground">
                   Ngày tham gia
                 </p>
-                <p className="text-foreground">
+                {/* <p className="text-foreground">
                   {new Date(user.joinedAt).toLocaleDateString("vi-VN")}
-                </p>
+                </p> */}
               </div>
-              <div>
+              {/* <div>
                 <p className="text-sm font-medium text-muted-foreground">
                   Sự kiện đã tham gia
                 </p>
                 <p className="text-foreground">{user.eventsJoined}</p>
-              </div>
-              {user.role === "event_manager" && (
+              </div> */}
+              {user.role.name === "MANAGER" && (
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">
+                  {/* <p className="text-sm font-medium text-muted-foreground">
                     Sự kiện đã tạo
                   </p>
-                  <p className="text-foreground">{user.eventsCreated}</p>
+                  <p className="text-foreground">{user.eventsCreated}</p> */}
                 </div>
               )}
             </div>
-
             <div className="rounded-lg border border-border p-4">
               <h4 className="mb-2 font-medium text-foreground">
                 Tóm tắt hoạt động
               </h4>
               <div className="space-y-2 text-sm text-muted-foreground">
-                <p>• Tham gia {user.eventsJoined} sự kiện tình nguyện</p>
+                {/* <p>• Tham gia {user.eventsJoined} sự kiện tình nguyện</p>
                 {user.role === "event_manager" && (
                   <p>• Tạo {user.eventsCreated} sự kiện</p>
                 )}
-                <p>
-                  • Thành viên từ{" "}
-                  {new Date(user.joinedAt).toLocaleDateString("vi-VN")}
-                </p>
+                <p> */}
+                • Thành viên từ{" "}
+                {/* {new Date(user.joinedAt).toLocaleDateString("vi-VN")} */}
+                {/* </p> */}
               </div>
             </div>
+            //{" "}
           </div>
         )}
 

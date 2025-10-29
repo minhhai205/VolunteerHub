@@ -37,8 +37,8 @@ export default function LockDialog({
           </DialogTitle>
           <DialogDescription>
             {lockAction === "lock"
-              ? `Bạn có chắc chắn muốn khóa tài khoản của "${user?.name}"? Người dùng sẽ không thể đăng nhập vào hệ thống.`
-              : `Bạn có chắc chắn muốn mở khóa tài khoản của "${user?.name}"? Người dùng sẽ có thể đăng nhập trở lại.`}
+              ? `Bạn có chắc chắn muốn khóa tài khoản của "${user?.fullName}"? Người dùng sẽ không thể đăng nhập vào hệ thống.`
+              : `Bạn có chắc chắn muốn mở khóa tài khoản của "${user?.fullName}"? Người dùng sẽ có thể đăng nhập trở lại.`}
           </DialogDescription>
         </DialogHeader>
 

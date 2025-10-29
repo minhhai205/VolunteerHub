@@ -1,5 +1,6 @@
 "use client";
 
+// note: may need changes to setPage
 import { useEffect, useState } from "react";
 import {
   Pagination,
@@ -16,7 +17,7 @@ import { generatePaginationItems } from "@/lib/pagination";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function VolunteersPage() {
-  const volunteers = mockUsers.filter((u) => u.role === "event_manager");
+  const volunteers = mockUsers.filter((u) => u.role.name === "MANAGER");
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentPage = Number(searchParams.get("page")) || 1;

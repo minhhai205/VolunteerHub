@@ -17,13 +17,15 @@ export interface Event {
 
 export interface User {
   id: string;
-  name: string;
+  fullName: string;
   email: string;
-  role: "volunteer" | "event_manager" | "admin";
+  role: {
+    id: number;
+    name: "USER" | "MANAGER" | "ADMIN";
+    description: string;
+  };
   status: "active" | "locked";
-  joinedAt: string;
-  eventsJoined: number;
-  eventsCreated: number;
+  phoneNumber?: string;
   avatar?: string;
 }
 
@@ -114,53 +116,63 @@ export const mockEvents: Event[] = [
 export const mockUsers: User[] = [
   {
     id: "1",
-    name: "Nguyễn Văn A",
+    fullName: "Nguyễn Văn A",
     email: "nguyenvana@email.com",
-    role: "event_manager",
+    role: {
+      id: 1,
+      name: "MANAGER",
+      description: "Event Manager",
+    },
     status: "active",
-    joinedAt: "2023-06-15",
-    eventsJoined: 12,
-    eventsCreated: 5,
+    phoneNumber: "0123456789",
   },
   {
     id: "2",
-    name: "Trần Thị B",
+    fullName: "Trần Thị B",
     email: "tranthib@email.com",
-    role: "event_manager",
+    role: {
+      id: 1,
+      name: "MANAGER",
+      description: "Event Manager",
+    },
     status: "active",
-    joinedAt: "2023-07-20",
-    eventsJoined: 8,
-    eventsCreated: 3,
+    phoneNumber: "0987654321",
   },
   {
     id: "3",
-    name: "Lê Văn C",
+    fullName: "Lê Văn C",
     email: "levanc@email.com",
-    role: "volunteer",
+    role: {
+      id: 1,
+      name: "USER",
+      description: "Event Manager",
+    },
     status: "active",
-    joinedAt: "2023-08-10",
-    eventsJoined: 15,
-    eventsCreated: 0,
+    phoneNumber: "0112233445",
   },
   {
     id: "4",
-    name: "Phạm Thị D",
+    fullName: "Phạm Thị D",
     email: "phamthid@email.com",
-    role: "volunteer",
+    role: {
+      id: 1,
+      name: "USER",
+      description: "Event Manager",
+    },
     status: "locked",
-    joinedAt: "2023-09-05",
-    eventsJoined: 6,
-    eventsCreated: 0,
+    phoneNumber: "0998877665",
   },
   {
     id: "5",
-    name: "Hoàng Văn E",
+    fullName: "Hoàng Văn E",
     email: "hoangvane@email.com",
-    role: "event_manager",
+    role: {
+      id: 1,
+      name: "USER",
+      description: "Event Manager",
+    },
     status: "active",
-    joinedAt: "2023-10-12",
-    eventsJoined: 10,
-    eventsCreated: 4,
+    phoneNumber: "0223344556",
   },
 ];
 

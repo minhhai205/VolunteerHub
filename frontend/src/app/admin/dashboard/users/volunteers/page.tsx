@@ -14,6 +14,7 @@ import UserCard from "../components/UserCard";
 import { mockUsers } from "@/lib/mockData";
 import { generatePaginationItems } from "@/lib/pagination";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useUserList } from "../hooks/useUserList";
 
 export default function VolunteersPage() {
   const router = useRouter();
@@ -23,7 +24,12 @@ export default function VolunteersPage() {
   const currentPage = Number(searchParams.get("page")) || 1;
   const [page, setPage] = useState(currentPage);
 
-  const volunteers = mockUsers.filter((u) => u.role === "volunteer");
+  // const volunteers = mockUsers.filter((u) => u.role.name === "USER");
+  const { users } = useUserList(page, 10);
+  console.log("Fetched users:", users);
+  const volunteers = users.filter((u) => u.role.name === "USER");
+  console.log("Volunteers filtered:", volunteers);
+
   const totalPages = 10;
 
   // ✅ keep URL and state in sync
@@ -48,8 +54,8 @@ export default function VolunteersPage() {
         <UserCard
           key={user.id}
           user={user}
-          onRequestLock={() => {}}
-          onShowDetail={() => {}}
+          // onRequestLock={() => {}}
+          // onShowDetail={() => {}}
         />
       ))}
 
