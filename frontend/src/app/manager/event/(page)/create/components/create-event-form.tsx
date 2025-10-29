@@ -3,12 +3,22 @@
 import type React from "react";
 
 import { useState } from "react";
-import { Calendar, MapPin, ImageIcon, FileText, Clock } from "lucide-react";
+import {
+  Calendar,
+  MapPin,
+  ImageIcon,
+  FileText,
+  Clock,
+  Tag,
+  AlertCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import styles from "./create-event-form.module.css";
+import { uploadToCloudinary } from "@/lib/upload";
+import { getAccessToken } from "@/lib/token";
 
 export function CreateEventForm() {
   const [formData, setFormData] = useState({
@@ -20,11 +30,26 @@ export function CreateEventForm() {
     startTime: "",
     endTime: "",
     image: null as File | null,
+    categories: [] as string[],
   });
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const categoryOptions = [
+    "Giáo dục",
+    "Môi trường",
+    "Y tế",
+    "Cộng đồng",
+    "Thể thao",
+    "Văn hóa",
+    "Kỹ năng",
+    "Khác",
+  ];
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // ... (logic không đổi)
     const file = e.target.files?.[0];
     if (file) {
       setFormData({ ...formData, image: file });
@@ -36,10 +61,96 @@ export function CreateEventForm() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleCategoryChange = (category: string) => {
+    // ... (logic không đổi)
+    setFormData((prev) => ({
+      ...prev,
+      categories: prev.categories.includes(category)
+        ? prev.categories.filter((c) => c !== category)
+        : [...prev.categories, category],
+    }));
+  };
+
+  // --- HÀM SUBMIT ĐÃ CẬP NHẬT ---
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Handle form submission logic here
+    setError(null);
+
+    // --- 1. Validation (không đổi) ---
+    if (!formData.image) {
+      setError("Vui lòng tải lên hình ảnh sự kiện.");
+      return;
+    }
+    if (formData.categories.length === 0) {
+      setError("Vui lòng chọn ít nhất một danh mục.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const imageUrl = await uploadToCloudinary(formData.image);
+      const startDateISO = new Date(
+        `${formData.startDate}T${formData.startTime}`
+      ).toISOString();
+      const endDateISO = new Date(
+        `${formData.endDate}T${formData.endTime}`
+      ).toISOString();
+
+      const apiPayload = {
+        name: formData.name,
+        description: formData.description,
+        location: formData.location,
+        imageUrl: imageUrl,
+        startDate: startDateISO,
+        endDate: endDateISO,
+        categoryNames: formData.categories,
+      };
+
+      const token = getAccessToken();
+
+      const response = await fetch(
+        "http://localhost:8080/api/event-request/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify(apiPayload),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(
+          errorData?.message || `Lỗi từ server: ${response.statusText}`
+        );
+      }
+      setFormData({
+        name: "",
+        description: "",
+        location: "",
+        startDate: "",
+        endDate: "",
+        startTime: "",
+        endTime: "",
+        image: null,
+        categories: [],
+      });
+      setImagePreview(null);
+    } catch (err) {
+      console.error("Lỗi khi tạo sự kiện:", err);
+      let errorMessage = "Đã có lỗi không xác định xảy ra.";
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === "string") {
+        errorMessage = err;
+      }
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -62,6 +173,7 @@ export function CreateEventForm() {
                 setFormData({ ...formData, name: e.target.value })
               }
               required
+              disabled={loading}
               className={styles.input}
             />
           </div>
@@ -79,6 +191,7 @@ export function CreateEventForm() {
                 setFormData({ ...formData, description: e.target.value })
               }
               required
+              disabled={loading}
               rows={6}
               className={styles.textarea}
             />
@@ -98,8 +211,30 @@ export function CreateEventForm() {
                 setFormData({ ...formData, location: e.target.value })
               }
               required
+              disabled={loading}
               className={styles.input}
             />
+          </div>
+
+          <div className={styles.field}>
+            <Label className={styles.label}>
+              <Tag className={styles.labelIcon} />
+              Danh mục sự kiện
+            </Label>
+            <div className={styles.categoryGrid}>
+              {categoryOptions.map((category) => (
+                <label key={category} className={styles.categoryCheckbox}>
+                  <input
+                    type="checkbox"
+                    checked={formData.categories.includes(category)}
+                    onChange={() => handleCategoryChange(category)}
+                    disabled={loading}
+                    className={styles.checkboxInput}
+                  />
+                  <span className={styles.checkboxLabel}>{category}</span>
+                </label>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -120,6 +255,7 @@ export function CreateEventForm() {
                   setFormData({ ...formData, startDate: e.target.value })
                 }
                 required
+                disabled={loading}
                 className={styles.input}
               />
             </div>
@@ -137,6 +273,7 @@ export function CreateEventForm() {
                   setFormData({ ...formData, startTime: e.target.value })
                 }
                 required
+                disabled={loading}
                 className={styles.input}
               />
             </div>
@@ -156,6 +293,7 @@ export function CreateEventForm() {
                   setFormData({ ...formData, endDate: e.target.value })
                 }
                 required
+                disabled={loading}
                 className={styles.input}
               />
             </div>
@@ -173,6 +311,7 @@ export function CreateEventForm() {
                   setFormData({ ...formData, endTime: e.target.value })
                 }
                 required
+                disabled={loading}
                 className={styles.input}
               />
             </div>
@@ -204,13 +343,19 @@ export function CreateEventForm() {
                       setImagePreview(null);
                       setFormData({ ...formData, image: null });
                     }}
+                    disabled={loading}
                     className={styles.removeImageButton}
                   >
                     Xóa ảnh
                   </Button>
                 </div>
               ) : (
-                <label htmlFor="image" className={styles.uploadLabel}>
+                <label
+                  htmlFor="image"
+                  className={`${styles.uploadLabel} ${
+                    loading ? styles.disabledUpload : ""
+                  }`}
+                >
                   <ImageIcon className={styles.uploadIcon} />
                   <span className={styles.uploadText}>Nhấn để chọn ảnh</span>
                   <span className={styles.uploadHint}>
@@ -223,22 +368,38 @@ export function CreateEventForm() {
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
+                disabled={loading}
                 className={styles.fileInput}
               />
             </div>
           </div>
         </div>
+
+        {/* --- HIỂN THỊ LỖI --- */}
+        {error && (
+          <div className={styles.errorContainer}>
+            <AlertCircle className={styles.errorIcon} />
+            <span className={styles.errorText}>{error}</span>
+          </div>
+        )}
+
         <div className={styles.actions}>
           <Button
             type="button"
             variant="outline"
             size="lg"
+            disabled={loading}
             className={styles.cancelButton}
           >
             Hủy
           </Button>
-          <Button type="submit" size="lg" className={styles.submitButton}>
-            Tạo sự kiện
+          <Button
+            type="submit"
+            size="lg"
+            disabled={loading}
+            className={styles.submitButton}
+          >
+            {loading ? "Đang xử lý..." : "Tạo sự kiện"}
           </Button>
         </div>
       </div>
