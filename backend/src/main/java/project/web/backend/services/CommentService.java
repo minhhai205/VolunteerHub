@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import project.web.backend.dtos.request.comment.CommentRequestDTO;
 import project.web.backend.dtos.response.comment.CommentResponseDTO;
 import project.web.backend.entities.Comment;
-import project.web.backend.entities.CommentRepository;
+import project.web.backend.repositories.CommentRepository;
 import project.web.backend.entities.Post;
 import project.web.backend.entities.User;
 import project.web.backend.exceptions.AppException;

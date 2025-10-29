@@ -10,13 +10,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import project.web.backend.entities.Token;
 import project.web.backend.entities.User;
 import project.web.backend.exceptions.AuthException;
+import project.web.backend.repositories.TokenRepository;
 import project.web.backend.utils.enums.ErrorCode;
 import project.web.backend.utils.enums.TokenType;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -37,6 +40,8 @@ public class JwtService {
     private String refreshKey;
     @Value("${security.jwt.reset.secretKey}")
     private String resetKey;
+
+    private final TokenRepository tokenRepository;
 
     public String generateToken(User user, TokenType type) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
@@ -87,7 +92,7 @@ public class JwtService {
                 throw new AuthException(ErrorCode.TOKEN_EXPIRED);
             }
             // check disable or token black list
-            // checkDisabled()
+            checkDisabled(token);
         } catch (ParseException e) {
             throw new AuthException(ErrorCode.TOKEN_INVALID);
         } catch (JOSEException e) {
@@ -105,6 +110,15 @@ public class JwtService {
 
     public String extractJti(String token) {
         return extractFieldFromPayload(token, JWTClaimsSet::getJWTID);
+    }
+
+    public void checkDisabled(String token) {
+        // if token not existed in DB, throw 401
+        String jti = extractJti(token);
+        Optional<Token> wrapper = tokenRepository.findByJti(jti);
+        if (wrapper.isEmpty()) {
+            throw new AuthException(ErrorCode.TOKEN_DISABLED);
+        }
     }
 
     private String getSecretKey(TokenType type) {
