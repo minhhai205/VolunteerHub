@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react"; // Thêm useEffect
+import { useState, useEffect } from "react";
 import styles from "./events.module.css";
 import { Header } from "@/components/static/Header";
 import { Footer } from "@/components/static/Footer";
@@ -55,6 +55,7 @@ export default function EventsPage() {
   const [activeFilter, setActiveFilter] = useState<
     "all" | "upcoming" | "ongoing" | "completed"
   >("all");
+
   useEffect(() => {
     const fetchEvents = async () => {
       setIsLoading(true);
@@ -83,23 +84,21 @@ export default function EventsPage() {
 
         console.log("Dữ liệu API thực tế:", JSON.stringify(result, null, 2));
 
-        // Kiểm tra cấu trúc data trả về
         if (!Array.isArray(result.data)) {
           throw new Error("Cấu trúc dữ liệu API trả về không hợp lệ.");
         }
 
         const apiData: ApiEvent[] = result.data;
 
-        // Map data từ API sang interface Event mà component đang dùng
         const mappedEvents: Event[] = apiData.map((apiEvent) => ({
           id: apiEvent.id.toString(),
           title: apiEvent.name,
           description: apiEvent.description,
-          image: apiEvent.imageUrl || "/placeholder.svg", // Dùng placeholder nếu ảnh null
+          image: apiEvent.imageUrl || "/placeholder.svg",
           startDate: apiEvent.startDate,
           endDate: apiEvent.endDate,
           participants: apiEvent.countMembers,
-          status: getEventStatus(apiEvent.startDate, apiEvent.endDate), // Tự tính status
+          status: getEventStatus(apiEvent.startDate, apiEvent.endDate),
         }));
 
         setAllEvents(mappedEvents);
@@ -116,9 +115,8 @@ export default function EventsPage() {
     };
 
     fetchEvents();
-  }, []); // Mảng rỗng đảm bảo useEffect chỉ chạy 1 lần khi component mount
+  }, []);
 
-  // Lọc dựa trên state allEvents thay vì mockEvents
   const filteredEvents = allEvents.filter((event) => {
     const matchesSearch =
       event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -154,9 +152,7 @@ export default function EventsPage() {
         </div>
 
         <div className={styles.controls}>
-          {/* ... phần search và filter giữ nguyên ... */}
           <div className={styles.searchBox}>
-                       {" "}
             <svg
               className={styles.searchIcon}
               width="16"
@@ -166,10 +162,9 @@ export default function EventsPage() {
               stroke="currentColor"
               strokeWidth="2"
             >
-                            <circle cx="11" cy="11" r="8" />
-                            <path d="m21 21-4.35-4.35" />           {" "}
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
             </svg>
-                       {" "}
             <input
               type="text"
               placeholder="Tìm kiếm sự kiện..."
@@ -177,51 +172,43 @@ export default function EventsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-                     {" "}
           </div>
-                   {" "}
           <div className={styles.filterGroup}>
-                       {" "}
             <button
               className={`${styles.filterButton} ${
                 activeFilter === "all" ? styles.active : ""
               }`}
               onClick={() => setActiveFilter("all")}
             >
-                            Tất cả            {" "}
+              Tất cả
             </button>
-                       {" "}
             <button
               className={`${styles.filterButton} ${
                 activeFilter === "upcoming" ? styles.active : ""
               }`}
               onClick={() => setActiveFilter("upcoming")}
             >
-                            Sắp diễn ra            {" "}
+              Sắp diễn ra
             </button>
-                       {" "}
             <button
               className={`${styles.filterButton} ${
                 activeFilter === "ongoing" ? styles.active : ""
               }`}
               onClick={() => setActiveFilter("ongoing")}
             >
-                            Đang diễn ra            {" "}
+              Đang diễn ra
             </button>
-                       {" "}
             <button
               className={`${styles.filterButton} ${
                 activeFilter === "completed" ? styles.active : ""
               }`}
               onClick={() => setActiveFilter("completed")}
             >
-                            Đã kết thúc            {" "}
+              Đã kết thúc
             </button>
-                     {" "}
           </div>
         </div>
 
-        {/* Thêm xử lý loading và error */}
         {isLoading && (
           <div className={styles.emptyState}>
             <h3 className={styles.emptyTitle}>Đang tải sự kiện...</h3>
@@ -235,7 +222,6 @@ export default function EventsPage() {
           </div>
         )}
 
-        {/* Chỉ hiển thị danh sách hoặc "Không tìm thấy" khi không loading và không có lỗi */}
         {!isLoading && !error && (
           <>
             {filteredEvents.length > 0 ? (
@@ -243,7 +229,7 @@ export default function EventsPage() {
                 {filteredEvents.map((event) => (
                   <div key={event.id} className={styles.eventCard}>
                     <img
-                      src={event.image} // Đã có fallback ở lúc map
+                      src={event.image}
                       alt={event.title}
                       className={styles.eventImage}
                     />
@@ -262,9 +248,7 @@ export default function EventsPage() {
                         {event.description}
                       </p>
                       <div className={styles.eventMeta}>
-                        {/* ... các meta item giữ nguyên ... */}
                         <div className={styles.metaItem}>
-                                               {" "}
                           <svg
                             className={styles.metaIcon}
                             width="16"
@@ -274,7 +258,6 @@ export default function EventsPage() {
                             stroke="currentColor"
                             strokeWidth="2"
                           >
-                                                   {" "}
                             <rect
                               x="3"
                               y="4"
@@ -283,28 +266,18 @@ export default function EventsPage() {
                               rx="2"
                               ry="2"
                             />
-                                                   {" "}
-                            <line x1="16" y1="2" x2="16" y2="6" />             
-                                      <line x1="8" y1="2" x2="8" y2="6" />     
-                                             {" "}
-                            <line x1="3" y1="10" x2="21" y2="10" />             
-                                   {" "}
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
                           </svg>
-                                               {" "}
                           <span>
-                                                   {" "}
-                            <span className={styles.metaLabel}>Bắt đầu:</span>  
-                                                 {" "}
+                            <span className={styles.metaLabel}>Bắt đầu:</span>{" "}
                             {new Date(event.startDate).toLocaleDateString(
                               "vi-VN"
                             )}
-                                                 {" "}
                           </span>
-                                             {" "}
                         </div>
-                                           {" "}
                         <div className={styles.metaItem}>
-                                               {" "}
                           <svg
                             className={styles.metaIcon}
                             width="16"
@@ -314,7 +287,6 @@ export default function EventsPage() {
                             stroke="currentColor"
                             strokeWidth="2"
                           >
-                            {" "}
                             <rect
                               x="3"
                               y="4"
@@ -323,28 +295,18 @@ export default function EventsPage() {
                               rx="2"
                               ry="2"
                             />
-                                                   {" "}
-                            <line x1="16" y1="2" x2="16" y2="6" />             
-                                      <line x1="8" y1="2" x2="8" y2="6" />     
-                                             {" "}
-                            <line x1="3" y1="10" x2="21" y2="10" />             
-                                   {" "}
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
                           </svg>
-                                               {" "}
                           <span>
-                                                   {" "}
                             <span className={styles.metaLabel}>Kết thúc:</span>{" "}
-                                                   {" "}
                             {new Date(event.endDate).toLocaleDateString(
                               "vi-VN"
                             )}
-                                                 {" "}
                           </span>
-                                             {" "}
                         </div>
-                                           {" "}
                         <div className={styles.metaItem}>
-                                               {" "}
                           <svg
                             className={styles.metaIcon}
                             width="16"
@@ -354,23 +316,24 @@ export default function EventsPage() {
                             stroke="currentColor"
                             strokeWidth="2"
                           >
-                                                   {" "}
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                                                   {" "}
-                            <circle cx="9" cy="7" r="4" />                     
-                              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />           
-                                        <path d="M16 3.13a4 4 0 0 1 0 7.75" /> 
-                                               {" "}
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                           </svg>
-                                               {" "}
                           <span>
-                                                   {" "}
                             <span className={styles.metaLabel}>Tham gia:</span>{" "}
-                                                    {event.participants} người  
-                                               {" "}
+                            {event.participants} người
                           </span>
-                                             {" "}
                         </div>
+                        <button
+                          className={styles.detailButton}
+                          onClick={() =>
+                            (window.location.href = `http://localhost:8080/api/event/${event.id}`)
+                          }
+                        >
+                          Xem chi tiết
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -400,7 +363,6 @@ export default function EventsPage() {
           </>
         )}
       </main>
-
       <Footer />
     </div>
   );
