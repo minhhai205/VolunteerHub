@@ -113,7 +113,7 @@ export function Header() {
           </Link>
           <Link 
             href="/manager/event/list" 
-            className={`${styles.navLink} ${isActive('/manager/event/list') ? styles.navLinkActive : ''}`}
+            className={`${styles.navLink} ${isActive('/manager/event') ? styles.navLinkActive : ''}`}
           >
             Sự kiện
           </Link>
