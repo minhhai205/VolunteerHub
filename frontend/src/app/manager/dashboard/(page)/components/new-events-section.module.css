@@ -1,0 +1,24 @@
+.eventCard {
+  border: 1px solid hsl(var(--color-border));
+  border-radius: 0.625rem;
+  padding: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.eventCard:hover {
+  background-color: hsl(var(--color-muted) / 0.5);
+}
+
+.eventDetails {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+  .eventDetails {
+    grid-template-columns: 1fr;
+  }
+}
