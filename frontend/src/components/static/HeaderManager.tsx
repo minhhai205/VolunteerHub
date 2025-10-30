@@ -47,8 +47,9 @@ export function Header() {
         return
       }
 
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
       // Gọi API logout với DTO
-      const response = await fetch('/api/auth/logout', {
+      const response = await fetch(`${apiUrl}/api/auth/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +73,7 @@ export function Header() {
         setShowUserMenu(false)
         
         // Redirect về trang chủ 
-        window.location.href = '/home'
+        window.location.href = '/auth/login'
       } else {
         // Xử lý khi logout thất bại
         console.error('Logout failed:', data)
