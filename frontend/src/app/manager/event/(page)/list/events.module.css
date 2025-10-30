@@ -185,27 +185,40 @@
   overflow: hidden;
 }
 
+/* Container bọc cả 3 mục: Bắt đầu, Kết thúc, Tham gia 
+  Class này sẽ xếp 3 mục con (.metaItem) lên cùng 1 hàng
+*/
 .eventMeta {
   display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* Cho phép xuống hàng nếu màn hình quá nhỏ */
+  align-items: center;
+  /* Dùng 1 trong 2 tùy chọn dưới đây */
+
+  /* Tùy chọn 1: Căn 3 mục giãn đều ra (giống ảnh mẫu) */
+  justify-content: space-between;
+
+  /* Tùy chọn 2: Căn 3 mục gần nhau với 1 khoảng cách */
+  /* gap: 1.5rem; */
+
+  margin-top: 1rem; /* Khoảng cách với phần mô tả ở trên */
+  width: 100%;
 }
 
 .metaItem {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: oklch(0.5 0.03 155);
-  font-size: 0.8125rem;
+  font-size: 0.9rem; /* Bạn có thể điều chỉnh 0.9rem, 0.875rem, v.v. */
+  color: #333;
 }
 
 .metaIcon {
-  color: oklch(0.55 0.12 155);
+  flex-shrink: 0;
 }
 
 .metaLabel {
-  font-weight: 500;
-  color: oklch(0.25 0.02 155);
+  font-weight: 600;
+  margin-right: 4px;
 }
 
 .emptyState {
@@ -260,4 +273,41 @@
     overflow-x: auto;
     padding-bottom: 0.5rem;
   }
+}
+
+/* CSS cho nút Xem chi tiết - Thêm vào file events.module.css */
+
+.detailButton {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #b8e6b8 0%, #9dd99d 100%);
+  border-color: oklch(0.55 0.12 155);
+  color: oklch(0.55 0.12 155);
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(157, 217, 157, 0.2);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.detailButton:hover {
+  background: linear-gradient(135deg, #9dd99d 0%, #8cd08c 100%);
+  box-shadow: 0 4px 8px rgba(157, 217, 157, 0.35);
+  transform: translateY(-2px);
+}
+
+.detailButton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(157, 217, 157, 0.2);
+}
+
+/* Đảm bảo eventMeta có flex layout để button nằm cùng hàng */
+.eventMeta {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
 }

@@ -1,4 +1,4 @@
-import { Header } from "@/components/static/Header";
+import { Header } from "@/components/static/HeaderManager";
 import styles from "./create-event.module.css";
 import { Footer } from "@/components/static/Footer";
 import { CreateEventForm } from "./components/create-event-form";

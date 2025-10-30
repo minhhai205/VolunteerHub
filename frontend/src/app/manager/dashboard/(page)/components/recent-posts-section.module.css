@@ -1,0 +1,19 @@
+.postCard {
+  padding: 1rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  background-color: hsl(var(--card));
+  transition: all 0.2s ease-in-out;
+}
+
+.postCard:hover {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.postStats {
+  display: flex;
+  gap: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid hsl(var(--border));
+}

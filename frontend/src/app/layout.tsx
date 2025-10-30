@@ -4,6 +4,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { Toaster } from "sonner";
+import ToastContainer from "@/components/static/toast/ToastContainer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,7 +26,11 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className="bg-white text-gray-900">{children}</body>
+      <body className="bg-white text-gray-900">
+        <Toaster position="top-right" richColors />
+        <ToastContainer />
+        {children}
+      </body>
     </html>
   );
 }
