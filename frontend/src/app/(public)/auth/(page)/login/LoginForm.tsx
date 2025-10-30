@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Mail, Lock, ArrowRight } from "lucide-react";
 import { saveTokens } from "@/lib/token";
-import { registerPushAfterLogin } from '@/lib/notification';
+import { registerPushAfterLogin } from "@/lib/notification";
+import { toastManager } from "@/components/static/toast/toast";
 
 export function LoginForm() {
   const router = useRouter();
@@ -47,6 +48,9 @@ export function LoginForm() {
       registerPushAfterLogin(result.data.accessToken);
 
       console.log("✅ Login success:", result);
+      toastManager.success(
+        "Đăng nhập thành công, đang chuyển hướng..............."
+      );
 
       const params = new URLSearchParams(window.location.search); // chuyển về trang chủ hoặc trang trước đó
       const redirectTo = params.get("redirect") || "/home";
