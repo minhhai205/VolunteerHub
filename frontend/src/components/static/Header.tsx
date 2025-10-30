@@ -47,8 +47,9 @@ export function Header() {
         return
       }
 
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
       // Gọi API logout với DTO
-      const response = await fetch('/api/auth/logout', {
+      const response = await fetch(`${apiUrl}/api/auth/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

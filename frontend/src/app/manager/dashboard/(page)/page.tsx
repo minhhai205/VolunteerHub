@@ -16,7 +16,7 @@ export default function DashboardPage() {
         <div className="space-y-2">
           <h1 className="text-4xl font-bold text-foreground">Dashboard</h1>
           <p className="text-muted-foreground">
-            Quản lý sự kiện và tình nguyện viên
+            Quản lý sự kiện và tình nguyện viên của bạn
           </p>
         </div>
 

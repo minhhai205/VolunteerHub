@@ -10,19 +10,20 @@ import project.web.backend.dtos.request.event.EventRequestDTO;
 import project.web.backend.dtos.request.notification.NotificationPayload;
 import project.web.backend.dtos.response.event.EventRequestResponseDTO;
 import project.web.backend.entities.Category;
+import project.web.backend.entities.Event;
 import project.web.backend.entities.EventCreateRequest;
 import project.web.backend.entities.User;
 import project.web.backend.exceptions.AppException;
+import project.web.backend.mappers.EventMapper;
 import project.web.backend.mappers.EventRequestMapper;
 import project.web.backend.repositories.*;
 import project.web.backend.utils.commons.SecurityUtil;
 import project.web.backend.utils.enums.ErrorCode;
 import project.web.backend.utils.enums.EventRequestStatus;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +33,8 @@ public class EventRequestService {
     private final EventRequestMapper eventRequestMapper;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final EventRepository eventRepository;
+    private final EventMapper eventMapper;
     private final PushNotificationService pushNotificationService;
 
     public EventRequestResponseDTO createEventRequest(EventRequestDTO eventRequestDTO) {
@@ -86,10 +89,23 @@ public class EventRequestService {
         }
 
         request.setStatus(EventRequestStatus.APPROVED);
-
         eventRequestRepository.save(request);
 
+        // Create new event
+        Event newEvent = Event.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .location(request.getLocation())
+                .imageUrl(request.getImageUrl())
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .categories(new HashSet<>(request.getCategories()))
+                .manager(request.getManager())
+                .build();
+        eventRepository.save(newEvent);
+
         // send web push to manager
+        // ....
 
         return eventRequestMapper.toResponseDTO(request);
     }

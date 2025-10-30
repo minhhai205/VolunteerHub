@@ -39,17 +39,11 @@
   gap: 0.75rem;
 }
 
+/* Dòng 1: Tiêu đề */
 .headerSection {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-}
-
-.titleSection {
-  display: flex;
   align-items: center;
-  gap: 0.75rem;
-  flex: 1;
+  justify-content: space-between;
 }
 
 .eventTitle {
@@ -57,22 +51,42 @@
   font-size: 1rem;
   color: hsl(var(--color-foreground));
   margin: 0;
+  line-height: 1.4;
 }
 
-.growthBadge {
-  flex-shrink: 0;
-  background: hsl(var(--color-primary) / 0.1);
-  color: hsl(var(--color-primary));
-  border: 1px solid hsl(var(--color-primary) / 0.2);
+/* Dòng 2: Mô tả */
+.descriptionSection {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.eventDescription {
+  font-size: 0.875rem;
+  color: hsl(var(--color-muted-foreground));
+  line-height: 1.5;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Dòng 3: Thống kê và nút */
+.footerSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid hsl(var(--color-border));
 }
 
 .statsSection {
   display: flex;
   gap: 1.5rem;
   flex-wrap: wrap;
-  padding: 0.75rem 0;
-  border-top: 1px solid hsl(var(--color-border));
-  border-bottom: 1px solid hsl(var(--color-border));
 }
 
 .statItem {
@@ -83,13 +97,17 @@
   color: hsl(var(--color-muted-foreground));
 }
 
+.statItem:last-child {
+  margin-left: 1rem;
+}
+
 .statItem svg {
   color: hsl(var(--color-primary));
 }
 
 .actionSection {
   display: flex;
-  justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 .viewButton {
@@ -121,13 +139,19 @@
     height: 12rem;
   }
 
-  .statsSection {
+  .footerSection {
     flex-direction: column;
-    gap: 0.75rem;
+    align-items: flex-start;
+    gap: 1rem;
   }
 
   .actionSection {
-    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .viewButton {
+    width: 100%;
+    justify-content: center;
   }
 }
 
@@ -146,6 +170,7 @@
   }
 
   .statsSection {
-    gap: 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }
