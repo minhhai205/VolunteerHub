@@ -1,6 +1,7 @@
 package project.web.backend.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import project.web.backend.dtos.response.ApiErrorResponse;
 import project.web.backend.dtos.response.ApiResponse;
+import project.web.backend.utils.enums.ErrorCode;
 
 import java.io.IOException;
 
@@ -43,6 +45,20 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.OK)
+    @ExceptionHandler({AccessDeniedException.class})
+    public ApiResponse handleAccessDeniedHandler(AccessDeniedException e, WebRequest request) {
+        log.info("---------------------------Access denied exception handler start---------------------------");
+        String error = e.getMessage();
+        return ApiErrorResponse.builder()
+                .status(ErrorCode.ACCESS_DENIED.getCode())
+                .message(ErrorCode.ACCESS_DENIED.getMessage())
+                .error(ErrorCode.ACCESS_DENIED.name())
+                .path(request.getDescription(false))
+                .build();
+    }
+
+
+    @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler({IOException.class})
     public ApiResponse handleIOCloudinaryEx(IOException e, WebRequest request) {
         log.info("---------------------------IO exception handler start---------------------------");
@@ -59,10 +75,6 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler({Exception.class})
     public ApiResponse handleServerError(Exception e, WebRequest request) throws AccessDeniedException {
-        if (e instanceof AccessDeniedException) {
-            // throw to access denied handler
-            throw (AccessDeniedException) e;
-        }
         log.info("---------------------------Server error 500 exception handler start---------------------------");
         String error = e.getMessage();
         return ApiErrorResponse.builder()
