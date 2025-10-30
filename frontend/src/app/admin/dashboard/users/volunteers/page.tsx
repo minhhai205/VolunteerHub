@@ -25,22 +25,12 @@ export default function VolunteersPage() {
   const [page, setPage] = useState(currentPage);
 
   // const volunteers = mockUsers.filter((u) => u.role.name === "USER");
-  const { users } = useUserList(page, 10);
-  console.log("Fetched users:", users);
-  const volunteers = users.filter((u) => u.role.name === "USER");
-  console.log("Volunteers filtered:", volunteers);
+  const { users, pagination } = useUserList(page, 10, "USER");
+  const totalPages = pagination.totalPage;
 
-  const totalPages = 10;
-
-  // ✅ keep URL and state in sync
+  // keep URL and state in sync
   useEffect(() => {
     router.push(`?page=${page}`);
-  }, [page]);
-
-  // simulate fetching data when page changes
-  useEffect(() => {
-    console.log("Fetching volunteers for page:", page);
-    // fetch(`/api/users/volunteers?page=${page}`)
   }, [page]);
 
   const handlePageChange = (newPage: number) => {
@@ -50,7 +40,7 @@ export default function VolunteersPage() {
 
   return (
     <div className="space-y-4">
-      {volunteers.map((user) => (
+      {users.map((user) => (
         <UserCard
           key={user.id}
           user={user}

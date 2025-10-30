@@ -36,7 +36,7 @@ public class UserController {
         @PreAuthorize("hasRole('ADMIN')")
         public ApiSuccessResponse<PageResponseDTO<List<UserDetailResponseDTO>>> getAllUsers(
                         Pageable pageable,
-                        @RequestParam(name = "role", required = false) String role) {
+                        @RequestParam(required = false) String role) {
                 return ApiSuccessResponse.<PageResponseDTO<List<UserDetailResponseDTO>>>builder()
                                 .data(userService.getAllUsers(pageable, role))
                                 .status(HttpStatus.OK.value())
