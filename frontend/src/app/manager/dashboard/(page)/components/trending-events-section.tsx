@@ -37,48 +37,50 @@ export function TrendingEventsSection() {
             <div key={event.id} className={styles.trendingCard}>
               <div className={styles.imageContainer}>
                 <img
-                  src={event.image || "/placeholder.svg"}
-                  alt={event.title}
+                  src={event.imageUrl || "/placeholder.svg"}
+                  alt={event.name}
                   className={styles.eventImage}
                 />
               </div>
 
               <div className={styles.contentWrapper}>
+                {/* Dòng 1: Tiêu đề */}
                 <div className={styles.headerSection}>
-                  <div className={styles.titleSection}>
-                    <h3 className={styles.eventTitle}>{event.title}</h3>
-                    <Badge variant="secondary" className={styles.growthBadge}>
-                      {event.growth}
-                    </Badge>
-                  </div>
+                  <h3 className={styles.eventTitle}>{event.name}</h3>
                 </div>
 
-                <div className={styles.statsSection}>
-                  <div className={styles.statItem}>
-                    <Users className="w-4 h-4" />
-                    <span>{event.members} thành viên</span>
-                  </div>
-                  <div className={styles.statItem}>
-                    <MessageSquare className="w-4 h-4" />
-                    <span>{event.discussions} bài trao đổi</span>
-                  </div>
-                  <div className={styles.statItem}>
-                    <Heart className="w-4 h-4" />
-                    <span>{event.likes} lượt thích</span>
-                  </div>
+                {/* Dòng 2: Mô tả */}
+                <div className={styles.descriptionSection}>
+                  <p className={styles.eventDescription}>
+                    {event.description || "Không có mô tả"}
+                  </p>
                 </div>
 
-                <div className={styles.actionSection}>
-                  <Link href={`/events/${event.id}`}>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={styles.viewButton}
-                    >
-                      Xem chi tiết
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </Link>
+                {/* Dòng 3: Thống kê và nút xem chi tiết */}
+                <div className={styles.footerSection}>
+                  <div className={styles.statsSection}>
+                    <div className={styles.statItem}>
+                      <Users className="w-4 h-4" />
+                      <span>{event.countMembers} thành viên</span>
+                    </div>
+                    <div className={styles.statItem}>
+                      <MessageSquare className="w-4 h-4" />
+                      <span>{event.countPosts} bài trao đổi</span>
+                    </div>
+                  </div>
+
+                  <div className={styles.actionSection}>
+                    <Link href={`/events/${event.id}`}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={styles.viewButton}
+                      >
+                        Xem chi tiết
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
