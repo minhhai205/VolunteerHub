@@ -2,6 +2,7 @@ package project.web.backend.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -10,6 +11,7 @@ import project.web.backend.dtos.response.ApiErrorResponse;
 import project.web.backend.dtos.response.ApiResponse;
 
 import java.io.IOException;
+
 
 @RestControllerAdvice
 @Slf4j
@@ -56,7 +58,11 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler({Exception.class})
-    public ApiResponse handleServerError(Exception e, WebRequest request) {
+    public ApiResponse handleServerError(Exception e, WebRequest request) throws AccessDeniedException {
+        if (e instanceof AccessDeniedException) {
+            // throw to access denied handler
+            throw (AccessDeniedException) e;
+        }
         log.info("---------------------------Server error 500 exception handler start---------------------------");
         String error = e.getMessage();
         return ApiErrorResponse.builder()
