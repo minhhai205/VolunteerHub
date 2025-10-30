@@ -43,6 +43,16 @@ public class EventController {
                 .build();
     }
 
+    @GetMapping("/manager/trending")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ApiSuccessResponse<List<EventResponseDTO>> getTrendingEventsByManager(){
+        return ApiSuccessResponse.<List<EventResponseDTO>>builder()
+                .data(eventService.getTrendingEventsByManager())
+                .status(HttpStatus.OK.value())
+                .message("Get trending events successfully!")
+                .build();
+    }
+
     @PostMapping("/registration/{eventId}")
     @PreAuthorize("hasRole('USER')")
     public ApiSuccessResponse<String> eventRegistration(

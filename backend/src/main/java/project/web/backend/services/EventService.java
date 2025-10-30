@@ -40,17 +40,8 @@ public class EventService {
 
         List<Long> eventsIds = events.stream().map(Event::getId).toList();
 
-        Map<Long, Long> memberCountMap = eventRepository.findCountMemberForEvents(eventsIds).stream()
-                .collect(Collectors.toMap(
-                        row -> (Long) row[0],
-                        row -> (Long) row[1]
-                ));
-
-        Map<Long, Long> postCountMap = eventRepository.findCountPostForEvents(eventsIds).stream()
-                .collect(Collectors.toMap(
-                        row -> (Long) row[0],
-                        row -> (Long) row[1]
-                ));
+        Map<Long, Long> memberCountMap = findCountMemberForEvents(eventsIds);
+        Map<Long, Long> postCountMap = findCountPostForEvents(eventsIds);
 
         eventResponses.forEach(eventResponse -> {
             eventResponse.setCountMembers(memberCountMap.get(eventResponse.getId()));
@@ -80,14 +71,42 @@ public class EventService {
         List<Event> events = eventRepository.findEventByIdIn(eventsIds);
         List<EventResponseDTO> eventResponses = events.stream().map(eventMapper::toResponseDTO).toList();
 
-        Map<Long, Long> memberCountMap = eventRepository.findCountMemberForEvents(eventsIds).stream()
-                .collect(Collectors.toMap(
-                        row -> (Long) row[0],
-                        row -> (Long) row[1]
-                ));
+        Map<Long, Long> memberCountMap = findCountMemberForEvents(eventsIds);
 
         eventResponses.forEach(eventResponse -> {
             eventResponse.setCountMembers(memberCountMap.get(eventResponse.getId()));
+        });
+
+        return eventResponses;
+    }
+
+    /**
+     *  Get top trending events ( members > minMembers, limit 6)
+     *
+     * @return List event.
+     */
+    public List<EventResponseDTO> getTrendingEventsByManager() {
+        log.info("------------ Get trending events --------------");
+
+        String email = SecurityUtil.getCurrentEmail();
+        User currentUser = userRepository.findByEmailWithNoReferences(email)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXIST));
+
+        // Tránh phân trang trên memory
+        Pageable pageable = PageRequest.of(0, 6);
+        int minMembers = 0;
+        List<Long> eventsIds = eventRepository.findTopTrendingEventsByManager(currentUser.getId(), minMembers, pageable)
+                .stream().map(Event::getId).toList();
+
+        List<Event> events = eventRepository.findEventByIdIn(eventsIds);
+        List<EventResponseDTO> eventResponses = events.stream().map(eventMapper::toResponseDTO).toList();
+
+        Map<Long, Long> memberCountMap = findCountMemberForEvents(eventsIds);
+        Map<Long, Long> postCountMap = findCountPostForEvents(eventsIds);
+
+        eventResponses.forEach(eventResponse -> {
+            eventResponse.setCountMembers(memberCountMap.get(eventResponse.getId()));
+            eventResponse.setCountPosts(postCountMap.get(eventResponse.getId()));
         });
 
         return eventResponses;
@@ -146,5 +165,21 @@ public class EventService {
         eventRepository.save(event);
 
         return eventMapper.toResponseDTO(event);
+    }
+
+    private Map<Long, Long> findCountMemberForEvents(List<Long> eventsIds) {
+        return  eventRepository.findCountMemberForEvents(eventsIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (Long) row[1]
+                ));
+    }
+
+    private Map<Long, Long> findCountPostForEvents(List<Long> eventsIds) {
+        return eventRepository.findCountPostForEvents(eventsIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (Long) row[1]
+                ));
     }
 }

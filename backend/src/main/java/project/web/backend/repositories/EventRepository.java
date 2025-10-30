@@ -65,4 +65,16 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     """)
     List<Event> findNewestPublishedEventsByManager(@Param("managerId") Long managerId, Pageable pageable);
 
+    @Query("""
+        SELECT e FROM Event e
+        WHERE e.manager.id = :managerId
+        AND SIZE(e.members) >= :minMembers
+        ORDER BY SIZE(e.members) DESC, e.createdAt DESC
+        """)
+    List<Event> findTopTrendingEventsByManager(
+            @Param("managerId") Long managerId,
+            @Param("minMembers") int minMembers,
+            Pageable pageable
+    );
+
 }
