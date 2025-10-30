@@ -24,7 +24,7 @@ export default function VolunteersPage() {
   const [page, setPage] = useState<number>(currentPage);
 
   // fetch volunteers (role = USER)
-  const { users, pagination } = useUserList(page, 10, "USER");
+  const { users, pagination, loading } = useUserList(page, 10, "USER");
   const totalPages = Math.max(1, pagination.totalPage);
 
   // keep local state in sync when user navigates back/forward
@@ -39,21 +39,29 @@ export default function VolunteersPage() {
     }
   }, [page, currentPage, router]);
 
-  // if backend reports fewer pages than requested, clamp UI and update URL
+  // if backend reports fewer pages than requested, replace the route immediately
   useEffect(() => {
+    if (loading) return;
     const tp = Math.max(1, pagination.totalPage || 1);
     if (page > tp) {
       const newPage = tp;
-      setPage(newPage);
-      // replace URL so back/forward is not polluted
+      // replace the URL first (no render of invalid page)
       router.replace(`?page=${newPage}`);
+      // update local state so we won't keep trying to redirect
+      setPage(newPage);
     }
-  }, [pagination.totalPage]); // depends on backend result
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, pagination.totalPage]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages) return;
     setPage(newPage);
   };
+
+  // If we determined the current page is invalid and are redirecting, show nothing / loading
+  if (!loading && page > totalPages) {
+    return null;
+  }
 
   return (
     <div className="space-y-4">
