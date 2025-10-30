@@ -39,6 +39,17 @@ export default function VolunteersPage() {
     }
   }, [page, currentPage, router]);
 
+  // if backend reports fewer pages than requested, clamp UI and update URL
+  useEffect(() => {
+    const tp = Math.max(1, pagination.totalPage || 1);
+    if (page > tp) {
+      const newPage = tp;
+      setPage(newPage);
+      // replace URL so back/forward is not polluted
+      router.replace(`?page=${newPage}`);
+    }
+  }, [pagination.totalPage]); // depends on backend result
+
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages) return;
     setPage(newPage);
