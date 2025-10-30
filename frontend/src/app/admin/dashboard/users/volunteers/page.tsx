@@ -11,27 +11,33 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 import UserCard from "../components/UserCard";
-import { mockUsers } from "@/lib/mockData";
 import { generatePaginationItems } from "@/lib/pagination";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useUserList } from "../hooks/useUserList";
 
 export default function VolunteersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // get current page from URL (default 1)
+  // read page from URL (1-based)
   const currentPage = Number(searchParams.get("page")) || 1;
-  const [page, setPage] = useState(currentPage);
+  const [page, setPage] = useState<number>(currentPage);
 
-  // const volunteers = mockUsers.filter((u) => u.role.name === "USER");
+  // fetch volunteers (role = USER)
   const { users, pagination } = useUserList(page, 10, "USER");
-  const totalPages = pagination.totalPage;
+  const totalPages = Math.max(1, pagination.totalPage);
 
-  // keep URL and state in sync
+  // keep local state in sync when user navigates back/forward
   useEffect(() => {
-    router.push(`?page=${page}`);
-  }, [page]);
+    setPage(currentPage);
+  }, [currentPage]);
+
+  // push only when local page differs from URL to avoid loops
+  useEffect(() => {
+    if (page !== currentPage) {
+      router.push(`?page=${page}`);
+    }
+  }, [page, currentPage, router]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages) return;
@@ -41,19 +47,17 @@ export default function VolunteersPage() {
   return (
     <div className="space-y-4">
       {users.map((user) => (
-        <UserCard
-          key={user.id}
-          user={user}
-          // onRequestLock={() => {}}
-          // onShowDetail={() => {}}
-        />
+        <UserCard key={user.id} user={user} />
       ))}
 
       <Pagination>
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              onClick={() => handlePageChange(page - 1)}
+              onClick={(e) => {
+                e.preventDefault();
+                handlePageChange(page - 1);
+              }}
               aria-disabled={page === 1}
               className={page === 1 ? "pointer-events-none opacity-50" : ""}
             />
@@ -79,7 +83,10 @@ export default function VolunteersPage() {
 
           <PaginationItem>
             <PaginationNext
-              onClick={() => handlePageChange(page + 1)}
+              onClick={(e) => {
+                e.preventDefault();
+                handlePageChange(page + 1);
+              }}
               aria-disabled={page === totalPages}
               className={
                 page === totalPages ? "pointer-events-none opacity-50" : ""
