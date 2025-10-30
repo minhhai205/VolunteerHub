@@ -57,6 +57,7 @@ export function LoginForm() {
       router.push(redirectTo);
     } catch (err) {
       console.error("❌ Login error:", err);
+      toastManager.error("Thông tin đăng nhập hoặc mật khẩu không chính xác !");
       setError(err instanceof Error ? err.message : "Đăng nhập thất bại!");
     } finally {
       setLoading(false);
