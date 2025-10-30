@@ -19,7 +19,7 @@ type JwtPayload = {
   scope: string;
   exp: number;
 };
-=======
+
 import { toastManager } from "@/components/static/toast/toast";
 
 export function LoginForm() {
@@ -72,17 +72,6 @@ export function LoginForm() {
         const redirectTo = params.get("redirect") || "/home";
         router.push(redirectTo);
       }
-    } catch (err) {
-      console.error("Login error:", err);
-=======
-      console.log("Login success:", result);
-      toastManager.success(
-        "Đăng nhập thành công, đang chuyển hướng..............."
-      );
-
-      const params = new URLSearchParams(window.location.search); // chuyển về trang chủ hoặc trang trước đó
-      const redirectTo = params.get("redirect") || "/home";
-      router.push(redirectTo);
     } catch (err) {
       console.error("Login error:", err);
       toastManager.error("Thông tin đăng nhập hoặc mật khẩu không chính xác !");
