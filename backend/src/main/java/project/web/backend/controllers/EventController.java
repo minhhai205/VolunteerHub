@@ -33,6 +33,16 @@ public class EventController {
                 .build();
     }
 
+    @GetMapping("/manager/newest")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ApiSuccessResponse<List<EventResponseDTO>> getNewestPublishedEventsByManager() {
+        return ApiSuccessResponse.<List<EventResponseDTO>>builder()
+                .data(eventService.getNewestPublishedEventsByManager())
+                .status(HttpStatus.OK.value())
+                .message("Get newest events successfully!")
+                .build();
+    }
+
     @PostMapping("/registration/{eventId}")
     @PreAuthorize("hasRole('USER')")
     public ApiSuccessResponse<String> eventRegistration(

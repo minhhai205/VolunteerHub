@@ -17,8 +17,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Builder
-public class
-EventCreateRequest extends AbstractEntity {
+public class EventCreateRequest extends AbstractEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

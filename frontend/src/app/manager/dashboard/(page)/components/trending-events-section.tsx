@@ -62,10 +62,10 @@ export function TrendingEventsSection() {
                     <MessageSquare className="w-4 h-4" />
                     <span>{event.discussions} bài trao đổi</span>
                   </div>
-                  <div className={styles.statItem}>
+                  {/* <div className={styles.statItem}>
                     <Heart className="w-4 h-4" />
                     <span>{event.likes} lượt thích</span>
-                  </div>
+                  </div> */}
                 </div>
 
                 <div className={styles.actionSection}>
