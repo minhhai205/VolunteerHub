@@ -21,7 +21,6 @@ import project.web.backend.utils.enums.ExportFormat;
 @RequiredArgsConstructor
 @Slf4j
 public class FileService {
-
     // Inject all FileExportStrategy beans
     private final List<FileExportStrategy<?>> strategyList;
 

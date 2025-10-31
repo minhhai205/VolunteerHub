@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import styles from "./events.module.css";
-import { Header } from "@/components/static/Header";
+import { Header } from "@/components/static/HeaderManager";
 import { Footer } from "@/components/static/Footer";
 import { getAccessToken } from "@/lib/token";
 

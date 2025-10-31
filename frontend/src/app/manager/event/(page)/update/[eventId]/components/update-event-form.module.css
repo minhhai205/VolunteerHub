@@ -1,0 +1,368 @@
+.form {
+  width: 100%;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.card {
+  background: rgb(255, 255, 255);
+  border: 1px solid rgb(220, 235, 220);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  box-shadow: 0 4px 6px rgba(76, 175, 80, 0.05),
+    0 10px 20px rgba(76, 175, 80, 0.08);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 12px rgba(76, 175, 80, 0.08),
+    0 16px 32px rgba(76, 175, 80, 0.12);
+  transform: translateY(-2px);
+}
+
+.section {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid rgb(232, 245, 233);
+}
+
+.section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 2rem;
+  padding-bottom: 0;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: rgb(56, 142, 60);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.field {
+  margin-bottom: 1.5rem;
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: rgb(56, 142, 60);
+  margin-bottom: 0.5rem;
+  font-size: 0.9375rem;
+}
+
+.labelIcon {
+  width: 1.125rem;
+  height: 1.125rem;
+  color: rgb(76, 175, 80);
+  transition: transform 0.2s ease;
+}
+
+.label:hover .labelIcon {
+  transform: scale(1.1);
+}
+
+.input,
+.textarea {
+  width: 100%;
+  border: 2px solid rgb(232, 245, 233);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1.125rem;
+  font-size: 0.9375rem;
+  transition: all 0.3s ease;
+  background: rgb(248, 252, 248);
+}
+
+.input:hover,
+.textarea:hover {
+  border-color: rgb(165, 214, 167);
+  background: rgb(255, 255, 255);
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: rgb(76, 175, 80);
+  box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.15);
+  background: rgb(255, 255, 255);
+  transform: scale(1.01);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.6;
+}
+
+.fieldGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* added styles for category multi-select */
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+  background: rgb(248, 252, 248);
+  border: 2px solid rgb(232, 245, 233);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.categoryGrid:hover {
+  border-color: rgb(165, 214, 167);
+  background: rgb(255, 255, 255);
+}
+
+.categoryCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  background: rgb(255, 255, 255);
+  border: 1px solid rgb(220, 235, 220);
+}
+
+.categoryCheckbox:hover {
+  background: rgb(241, 248, 242);
+  border-color: rgb(165, 214, 167);
+  transform: translateY(-1px);
+}
+
+.checkboxInput {
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+  accent-color: rgb(76, 175, 80);
+  transition: all 0.2s ease;
+}
+
+.checkboxInput:checked {
+  background-color: rgb(76, 175, 80);
+}
+
+.checkboxLabel {
+  font-size: 0.9375rem;
+  color: rgb(56, 142, 60);
+  font-weight: 500;
+  user-select: none;
+}
+
+.categoryCheckbox:has(.checkboxInput:checked) {
+  background: rgb(232, 245, 233);
+  border-color: rgb(76, 175, 80);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.15);
+}
+
+.imageUpload {
+  position: relative;
+}
+
+.uploadLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 3rem 2rem;
+  border: 2px dashed rgb(165, 214, 167);
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(
+    135deg,
+    rgb(248, 250, 248) 0%,
+    rgb(240, 248, 242) 100%
+  );
+}
+
+.uploadLabel:hover {
+  border-color: rgb(76, 175, 80);
+  background: linear-gradient(
+    135deg,
+    rgb(240, 248, 242) 0%,
+    rgb(232, 245, 233) 100%
+  );
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.15);
+}
+
+.uploadIcon {
+  width: 3rem;
+  height: 3rem;
+  color: rgb(76, 175, 80);
+  transition: transform 0.3s ease;
+}
+
+.uploadLabel:hover .uploadIcon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.uploadText {
+  font-weight: 500;
+  color: rgb(56, 142, 60);
+  font-size: 1rem;
+}
+
+.uploadHint {
+  font-size: 0.875rem;
+  color: rgb(100, 120, 100);
+}
+
+.fileInput {
+  display: none;
+}
+
+.imagePreviewContainer {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.15);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.imagePreview {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.imagePreviewContainer:hover .imagePreview {
+  transform: scale(1.02);
+}
+
+.removeImageButton {
+  margin-top: 1rem;
+  background: rgb(241, 248, 242);
+  border: 2px solid rgb(165, 214, 167);
+  color: rgb(56, 142, 60);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.removeImageButton:hover {
+  background: rgb(232, 245, 233);
+  border-color: rgb(129, 199, 132);
+  transform: translateY(-1px);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1.5rem;
+}
+
+.cancelButton {
+  min-width: 120px;
+  background: rgb(248, 250, 248);
+  border: 2px solid rgb(165, 214, 167);
+  color: rgb(56, 142, 60);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelButton:hover {
+  background: rgb(232, 245, 233);
+  border-color: rgb(129, 199, 132);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.15);
+}
+
+.submitButton {
+  min-width: 150px;
+  background: linear-gradient(
+    135deg,
+    rgb(76, 175, 80) 0%,
+    rgb(102, 187, 106) 100%
+  );
+  color: rgb(255, 255, 255);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  transition: all 0.3s ease;
+}
+
+.submitButton:hover {
+  background: linear-gradient(
+    135deg,
+    rgb(67, 160, 71) 0%,
+    rgb(76, 175, 80) 100%
+  );
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.submitButton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 1.5rem;
+  }
+
+  .fieldGroup {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .categoryGrid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .cancelButton,
+  .submitButton {
+    width: 100%;
+  }
+}

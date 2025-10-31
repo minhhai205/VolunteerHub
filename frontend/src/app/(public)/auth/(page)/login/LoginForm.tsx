@@ -10,7 +10,17 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Mail, Lock, ArrowRight } from "lucide-react";
 import { saveTokens } from "@/lib/token";
-import { registerPushAfterLogin } from '@/lib/notification';
+import { registerPushAfterLogin } from "@/lib/notification";
+
+import { jwtDecode } from "jwt-decode";
+
+type JwtPayload = {
+  sub: string;
+  scope: string;
+  exp: number;
+};
+
+import { toastManager } from "@/components/static/toast/toast";
 
 export function LoginForm() {
   const router = useRouter();
@@ -46,13 +56,25 @@ export function LoginForm() {
       // Đăng ký nhận Push Notification
       registerPushAfterLogin(result.data.accessToken);
 
-      console.log("✅ Login success:", result);
+      // Decode JWT để lấy role
+      const decoded = jwtDecode<JwtPayload>(result.data.accessToken);
+      const role = decoded.scope?.replace("ROLE_", ""); // ADMIN / USER / MANAGER
 
-      const params = new URLSearchParams(window.location.search); // chuyển về trang chủ hoặc trang trước đó
-      const redirectTo = params.get("redirect") || "/home";
-      router.push(redirectTo);
+      console.log("Login success:", result);
+
+      // Điều hướng theo role
+      if (role === "ADMIN") {
+        router.push("/admin/dashboard");
+      } else if (role === "MANAGER") {
+        router.push("/manager/dashboard");
+      } else {
+        const params = new URLSearchParams(window.location.search); // chuyển về trang chủ hoặc trang trước đó
+        const redirectTo = params.get("redirect") || "/home";
+        router.push(redirectTo);
+      }
     } catch (err) {
-      console.error("❌ Login error:", err);
+      console.error("Login error:", err);
+      toastManager.error("Thông tin đăng nhập hoặc mật khẩu không chính xác !");
       setError(err instanceof Error ? err.message : "Đăng nhập thất bại!");
     } finally {
       setLoading(false);

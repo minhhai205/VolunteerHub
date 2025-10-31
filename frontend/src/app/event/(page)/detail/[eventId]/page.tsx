@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Users, MapPin, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Post } from "../post/Post";
+import { Post } from "../components/post/Post";
 import styles from "./event-detail.module.css";
 import { useDetail } from "../../../hooks/useDetail";
 

@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import { ThemeProvider } from "./components/providers/ThemeProvider";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useEffect, useState } from "react";
+import ProtectedRoute from "@/components/auth/ProtectedRoute"; // import ProtectedRoute
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,12 +19,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export default function RootLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Use localStorage instead of cookies
+  // Sidebar state
   const [defaultOpen, setDefaultOpen] = useState(true);
 
   useEffect(() => {
@@ -38,23 +39,25 @@ export default function RootLayout({
   }, [defaultOpen]);
 
   return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} antialiased flex`}
-    >
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
+    <ProtectedRoute allowedScopes={["ADMIN"]}>
+      <div
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex`}
       >
-        <SidebarProvider defaultOpen={defaultOpen}>
-          <AppSidebar />
-          <main className="w-full">
-            <Navbar />
-            <div className="px-4">{children}</div>
-          </main>
-        </SidebarProvider>
-      </ThemeProvider>
-    </div>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SidebarProvider defaultOpen={defaultOpen}>
+            <AppSidebar />
+            <main className="w-full">
+              <Navbar />
+              <div className="px-4">{children}</div>
+            </main>
+          </SidebarProvider>
+        </ThemeProvider>
+      </div>
+    </ProtectedRoute>
   );
 }

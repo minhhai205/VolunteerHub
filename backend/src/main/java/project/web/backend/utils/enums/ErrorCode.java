@@ -15,6 +15,7 @@ public enum ErrorCode {
             HttpStatus.BAD_REQUEST),
     TOKEN_SIGNATURE_INVALID(400, "Your token signature was invalid, please login again to get your new access token",
             HttpStatus.BAD_REQUEST),
+    TOKEN_DISABLED(401, "Your token is disabled", HttpStatus.UNAUTHORIZED),
     TOKEN_EXPIRED(400, "Your token was expired, please login again", HttpStatus.BAD_REQUEST),
     ACCOUNT_NOT_EXIST(401, "Can't find any account with your given email, please try others", HttpStatus.UNAUTHORIZED),
     PASSWORD_INVALID(401, "Your password was invalid, please try again", HttpStatus.UNAUTHORIZED),

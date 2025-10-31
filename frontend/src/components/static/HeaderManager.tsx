@@ -73,7 +73,7 @@ export function Header() {
         setShowUserMenu(false)
         
         // Redirect về trang chủ 
-        window.location.href = '/home'
+        window.location.href = '/auth/login'
       } else {
         // Xử lý khi logout thất bại
         console.error('Logout failed:', data)
@@ -97,7 +97,7 @@ export function Header() {
     <header className={styles.header}>
       <div className={styles.container}>
         {/* Logo and Brand */}
-        <Link href="/home" className={styles.logo}>
+        <Link href="/manager/dashboard" className={styles.logo}>
           <div className={styles.logoIcon}>
             <Heart className={styles.logoIconSvg} fill="currentColor" />
           </div>
@@ -107,14 +107,14 @@ export function Header() {
         {/* Navigation */}
         <nav className={styles.nav}>
           <Link 
-            href="/home" 
-            className={`${styles.navLink} ${isActive('/home') ? styles.navLinkActive : ''}`}
+            href="/manager/dashboard" 
+            className={`${styles.navLink} ${isActive('/manager/dashboard') ? styles.navLinkActive : ''}`}
           >
-            Trang chủ
+            Tổng quan
           </Link>
           <Link 
-            href="/event/list" 
-            className={`${styles.navLink} ${isActive('/event') ? styles.navLinkActive : ''}`}
+            href="/manager/event/list" 
+            className={`${styles.navLink} ${isActive('/manager/event') ? styles.navLinkActive : ''}`}
           >
             Sự kiện
           </Link>
