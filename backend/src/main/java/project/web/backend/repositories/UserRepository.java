@@ -23,7 +23,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
         @Query("""
                         SELECT u FROM User u
                         JOIN FETCH u.role r
-                        WHERE r.id=:id
+                        WHERE u.id=:id
                         """)
         Optional<User> findByIdWithRole(@Param("id") Long id);
 
