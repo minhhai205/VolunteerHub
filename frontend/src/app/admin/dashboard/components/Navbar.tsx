@@ -15,10 +15,13 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { NotificationsDropdown } from "./Notification";
+import { useLogout } from "../hooks/useLogout";
 
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
   const { toggleSidebar } = useSidebar();
+  const { logout, isLoading } = useLogout();
+
   return (
     <nav className="p-4 flex items-center justify-between sticky top-0 bg-background z-10">
       {/* LEFT */}
@@ -69,7 +72,7 @@ const Navbar = () => {
               <Settings className="h-[1.2rem] w-[1.2rem] mr-2" />
               Cài đặt
             </DropdownMenuItem>
-            <DropdownMenuItem variant="destructive">
+            <DropdownMenuItem variant="destructive" onClick={logout}>
               <LogOut className="h-[1.2rem] w-[1.2rem] mr-2" />
               Đăng xuất
             </DropdownMenuItem>
