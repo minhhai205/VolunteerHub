@@ -14,6 +14,7 @@ import UserCard from "../components/UserCard";
 import { generatePaginationItems } from "@/lib/pagination";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUserList } from "../hooks/useUserList";
+import { User } from "@/lib/mockData";
 
 export default function VolunteersPage() {
   const router = useRouter();
@@ -26,6 +27,52 @@ export default function VolunteersPage() {
   // fetch volunteers (role = USER)
   const { users, pagination, loading } = useUserList(page, 10, "USER");
   const totalPages = Math.max(1, pagination.totalPage);
+
+  // 3. Tạo state "lạc quan" (optimistic) để render UI
+  // Đây là danh sách mà UI sẽ hiển thị
+  const [optimisticUsers, setOptimisticUsers] = useState<User[]>([]);
+
+  // 4. Đồng bộ state GỐC vào state "lạc quan" khi data từ server thay đổi
+  useEffect(() => {
+    setOptimisticUsers(users);
+  }, [users]);
+
+  // Listen for optimistic lock/unlock events and apply or revert changes
+  useEffect(() => {
+    const onOptimistic = (e: Event) => {
+      const detail = (e as CustomEvent).detail as {
+        userId: string;
+        lock: boolean;
+      };
+      setOptimisticUsers((prev) =>
+        prev.map((u) =>
+          u.id === detail.userId
+            ? { ...u, status: detail.lock ? "locked" : "active" }
+            : u
+        )
+      );
+    };
+
+    const onRevert = (e: Event) => {
+      // revert from latest canonical users list (server state)
+      const detail = (e as CustomEvent).detail as { userId: string };
+      setOptimisticUsers((prev) =>
+        prev.map((u) => {
+          const server = users.find((s) => s.id === detail.userId);
+          return server ? server : u;
+        })
+      );
+    };
+
+    window.addEventListener("user-lock-optimistic", onOptimistic);
+    window.addEventListener("user-lock-revert", onRevert);
+
+    return () => {
+      window.removeEventListener("user-lock-optimistic", onOptimistic);
+      window.removeEventListener("user-lock-revert", onRevert);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [users]);
 
   // keep local state in sync when user navigates back/forward
   useEffect(() => {
@@ -65,7 +112,8 @@ export default function VolunteersPage() {
 
   return (
     <div className="space-y-4">
-      {users.map((user) => (
+      {/* render optimisticUsers so UI updates immediately */}
+      {optimisticUsers.map((user) => (
         <UserCard key={user.id} user={user} />
       ))}
 
