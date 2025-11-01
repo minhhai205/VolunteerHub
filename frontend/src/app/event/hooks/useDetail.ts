@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
+
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
@@ -123,27 +126,28 @@ const mockPosts: Post[] = [
   },
 ];
 
-// API functions
 export async function fetchEventData(eventId: string): Promise<Event> {
-  // try {
-  //   // Try to fetch from API
-  //   const response = await fetch(`${API_BASE_URL}/events/${eventId}`)
-  //   if (response.ok) {
-  //     return response.json()
-  //   }
-  // } catch (error) {
-  //   console.warn("API call failed, using mock data:", error)
-  // }
+  try {
+    const res = await fetchWithAuth(`${API_BASE_URL}/event/${eventId}`, {
+      method: "GET",
+    });
 
-  // Fallback to mock data
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        ...mockEvent,
-        posts: mockPosts,
-      });
-    }, 500);
-  });
+    const response = await res.json();
+
+    // Kiểm tra status logic từ backend
+    if (response.status !== 200) {
+      const error: any = new Error(
+        response.message || "Failed to fetch event detail"
+      );
+      error.status = response.status;
+      throw error;
+    }
+
+    return response.data as Event;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error;
+  }
 }
 
 export async function fetchPosts(eventId: string): Promise<Post[]> {

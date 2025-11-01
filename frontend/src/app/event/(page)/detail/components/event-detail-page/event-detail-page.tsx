@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { Header } from "@/components/static/Header";
 import { Footer } from "@/components/static/Footer";
 import EventHeader from "../event-header/event-header";
@@ -13,10 +14,15 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const params = useParams();
+  const eventId = params.eventId as string;
+
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await fetchEventData("1");
+        console.log(eventId)
+        if (!eventId) return;
+        const data = await fetchEventData(eventId);
         setEvent(data);
       } catch (error) {
         console.error("Failed to load event:", error);
@@ -67,7 +73,7 @@ export default function EventDetailPage() {
               <div className="space-y-4 text-sm">
                 <div>
                   <p className="text-muted-foreground text-xs font-semibold mb-1">
-                    SỰ KIỆN
+                    DANH MỤC
                   </p>
                   <p className="font-semibold text-foreground">
                     {event.categoryNames?.join(", ") || "Sự kiện"}
