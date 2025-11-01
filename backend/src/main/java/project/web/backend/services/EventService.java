@@ -137,7 +137,14 @@ public class EventService {
         Event event = eventRepository.findEventById(eventId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
 
-        return eventMapper.toResponseDTO(event);
+        EventResponseDTO eventResponseDTO = eventMapper.toResponseDTO(event);
+
+        List<Long> eventsIds = List.of(event.getId());
+        Map<Long, Long> memberCountMap = findCountMemberForEvents(eventsIds);
+
+        eventResponseDTO.setCountMembers(memberCountMap.get(event.getId()));
+
+        return eventResponseDTO;
     }
 
     @Transactional
