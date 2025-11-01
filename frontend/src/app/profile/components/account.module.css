@@ -35,7 +35,43 @@
   --sidebar-ring: oklch(0.65 0.12 142.5);
 }
 
-/* Bạn vẫn có thể thêm các class cục bộ khác ở đây */
+.backButton {
+  position: absolute;
+  top: 3rem;
+  right: 1.5rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  font-size: 1.875rem; /* 30px */
+  font-weight: 700; /* bold */
+  padding: 0; /* Xóa padding mặc định */
+
+  /* SỬ DỤNG BIẾN TỪ .accountTheme */
+  border: 1px solid var(--border);
+  background-color: var(--muted); /* Nền xám nhạt (oklch(0.94 0 0)) */
+  color: var(--secondary-foreground); /* Màu chữ tối (oklch(0.3 0 0)) */
+
+  /* Căn giữa mũi tên */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Hiệu ứng chuyển động */
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Thêm hiệu ứng hover "chuyển màu" */
+.backButton:hover {
+  /* Chuyển sang màu xanh nhạt (từ theme) */
+  background-color: var(--secondary);
+  /* Chuyển màu chữ sang xanh đậm (từ theme) */
+  color: var(--primary);
+  /* Hiệu ứng phóng to nhẹ */
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
 .someOtherClass {
   padding: 1rem;
 }

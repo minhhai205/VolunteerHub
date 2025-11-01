@@ -3,6 +3,8 @@
 import { ProfileCard } from "./profile-card";
 import { StatisticsCard } from "./statistics-card";
 import { AccountOptions } from "./account-options";
+import { useRouter } from "next/navigation";
+import styles from "./account.module.css";
 
 interface UserProfile {
   name: string;
@@ -31,9 +33,19 @@ const mockUser: UserProfile = {
 };
 
 export default function AccountPage() {
+  const router = useRouter();
   return (
     <main className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <button
+          onClick={() => router.back()}
+          className={styles.backButton}
+          aria-label="Quay lại"
+          title="Quay lại"
+        >
+          ←
+        </button>
+
         {/* Header Section */}
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-foreground mb-2">
