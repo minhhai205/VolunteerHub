@@ -1,6 +1,7 @@
 package project.web.backend.dtos.response.post;
 
 import lombok.*;
+import project.web.backend.dtos.response.user.UserResponseDTO;
 import project.web.backend.entities.*;
 
 import java.io.Serializable;
@@ -16,7 +17,7 @@ import java.util.Set;
 public class PostResponseDTO implements Serializable {
     private Long id;
     private Long eventId;
-    private Long userId;
+    private UserResponseDTO user;
     private String title;
     private String content;
     private Set<PostMediaResponseDTO> medias;
