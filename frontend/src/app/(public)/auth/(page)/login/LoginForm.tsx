@@ -64,10 +64,13 @@ export function LoginForm() {
 
       // Điều hướng theo role
       if (role === "ADMIN") {
+        toastManager.success("Đăng nhập thành công !");
         router.push("/admin/dashboard");
       } else if (role === "MANAGER") {
+        toastManager.success("Đăng nhập thành công !");
         router.push("/manager/dashboard");
       } else {
+        toastManager.success("Đăng nhập thành công !");
         const params = new URLSearchParams(window.location.search); // chuyển về trang chủ hoặc trang trước đó
         const redirectTo = params.get("redirect") || "/home";
         router.push(redirectTo);

@@ -1,0 +1,191 @@
+.uiSettings {
+  max-width: 900px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0 0 0.5rem 0;
+}
+
+.description {
+  font-size: 1rem;
+  color: var(--muted-foreground);
+  margin: 0 0 2rem 0;
+}
+
+.themeOptions,
+.fontSizeOptions {
+  display: flex;
+  gap: 1rem;
+}
+
+.radioOption {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.radioInput {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+.radioLabel {
+  color: var(--foreground);
+  font-size: 0.95rem;
+}
+
+.selectWrapper {
+  display: flex;
+}
+
+.select {
+  flex: 1;
+  max-width: 300px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background-color: var(--input);
+  color: var(--foreground);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(69, 140, 90, 0.1);
+}
+
+.notificationOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.notificationItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+}
+
+.notificationInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.notificationTitle {
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+.notificationDesc {
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+}
+
+.toggle {
+  position: relative;
+  display: inline-flex;
+  width: 48px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.toggleInput {
+  display: none;
+}
+
+.toggleSlider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--muted);
+  border-radius: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.toggleSlider::before {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: white;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggleInput:checked + .toggleSlider {
+  background-color: var(--primary);
+}
+
+.toggleInput:checked + .toggleSlider::before {
+  transform: translateX(20px);
+}
+
+.saveContainer {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.saveButton {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.saveButton:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .uiSettings {
+    max-width: 100%;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .themeOptions,
+  .fontSizeOptions {
+    flex-direction: column;
+  }
+
+  .selectWrapper {
+    width: 100%;
+  }
+
+  .select {
+    max-width: 100%;
+  }
+
+  .notificationItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}

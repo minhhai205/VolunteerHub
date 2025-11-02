@@ -1,158 +1,323 @@
-"use client";
-
-import { useEffect, useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
-export interface CommentData {
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+
+/* ---------- Interfaces ---------- */
+export interface User {
   id: number;
-  author: {
-    name: string;
-    avatar: string;
-  };
-  content: string;
-  timestamp: string;
-  likes: number;
+  fullName: string;
+  avatar?: string;
 }
 
-export interface PostData {
+export interface Comment {
   id: number;
-  author: {
-    name: string;
-    avatar: string;
-  };
+  author: User;
   content: string;
-  image?: string;
-  timestamp: string;
-  likes: number;
-  comments: CommentData[];
+  createdAt: string;
 }
 
-export interface EventData {
+export interface PostMedia {
+  id: number;
+  fileUrl: string;
+}
+
+export interface Post {
   id: number;
   title: string;
-  date: string;
-  location: string;
-  time: string;
-  participants: number;
+  content: string;
+  userId: number;
+  eventId: number;
+  user?: User;
+  likesCount?: number;
+  isLiked?: boolean;
+  medias?: PostMedia[];
+  commentsCount?: number;
+  comments?: Comment[];
+  createdAt: string;
+}
+
+export interface Event {
+  id: number;
+  name: string;
   description: string;
-  image: string;
-  status: string;
-  organizer: string;
-  requirements: string[];
+  location: string;
+  imageUrl: string;
+  startDate: string;
+  endDate: string;
+  categoryNames?: string[];
+  countMembers?: number;
+  countPosts?: number;
+  posts?: Post[];
 }
 
-interface UseDetailResult {
-  event: EventData | null;
-  posts: PostData[];
-  loading: boolean;
-  error: string | null;
+export interface PaginatedPostResponse {
+  pageNo: number;
+  pageSize: number;
+  totalPage: number;
+  data: Post[];
 }
 
-/**
- * Hook fetch dữ liệu chi tiết sự kiện và bài viết (hoặc mock nếu chưa có API)
- */
-export const useDetail = (eventId: string): UseDetailResult => {
-  const [event, setEvent] = useState<EventData | null>(null);
-  const [posts, setPosts] = useState<PostData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export interface ApiResponse<T> {
+  status: number;
+  message: string;
+  data: T;
+}
 
-  useEffect(() => {
-    if (!eventId) return;
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [eventRes, postsRes] = await Promise.allSettled([
-          fetchWithAuth(`http://localhost:8080/api/events/${eventId}`),
-          fetchWithAuth(`http://localhost:8080/api/events/${eventId}/posts`),
-        ]);
-
-        console.log("eventRes.status: ", eventRes.status)
-
-        if (
-          eventRes.status === "rejected" ||
-          postsRes.status === "rejected" ||
-          !eventRes.value.ok
-        ) {
-          // Mock dữ liệu fallback
-          const mockEvent: EventData = {
-            id: 1,
-            title: "Chiến dịch Mùa hè Xanh 2025",
-            date: "2025-10-20",
-            location: "Quận 9, TP. HCM",
-            time: "07:00 - 17:00",
-            participants: 80,
-            description:
-              "Sự kiện tình nguyện lớn nhất năm nhằm hỗ trợ người dân vùng sâu vùng xa.",
-            image: "/placeholder.svg",
-            status: "Đang mở đăng ký",
-            organizer: "Đoàn Trường Đại học Bách Khoa",
-            requirements: [
-              "Sinh viên đang theo học đại học",
-              "Có tinh thần trách nhiệm cao",
-              "Cam kết tham gia đầy đủ thời gian chiến dịch",
-            ],
-          };
-
-          const mockPosts: PostData[] = [
-            {
-              id: 1,
-              author: {
-                name: "Nguyễn Văn A",
-                avatar: "/avatars/a.png",
-              },
-              content: "Mình đã tham gia năm ngoái, rất đáng nhớ luôn 😍",
-              timestamp: "2025-10-01T09:00:00Z",
-              image: "/images/event1.jpg",
-              likes: 23,
-              comments: [
-                {
-                  id: 1,
-                  author: { name: "Trần Thị B", avatar: "/avatars/b.png" },
-                  content: "Năm nay chắc còn vui hơn!",
-                  timestamp: "2025-10-01T10:00:00Z",
-                  likes: 3,
-                },
-              ],
-            },
-            {
-              id: 2,
-              author: {
-                name: "Lê Minh C",
-                avatar: "/avatars/c.png",
-              },
-              content: "Cho mình hỏi cần chuẩn bị gì khi tham gia ạ?",
-              timestamp: "2025-10-02T08:00:00Z",
-              likes: 15,
-              comments: [],
-            },
-          ];
-
-          setEvent(mockEvent);
-          setPosts(mockPosts);
-        } else {
-          const eventData: EventData = await eventRes.value.json();
-          const postsData: PostData[] =
-            postsRes.status === "fulfilled" && postsRes.value.ok
-              ? await postsRes.value.json()
-              : [];
-          setEvent(eventData);
-          setPosts(postsData);
-        }
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else if (typeof err === "string") {
-          setError(err);
-        } else {
-          setError("Lỗi khi tải dữ liệu");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [eventId]);
-  return { event, posts, loading, error };
+// Mock data based on backend DTOs
+const mockEvent: Event = {
+  id: 1,
+  name: "Chiến dịch Xuân tính nguyện 2025",
+  description:
+    "Chiến dịch Xuân tính nguyện 2025 là một hoạt động ý nghĩa nhằm mang lại niềm vui và sự ấm áp cho cộng đồng trong dịp Tết Nguyên Đán. Chúng tôi sẽ tổ chức các hoạt động trong cây xanh, dọn dẹp môi trường, và trao quà cho các gia đình có hoàn cảnh khó khăn.",
+  location: "Hà Nội, Việt Nam",
+  imageUrl: "/event-banner.jpg",
+  startDate: "2026-01-15T08:00:00",
+  endDate: "2026-01-15T17:00:00",
+  categoryNames: ["Tình nguyện", "Cộng đồng"],
+  countMembers: 156,
+  countPosts: 5,
 };
+
+const mockPosts: Post[] = [
+  {
+    id: 1,
+    title: "Bình luận từ Nguyễn Văn A",
+    content:
+      "Mình rất mong chờ được tham gia sự kiện này! Đây là lần đầu tiên mình tham gia hoạt động tính nguyện và rất hào hức.",
+    userId: 1,
+    eventId: 1,
+    user: { id: 1, fullName: "Nguyễn Văn A", avatar: "" },
+    likesCount: 12,
+    isLiked: false,
+    commentsCount: 2,
+    medias: [],
+    comments: [
+      {
+        id: 1,
+        author: { id: 2, fullName: "Trần Thị B" },
+        content: "Mình cũng vậy, chúng ta cố gắng làm tốt nhé!",
+        createdAt: new Date(Date.now() - 3600000).toISOString(),
+      },
+    ],
+    createdAt: new Date(Date.now() - 7200000).toISOString(),
+  },
+  {
+    id: 2,
+    title: "Bình luận từ Trần Thị B",
+    content:
+      "Các bạn có thể cho mình biết chuẩn bị những gì không? Mình muốn tham gia nhưng chưa rõ về trạng phục và dung cụ cần thiết.",
+    userId: 2,
+    eventId: 1,
+    user: { id: 2, fullName: "Trần Thị B", avatar: "" },
+    likesCount: 8,
+    isLiked: false,
+    commentsCount: 0,
+    medias: [
+      { id: 1, fileUrl: "/images/home1.jpg" },
+      // { id: 1, fileUrl: "/images/home1.jpg" },
+      // { id: 1, fileUrl: "/images/home1.jpg" },
+    ],
+    comments: [],
+    createdAt: new Date(Date.now() - 10800000).toISOString(),
+  },
+  {
+    id: 3,
+    title: "Bình luận từ Lê Minh C",
+    content:
+      "Mình chia sẻ một số tips hữu ích cho những ai sắp tham gia lần đầu. Hãy mang theo nước uống đầy đủ!",
+    userId: 3,
+    eventId: 1,
+    user: { id: 3, fullName: "Lê Minh C", avatar: "" },
+    likesCount: 24,
+    isLiked: false,
+    commentsCount: 3,
+    medias: [],
+    comments: [],
+    createdAt: new Date(Date.now() - 14400000).toISOString(),
+  },
+];
+
+export async function fetchEventData(eventId: string): Promise<Event> {
+  try {
+    const res = await fetchWithAuth(`${API_BASE_URL}/event/${eventId}`, {
+      method: "GET",
+    });
+
+    const response = await res.json();
+
+    // Kiểm tra status logic từ backend
+    if (response.status !== 200) {
+      const error: any = new Error(
+        response.message || "Failed to fetch event detail"
+      );
+      error.status = response.status;
+      throw error;
+    }
+
+    return response.data as Event;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error;
+  }
+}
+
+// Cập nhật hàm fetchPosts để nhận tham số phân trang
+export async function fetchPosts(
+  eventId: string,
+  pageNo: number = 0,
+  pageSize: number = 2
+): Promise<PaginatedPostResponse> {
+  try {
+    const response = await fetchWithAuth(
+      `${API_BASE_URL}/post/post-list/${eventId}?page=${pageNo}&size=${pageSize}`,
+      { method: "GET" }
+    ).then((res) => res.json());
+
+    if (response.status === 200) {
+      // Kiểm tra xem response.data có phải là PaginatedResponse không
+      if (
+        response.data &&
+        typeof response.data === "object" &&
+        "data" in response.data
+      ) {
+        return response.data as PaginatedPostResponse;
+      }
+
+      // Nếu API chưa hỗ trợ phân trang, tạo response giả
+      const posts = Array.isArray(response.data)
+        ? response.data
+        : response.data.data || [];
+      return {
+        pageNo: pageNo,
+        pageSize: pageSize,
+        totalPage: Math.ceil(posts.length / pageSize),
+        data: posts.slice(pageNo * pageSize, (pageNo + 1) * pageSize),
+      };
+    }
+
+    throw new Error(response.message || "Failed to fetch posts");
+  } catch (error) {
+    console.warn("API call failed, using mock data:", error);
+
+    // Mock data với phân trang
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const start = pageNo * pageSize;
+        const end = start + pageSize;
+        const paginatedMockPosts = mockPosts.slice(start, end);
+
+        resolve({
+          pageNo: pageNo,
+          pageSize: pageSize,
+          totalPage: Math.ceil(mockPosts.length / pageSize),
+          data: paginatedMockPosts,
+        });
+      }, 300);
+    });
+  }
+}
+
+export async function createPost(
+  eventId: string,
+  content: string,
+  medias?: PostMedia[]
+): Promise<Post> {
+  // try {
+  //   const payload = {
+  //     eventId,
+  //     content,
+  //     medias: medias || [],
+  //   }
+  //   const response = await fetch(`${API_BASE_URL}/posts`, {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify(payload),
+  //   })
+  //   if (response.ok) {
+  //     return response.json()
+  //   }
+  // } catch (error) {
+  //   console.warn("API call failed, using mock data:", error)
+  // }
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const newPost: Post = {
+        id: Date.now(),
+        title: "Bài viết của bạn",
+        content,
+        userId: 0,
+        eventId: Number.parseInt(eventId),
+        user: { id: 0, fullName: "Bạn" },
+        likesCount: 0,
+        isLiked: false,
+        commentsCount: 0,
+        medias: medias || [],
+        comments: [],
+        createdAt: new Date().toISOString(),
+      };
+      resolve(newPost);
+    }, 300);
+  });
+}
+
+export async function likePost(postId: number): Promise<Post> {
+  // try {
+  //   const response = await fetch(`${API_BASE_URL}/posts/${postId}/like`, {
+  //     method: "POST",
+  //   })
+  //   if (response.ok) {
+  //     return response.json()
+  //   }
+  // } catch (error) {
+  //   console.warn("API call failed, using mock data:", error)
+  // }
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const post = mockPosts.find((p) => p.id === postId);
+      if (post) {
+        post.isLiked = !post.isLiked;
+        post.likesCount = (post.likesCount || 0) + (post.isLiked ? 1 : -1);
+        resolve(post);
+      }
+    }, 200);
+  });
+}
+
+export async function addComment(
+  postId: number,
+  content: string
+): Promise<Post> {
+  // try {
+  //   const response = await fetch(`${API_BASE_URL}/posts/${postId}/comments`, {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({ content }),
+  //   })
+  //   if (response.ok) {
+  //     return response.json()
+  //   }
+  // } catch (error) {
+  //   console.warn("API call failed, using mock data:", error)
+  // }
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const post = mockPosts.find((p) => p.id === postId);
+      if (post) {
+        const newComment: Comment = {
+          id: Date.now(),
+          author: { id: 0, fullName: "Bạn" },
+          content,
+          createdAt: new Date().toISOString(),
+        };
+        post.comments = [...(post.comments || []), newComment];
+        post.commentsCount = (post.commentsCount || 0) + 1;
+        resolve(post);
+      }
+    }, 300);
+  });
+}
