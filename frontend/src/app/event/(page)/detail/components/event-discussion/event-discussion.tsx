@@ -1,104 +1,109 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import PostForm from "../post-form/post-form"
-import PostItem from "../post-item/post-item"
-import { fetchPosts, createPost, Post, PostMedia } from "../../../../hooks/useDetail"
-import styles from "./event-discussion.module.css"
+import { useState, useEffect } from "react";
+import PostForm from "../post-form/post-form";
+import PostItem from "../post-item/post-item";
+import {
+  fetchPosts,
+  createPost,
+  Post,
+  PostMedia,
+} from "../../../../hooks/useDetail";
+import styles from "./event-discussion.module.css";
 
 interface EventDiscussionProps {
-  eventId: string
+  eventId: string;
 }
 
 interface PaginatedResponse {
-  pageNo: number
-  pageSize: number
-  totalPage: number
-  data: Post[]
+  pageNo: number;
+  pageSize: number;
+  totalPage: number;
+  data: Post[];
 }
 
 // Type guard function
 function isPaginatedResponse(response: unknown): response is PaginatedResponse {
-  if (!response || typeof response !== 'object') return false
-  
-  const obj = response as Record<string, unknown>
-  
+  if (!response || typeof response !== "object") return false;
+
+  const obj = response as Record<string, unknown>;
+
   return (
-    typeof obj.pageNo === 'number' &&
-    typeof obj.pageSize === 'number' &&
-    typeof obj.totalPage === 'number' &&
+    typeof obj.pageNo === "number" &&
+    typeof obj.pageSize === "number" &&
+    typeof obj.totalPage === "number" &&
     Array.isArray(obj.data)
-  )
+  );
 }
 
 export default function EventDiscussion({ eventId }: EventDiscussionProps) {
-  const [posts, setPosts] = useState<Post[]>([])
-  const [loading, setLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [currentPage, setCurrentPage] = useState(0)
-  const [totalPages, setTotalPages] = useState(1)
-  const [pageSize] = useState(1)
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageSize] = useState(2);
 
   // Load trang đầu tiên
   useEffect(() => {
     const loadInitialPosts = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
-        const response = await fetchPosts(eventId, 0, pageSize)
-        
+        const response = await fetchPosts(eventId, 0, pageSize);
+
         if (isPaginatedResponse(response)) {
-          setPosts(response.data)
-          setTotalPages(response.totalPage)
-          setCurrentPage(0)
+          setPosts(response.data);
+          setTotalPages(response.totalPage);
+          setCurrentPage(0);
         } else if (Array.isArray(response)) {
-          setPosts(response)
+          setPosts(response);
         }
       } catch (error) {
-        console.error("Failed to load posts:", error)
+        console.error("Failed to load posts:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    loadInitialPosts()
-  }, [eventId, pageSize])
+    loadInitialPosts();
+  }, [eventId, pageSize]);
 
   // Hàm tải thêm bài viết
   const loadMorePosts = async () => {
-    if (loadingMore || currentPage >= totalPages - 1) return
+    if (loadingMore || currentPage >= totalPages - 1) return;
 
-    setLoadingMore(true)
+    setLoadingMore(true);
     try {
-      const nextPage = currentPage + 1
-      const response = await fetchPosts(eventId, nextPage, pageSize)
-      
+      const nextPage = currentPage + 1;
+      const response = await fetchPosts(eventId, nextPage, pageSize);
+
       if (isPaginatedResponse(response)) {
-        setPosts(prev => [...prev, ...response.data])
-        setCurrentPage(nextPage)
-        setTotalPages(response.totalPage)
+        setPosts((prev) => [...prev, ...response.data]);
+        setCurrentPage(nextPage);
+        setTotalPages(response.totalPage);
       }
     } catch (error) {
-      console.error("Failed to load more posts:", error)
+      console.error("Failed to load more posts:", error);
     } finally {
-      setLoadingMore(false)
+      setLoadingMore(false);
     }
-  }
+  };
 
   const handlePostCreate = async (content: string, medias?: PostMedia[]) => {
     try {
-      const newPost = await createPost(eventId, content, medias)
+      const newPost = await createPost(eventId, content, medias);
       // Thêm bài viết mới vào đầu danh sách
-      setPosts([newPost, ...posts])
+      setPosts([newPost, ...posts]);
     } catch (error) {
-      console.error("Failed to create post:", error)
+      console.error("Failed to create post:", error);
     }
-  }
+  };
 
   const handlePostUpdate = (postId: number, updatedPost: Post) => {
-    setPosts(posts.map((p) => (p.id === postId ? updatedPost : p)))
-  }
+    setPosts(posts.map((p) => (p.id === postId ? updatedPost : p)));
+  };
 
-  const hasMorePosts = currentPage < totalPages - 1
+  const hasMorePosts = currentPage < totalPages - 1;
 
   return (
     <div className={styles.discussionSection}>
@@ -118,13 +123,13 @@ export default function EventDiscussion({ eventId }: EventDiscussionProps) {
         ) : posts.length > 0 ? (
           <>
             {posts.map((post) => (
-              <PostItem 
-                key={post.id} 
-                post={post} 
-                onUpdate={(updated) => handlePostUpdate(post.id, updated)} 
+              <PostItem
+                key={post.id}
+                post={post}
+                onUpdate={(updated) => handlePostUpdate(post.id, updated)}
               />
             ))}
-            
+
             {/* Nút Load More */}
             {hasMorePosts && (
               <div className={styles.loadMoreContainer}>
@@ -140,17 +145,17 @@ export default function EventDiscussion({ eventId }: EventDiscussionProps) {
                     </>
                   ) : (
                     <>
-                      <svg 
-                        width="20" 
-                        height="20" 
-                        viewBox="0 0 20 20" 
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
                         fill="none"
                         className={styles.loadMoreIcon}
                       >
-                        <path 
-                          d="M10 4V16M4 10H16" 
-                          stroke="currentColor" 
-                          strokeWidth="2" 
+                        <path
+                          d="M10 4V16M4 10H16"
+                          stroke="currentColor"
+                          strokeWidth="2"
                           strokeLinecap="round"
                         />
                       </svg>
@@ -159,7 +164,7 @@ export default function EventDiscussion({ eventId }: EventDiscussionProps) {
                   )}
                 </button>
                 <p className={styles.loadMoreInfo}>
-                  Hiển thị {posts.length} / {totalPages * pageSize} bài viết
+                  Đã hiển thị {posts.length} bài viết
                 </p>
               </div>
             )}
@@ -168,15 +173,19 @@ export default function EventDiscussion({ eventId }: EventDiscussionProps) {
             {!hasMorePosts && posts.length > pageSize && (
               <div className={styles.endMessage}>
                 <div className={styles.endMessageLine}></div>
-                <span className={styles.endMessageText}>Đã hiển thị tất cả bài viết</span>
+                <span className={styles.endMessageText}>
+                  Đã hiển thị tất cả bài viết
+                </span>
                 <div className={styles.endMessageLine}></div>
               </div>
             )}
           </>
         ) : (
-          <p className={styles.emptyState}>Chưa có bài viết nào. Hãy là người đầu tiên bình luận!</p>
+          <p className={styles.emptyState}>
+            Chưa có bài viết nào. Hãy là người đầu tiên bình luận!
+          </p>
         )}
       </div>
     </div>
-  )
+  );
 }

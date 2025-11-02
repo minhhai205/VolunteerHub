@@ -167,7 +167,7 @@ export async function fetchEventData(eventId: string): Promise<Event> {
 export async function fetchPosts(
   eventId: string,
   pageNo: number = 0,
-  pageSize: number = 1
+  pageSize: number = 2
 ): Promise<PaginatedPostResponse> {
   try {
     const response = await fetchWithAuth(
