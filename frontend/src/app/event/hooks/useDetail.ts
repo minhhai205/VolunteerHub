@@ -52,6 +52,19 @@ export interface Event {
   posts?: Post[];
 }
 
+export interface PaginatedPostResponse {
+  pageNo: number;
+  pageSize: number;
+  totalPage: number;
+  data: Post[];
+}
+
+export interface ApiResponse<T> {
+  status: number;
+  message: string;
+  data: T;
+}
+
 // Mock data based on backend DTOs
 const mockEvent: Event = {
   id: 1,
@@ -150,28 +163,60 @@ export async function fetchEventData(eventId: string): Promise<Event> {
   }
 }
 
-export async function fetchPosts(eventId: string): Promise<Post[]> {
+// Cập nhật hàm fetchPosts để nhận tham số phân trang
+export async function fetchPosts(
+  eventId: string,
+  pageNo: number = 0,
+  pageSize: number = 2
+): Promise<PaginatedPostResponse> {
   try {
     const response = await fetchWithAuth(
-      `${API_BASE_URL}/post/post-list/${eventId}`,
+      `${API_BASE_URL}/post/post-list/${eventId}?page=${pageNo}&size=${pageSize}`,
       { method: "GET" }
     ).then((res) => res.json());
 
-    console.log("Fetching posts for event:", eventId);
-    console.log(response.data.data)
+    if (response.status === 200) {
+      // Kiểm tra xem response.data có phải là PaginatedResponse không
+      if (
+        response.data &&
+        typeof response.data === "object" &&
+        "data" in response.data
+      ) {
+        return response.data as PaginatedPostResponse;
+      }
 
-    if (response.status == 200) {
-      return response.data.data;
+      // Nếu API chưa hỗ trợ phân trang, tạo response giả
+      const posts = Array.isArray(response.data)
+        ? response.data
+        : response.data.data || [];
+      return {
+        pageNo: pageNo,
+        pageSize: pageSize,
+        totalPage: Math.ceil(posts.length / pageSize),
+        data: posts.slice(pageNo * pageSize, (pageNo + 1) * pageSize),
+      };
     }
+
+    throw new Error(response.message || "Failed to fetch posts");
   } catch (error) {
     console.warn("API call failed, using mock data:", error);
-  }
 
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(mockPosts);
-    }, 300);
-  });
+    // Mock data với phân trang
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const start = pageNo * pageSize;
+        const end = start + pageSize;
+        const paginatedMockPosts = mockPosts.slice(start, end);
+
+        resolve({
+          pageNo: pageNo,
+          pageSize: pageSize,
+          totalPage: Math.ceil(mockPosts.length / pageSize),
+          data: paginatedMockPosts,
+        });
+      }, 300);
+    });
+  }
 }
 
 export async function createPost(
