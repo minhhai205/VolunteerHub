@@ -1,6 +1,5 @@
 package project.web.backend.controllers;
 
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -24,53 +23,52 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class UserController {
-    private final UserService userService;
+        private final UserService userService;
 
-    /**
-     * get all users api for admin site
-     *
-     * @param pageable pagination parameter
-     * @return {@link PageResponseDTO}
-     */
-    @GetMapping("/user-list")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ApiSuccessResponse<PageResponseDTO<List<UserDetailResponseDTO>>> getAllUsers(
-            Pageable pageable
-    ) {
-        return ApiSuccessResponse.<PageResponseDTO<List<UserDetailResponseDTO>>>builder()
-                .data(userService.getAllUsers(pageable))
-                .status(HttpStatus.OK.value())
-                .message("Get all users successfully!")
-                .build();
-    }
+        // may need search param later
+        /**
+         * get all users api for admin site
+         *
+         * @param pageable pagination parameter
+         * @return {@link PageResponseDTO}
+         */
+        @GetMapping("/user-list")
+        @PreAuthorize("hasRole('ADMIN')")
+        public ApiSuccessResponse<PageResponseDTO<List<UserDetailResponseDTO>>> getAllUsers(
+                        Pageable pageable,
+                        @RequestParam(required = false) String role) {
+                return ApiSuccessResponse.<PageResponseDTO<List<UserDetailResponseDTO>>>builder()
+                                .data(userService.getAllUsers(pageable, role))
+                                .status(HttpStatus.OK.value())
+                                .message("Get all users successfully!")
+                                .build();
+        }
 
-    /**
-     * update information for account
-     *
-     * @param dto updateInformation dto
-     * @return {@link UserResponseDTO}
-     */
-    @PatchMapping("/update-information")
-    public ApiSuccessResponse<UserResponseDTO> updateInformation(
-            @RequestBody @Valid UpdateInformationRequestDTO dto
-    ) {
-        return ApiSuccessResponse.<UserResponseDTO>builder()
-                .data(userService.updateInformation(dto))
-                .status(HttpStatus.OK.value())
-                .message("Update users successfully!")
-                .build();
-    }
+        /**
+         * update information for account
+         *
+         * @param dto updateInformation dto
+         * @return {@link UserResponseDTO}
+         */
+        @PatchMapping("/update-information")
+        public ApiSuccessResponse<UserResponseDTO> updateInformation(
+                        @RequestBody @Valid UpdateInformationRequestDTO dto) {
+                return ApiSuccessResponse.<UserResponseDTO>builder()
+                                .data(userService.updateInformation(dto))
+                                .status(HttpStatus.OK.value())
+                                .message("Update users successfully!")
+                                .build();
+        }
 
-    @PatchMapping("/lock-user/{userId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ApiSuccessResponse<String> lockUser(
-            @PathVariable @Min(value = 1, message = "id must bt greater than 0") Long userId,
-            @RequestBody @Valid LockRequestDTO dto
-    ) {
-        return ApiSuccessResponse.<String>builder()
-                .data(userService.lockUser(userId, dto))
-                .status(HttpStatus.OK.value())
-                .message("Update lock status user successfully!")
-                .build();
-    }
+        @PatchMapping("/lock-user/{userId}")
+        @PreAuthorize("hasRole('ADMIN')")
+        public ApiSuccessResponse<String> lockUser(
+                        @PathVariable @Min(value = 1, message = "id must bt greater than 0") Long userId,
+                        @RequestBody @Valid LockRequestDTO dto) {
+                return ApiSuccessResponse.<String>builder()
+                                .data(userService.lockUser(userId, dto))
+                                .status(HttpStatus.OK.value())
+                                .message("Update lock status user successfully!")
+                                .build();
+        }
 }

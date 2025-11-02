@@ -1,6 +1,5 @@
 package project.web.backend.services;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,8 +26,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public PageResponseDTO<List<UserDetailResponseDTO>> getAllUsers(Pageable pageable) {
-        Page<User> users = userRepository.getAllUsersAndManagers(pageable);
+    public PageResponseDTO<List<UserDetailResponseDTO>> getAllUsers(Pageable pageable, String role) {
+        Page<User> users;
+        if (role == null || role.isBlank()) {
+            users = userRepository.getAllUsersAndManagers(pageable);
+        } else {
+            // normalize role value (expecting values like "USER", "MANAGER", "ADMIN")
+            String normalizedRole = role.trim().toUpperCase();
+            users = userRepository.findAllByRoleName(normalizedRole, pageable);
+        }
+
         return PageResponseDTO.<List<UserDetailResponseDTO>>builder()
                 .pageNo(pageable.getPageNumber())
                 .pageSize(pageable.getPageSize())
