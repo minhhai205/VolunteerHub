@@ -7,7 +7,7 @@ const API_BASE_URL =
 /* ---------- Interfaces ---------- */
 export interface User {
   id: number;
-  name: string;
+  fullName: string;
   avatar?: string;
 }
 
@@ -29,7 +29,7 @@ export interface Post {
   content: string;
   userId: number;
   eventId: number;
-  author?: User;
+  user?: User;
   likesCount?: number;
   isLiked?: boolean;
   medias?: PostMedia[];
@@ -75,7 +75,7 @@ const mockPosts: Post[] = [
       "Mình rất mong chờ được tham gia sự kiện này! Đây là lần đầu tiên mình tham gia hoạt động tính nguyện và rất hào hức.",
     userId: 1,
     eventId: 1,
-    author: { id: 1, name: "Nguyễn Văn A", avatar: "" },
+    user: { id: 1, fullName: "Nguyễn Văn A", avatar: "" },
     likesCount: 12,
     isLiked: false,
     commentsCount: 2,
@@ -83,7 +83,7 @@ const mockPosts: Post[] = [
     comments: [
       {
         id: 1,
-        author: { id: 2, name: "Trần Thị B" },
+        author: { id: 2, fullName: "Trần Thị B" },
         content: "Mình cũng vậy, chúng ta cố gắng làm tốt nhé!",
         createdAt: new Date(Date.now() - 3600000).toISOString(),
       },
@@ -97,7 +97,7 @@ const mockPosts: Post[] = [
       "Các bạn có thể cho mình biết chuẩn bị những gì không? Mình muốn tham gia nhưng chưa rõ về trạng phục và dung cụ cần thiết.",
     userId: 2,
     eventId: 1,
-    author: { id: 2, name: "Trần Thị B", avatar: "" },
+    user: { id: 2, fullName: "Trần Thị B", avatar: "" },
     likesCount: 8,
     isLiked: false,
     commentsCount: 0,
@@ -116,7 +116,7 @@ const mockPosts: Post[] = [
       "Mình chia sẻ một số tips hữu ích cho những ai sắp tham gia lần đầu. Hãy mang theo nước uống đầy đủ!",
     userId: 3,
     eventId: 1,
-    author: { id: 3, name: "Lê Minh C", avatar: "" },
+    user: { id: 3, fullName: "Lê Minh C", avatar: "" },
     likesCount: 24,
     isLiked: false,
     commentsCount: 3,
@@ -151,14 +151,21 @@ export async function fetchEventData(eventId: string): Promise<Event> {
 }
 
 export async function fetchPosts(eventId: string): Promise<Post[]> {
-  // try {
-  //   const response = await fetch(`${API_BASE_URL}/posts?eventId=${eventId}`)
-  //   if (response.ok) {
-  //     return response.json()
-  //   }
-  // } catch (error) {
-  //   console.warn("API call failed, using mock data:", error)
-  // }
+  try {
+    const response = await fetchWithAuth(
+      `${API_BASE_URL}/post/post-list/${eventId}`,
+      { method: "GET" }
+    ).then((res) => res.json());
+
+    console.log("Fetching posts for event:", eventId);
+    console.log(response.data.data)
+
+    if (response.status == 200) {
+      return response.data.data;
+    }
+  } catch (error) {
+    console.warn("API call failed, using mock data:", error);
+  }
 
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -198,7 +205,7 @@ export async function createPost(
         content,
         userId: 0,
         eventId: Number.parseInt(eventId),
-        author: { id: 0, name: "Bạn" },
+        user: { id: 0, fullName: "Bạn" },
         likesCount: 0,
         isLiked: false,
         commentsCount: 0,
@@ -258,7 +265,7 @@ export async function addComment(
       if (post) {
         const newComment: Comment = {
           id: Date.now(),
-          author: { id: 0, name: "Bạn" },
+          author: { id: 0, fullName: "Bạn" },
           content,
           createdAt: new Date().toISOString(),
         };
