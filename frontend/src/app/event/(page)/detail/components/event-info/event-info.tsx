@@ -1,5 +1,4 @@
 "use client"
-
 import type { Event } from "../../../../hooks/useDetail"
 import { Calendar, Clock, MapPin, Users } from "lucide-react"
 import styles from "./event-info.module.css"
@@ -11,23 +10,34 @@ interface EventInfoProps {
 export default function EventInfo({ event }: EventInfoProps) {
   const startDate = new Date(event.startDate)
   const endDate = new Date(event.endDate)
-  const timeStart = startDate.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })
-  const timeEnd = endDate.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
+  }
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
 
   const infoCards = [
     {
       icon: Calendar,
-      label: "Ngày",
-      value: startDate.toLocaleDateString("vi-VN", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      }),
+      label: "Ngày bắt đầu",
+      date: formatDate(startDate),
+      time: formatTime(startDate),
     },
     {
       icon: Clock,
-      label: "Thời gian",
-      value: `${timeStart} - ${timeEnd}`,
+      label: "Ngày kết thúc",
+      date: formatDate(endDate),
+      time: formatTime(endDate),
     },
     {
       icon: MapPin,
@@ -53,7 +63,18 @@ export default function EventInfo({ event }: EventInfoProps) {
               </div>
               <div>
                 <p className={styles.label}>{card.label}</p>
-                <p className={styles.value}>{card.value}</p>
+                <p className={styles.value}>
+                  {"date" in card && "time" in card ? (
+                    <>
+                      {card.date}
+                      <span style={{ marginLeft: "1rem", opacity: 0.7 }}>
+                        {card.time}
+                      </span>
+                    </>
+                  ) : (
+                    card.value
+                  )}
+                </p>
               </div>
             </div>
           )

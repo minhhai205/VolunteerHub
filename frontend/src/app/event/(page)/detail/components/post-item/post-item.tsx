@@ -66,9 +66,9 @@ export default function PostItem({ post, onUpdate }: PostItemProps) {
     <div className={styles.postCard}>
       <div className={styles.header}>
         <div className={styles.userInfo}>
-          <div className={styles.avatar}>{post.author?.name?.charAt(0).toUpperCase() || "U"}</div>
+          <div className={styles.avatar}>{post.user?.fullName?.charAt(0).toUpperCase() || "U"}</div>
           <div>
-            <p className={styles.userName}>{post.author?.name || "Người dùng"}</p>
+            <p className={styles.userName}>{post.user?.fullName || "Người dùng"}</p>
             <p className={styles.timestamp}>{formatDate(post.createdAt)}</p>
           </div>
         </div>
@@ -132,9 +132,9 @@ export default function PostItem({ post, onUpdate }: PostItemProps) {
           <h4 className={styles.commentsTitle}>Bình luận</h4>
           {post.comments.map((comment) => (
             <div key={comment.id} className={styles.comment}>
-              <div className={styles.commentAvatar}>{comment.author.name.charAt(0).toUpperCase()}</div>
+              <div className={styles.commentAvatar}>{comment.author.fullName.charAt(0).toUpperCase()}</div>
               <div className={styles.commentContent}>
-                <p className={styles.commentAuthor}>{comment.author.name}</p>
+                <p className={styles.commentAuthor}>{comment.author.fullName}</p>
                 <p className={styles.commentText}>{comment.content}</p>
               </div>
             </div>
