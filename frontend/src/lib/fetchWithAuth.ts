@@ -5,6 +5,7 @@ import {
   saveTokens,
   clearTokens,
 } from "@/lib/token";
+import { showUnauthorizedDialog } from "@/lib/unauthorizedDialog";
 
 export async function fetchWithAuth(
   input: RequestInfo,
@@ -36,7 +37,7 @@ export async function fetchWithAuth(
   let response = await fetch(input, config);
   let result;
   try {
-    result = await response.clone().json(); // clone để không mất body
+    result = await response.clone().json();
   } catch {
     return response;
   }
@@ -109,7 +110,8 @@ function handleUnAuthorized() {
     const redirectUrl = `/auth/login?redirect=${encodeURIComponent(
       currentPath
     )}`;
-    window.location.replace(redirectUrl);
+    
+    showUnauthorizedDialog(redirectUrl);
   }
 }
 
