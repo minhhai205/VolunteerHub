@@ -6,6 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import { getAccessToken } from "@/lib/token";
 import { toastManager } from "@/components/static/toast/toast";
 import { toast } from "sonner";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface EditProfileFormProps {
   onSave: () => void;
@@ -46,7 +47,7 @@ export default function EditProfileForm({ onSave }: EditProfileFormProps) {
     const fetchUserInfo = async () => {
       try {
         setLoading(true);
-        const res = await fetch(
+        const res = await fetchWithAuth(
           `http://localhost:8080/api/user/information/${email}`,
           {
             headers: {
@@ -91,7 +92,7 @@ export default function EditProfileForm({ onSave }: EditProfileFormProps) {
 
     try {
       setLoading(true);
-      const res = await fetch(
+      const res = await fetchWithAuth(
         "http://localhost:8080/api/user/update-information",
         {
           method: "PATCH",
