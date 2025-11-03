@@ -15,7 +15,6 @@ import java.util.Set;
 public class CreatePostRequestDTO implements Serializable {
     @NotNull
     private Long eventId;
-    @NotBlank
     private String title;
     @NotBlank
     private String content;

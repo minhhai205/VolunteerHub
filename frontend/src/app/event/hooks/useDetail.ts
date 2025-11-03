@@ -222,45 +222,31 @@ export async function fetchPosts(
 export async function createPost(
   eventId: string,
   content: string,
-  medias?: PostMedia[]
+  medias?: string[]
 ): Promise<Post> {
-  // try {
-  //   const payload = {
-  //     eventId,
-  //     content,
-  //     medias: medias || [],
-  //   }
-  //   const response = await fetch(`${API_BASE_URL}/posts`, {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify(payload),
-  //   })
-  //   if (response.ok) {
-  //     return response.json()
-  //   }
-  // } catch (error) {
-  //   console.warn("API call failed, using mock data:", error)
-  // }
+  const payload = {
+    eventId,
+    content,
+    medias: medias || [],
+  };
 
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const newPost: Post = {
-        id: Date.now(),
-        title: "Bài viết của bạn",
-        content,
-        userId: 0,
-        eventId: Number.parseInt(eventId),
-        user: { id: 0, fullName: "Bạn" },
-        likesCount: 0,
-        isLiked: false,
-        commentsCount: 0,
-        medias: medias || [],
-        comments: [],
-        createdAt: new Date().toISOString(),
-      };
-      resolve(newPost);
-    }, 300);
-  });
+  try {
+    const response = await fetchWithAuth(`${API_BASE_URL}/post/create-post`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }).then((res) => res.json());
+
+    if (response.status !== 200) {
+      const errorText = await response.text();
+      throw new Error(`Tạo bài viết thất bại: ${errorText}`);
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("API call failed:", error);
+    throw error;
+  }
 }
 
 export async function likePost(postId: number): Promise<Post> {
