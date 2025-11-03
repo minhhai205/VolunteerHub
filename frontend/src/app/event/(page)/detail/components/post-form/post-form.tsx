@@ -1,64 +1,72 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useRef } from "react"
-import { Send, ImageIcon, X } from "lucide-react"
-import styles from "./post-form.module.css"
-import type { PostMedia } from "../../../../hooks/useDetail"
+import type React from "react";
+import { useState, useRef } from "react";
+import { Send, ImageIcon, X } from "lucide-react";
+import styles from "./post-form.module.css";
+import type { PostMedia } from "../../../../hooks/useDetail";
+import { uploadToCloudinary } from "@/lib/upload";
 
 interface PostFormProps {
-  onSubmit: (content: string, medias?: PostMedia[]) => void
+  onSubmit: (content: string, medias?: string[]) => void;
 }
 
 export default function PostForm({ onSubmit }: PostFormProps) {
-  const [content, setContent] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [selectedImages, setSelectedImages] = useState<File[]>([])
-  const [previewUrls, setPreviewUrls] = useState<string[]>([])
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [content, setContent] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || [])
-    const newFiles = [...selectedImages, ...files].slice(0, 5) // Max 5 images
-    setSelectedImages(newFiles)
+    const files = Array.from(e.target.files || []);
+    const newFiles = [...selectedImages, ...files].slice(0, 5); // Max 5 images
+    setSelectedImages(newFiles);
 
     // Create preview URLs
-    const urls = newFiles.map((file) => URL.createObjectURL(file))
-    setPreviewUrls(urls)
-  }
+    const urls = newFiles.map((file) => URL.createObjectURL(file));
+    setPreviewUrls(urls);
+  };
 
   const removeImage = (index: number) => {
-    const newFiles = selectedImages.filter((_, i) => i !== index)
-    const newUrls = previewUrls.filter((_, i) => i !== index)
-    setSelectedImages(newFiles)
-    setPreviewUrls(newUrls)
-  }
+    const newFiles = selectedImages.filter((_, i) => i !== index);
+    const newUrls = previewUrls.filter((_, i) => i !== index);
+    setSelectedImages(newFiles);
+    setPreviewUrls(newUrls);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!content.trim()) return
+    e.preventDefault();
+    if (!content.trim()) return;
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      // In real app, upload images first and get media objects
-      const medias: PostMedia[] = selectedImages.map((file, idx) => ({
-        id: Date.now() + idx,
-        fileUrl: previewUrls[idx],
-      }))
+      // Upload từng ảnh lên Cloudinary song song
+      const uploadedUrls = await Promise.all(
+        selectedImages.map((file) => uploadToCloudinary(file))
+      );
 
-      await onSubmit(content, medias)
-      setContent("")
-      setSelectedImages([])
-      setPreviewUrls([])
+      // Tạo mảng PostMedia từ URL thực tế
+      const medias: string[] = uploadedUrls;
+      // Gọi callback cha để tạo bài viết thật
+      await onSubmit(content, medias);
 
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ""
-      }
+      // Reset form sau khi gửi thành công
+      setContent("");
+      setSelectedImages([]);
+      setPreviewUrls([]);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    } catch (error) {
+      console.error("Lỗi khi gửi bài viết:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Đã có lỗi xảy ra khi tạo bài viết. Vui lòng thử lại!"
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
@@ -80,7 +88,11 @@ export default function PostForm({ onSubmit }: PostFormProps) {
           {previewUrls.map((url, idx) => (
             <div key={idx} className={styles.imageItem}>
               <img src={url || "/placeholder.svg"} alt={`Preview ${idx}`} />
-              <button type="button" onClick={() => removeImage(idx)} className={styles.removeBtn}>
+              <button
+                type="button"
+                onClick={() => removeImage(idx)}
+                className={styles.removeBtn}
+              >
                 <X size={16} />
               </button>
             </div>
@@ -107,7 +119,11 @@ export default function PostForm({ onSubmit }: PostFormProps) {
           <span>Thêm ảnh</span>
         </button>
 
-        <button type="submit" disabled={!content.trim() || isLoading} className={styles.submitBtn}>
+        <button
+          type="submit"
+          disabled={!content.trim() || isLoading}
+          className={styles.submitBtn}
+        >
           {isLoading ? (
             <span>Đang gửi...</span>
           ) : (
@@ -119,5 +135,5 @@ export default function PostForm({ onSubmit }: PostFormProps) {
         </button>
       </div>
     </form>
-  )
+  );
 }
