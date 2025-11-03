@@ -63,17 +63,26 @@ export function LoginForm() {
       console.log("Login success:", result);
 
       // Điều hướng theo role
-      if (role === "ADMIN") {
-        toastManager.success("Đăng nhập thành công !");
-        router.push("/admin/dashboard");
-      } else if (role === "MANAGER") {
-        toastManager.success("Đăng nhập thành công !");
-        router.push("/manager/dashboard");
-      } else {
-        toastManager.success("Đăng nhập thành công !");
-        const params = new URLSearchParams(window.location.search); // chuyển về trang chủ hoặc trang trước đó
-        const redirectTo = params.get("redirect") || "/home";
+      // Điều hướng theo role (ưu tiên redirect URL nếu có)
+      toastManager.success("Đăng nhập thành công !");
+
+      const params = new URLSearchParams(window.location.search);
+      const redirectTo = params.get("redirect");
+
+      if (redirectTo) {
         router.push(redirectTo);
+      } else {
+        switch (role) {
+          case "ADMIN":
+            router.push("/admin/dashboard");
+            break;
+          case "MANAGER":
+            router.push("/manager/dashboard");
+            break;
+          default:
+            router.push("/home");
+            break;
+        }
       }
     } catch (err) {
       console.error("Login error:", err);

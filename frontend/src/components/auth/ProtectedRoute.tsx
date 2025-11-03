@@ -4,6 +4,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getAccessToken } from "@/lib/token";
+import { toastManager } from "../static/toast/toast";
+import { showUnauthorizedDialog } from "@/lib/unauthorizedDialog";
 
 interface ProtectedRouteProps {
   allowedScopes?: string[]; // ["ADMIN"], ["MANAGER"], []
@@ -20,10 +22,18 @@ export default function ProtectedRoute({
   useEffect(() => {
     const token = getAccessToken();
 
-    console.log(token)
+    console.log(token);
     // Nếu không có token → redirect login
+
     if (!token) {
-      router.replace("/auth/login");
+      if (typeof window !== "undefined") {
+        const currentPath = window.location.pathname + window.location.search;
+        const redirectUrl = `/auth/login?redirect=${encodeURIComponent(
+          currentPath
+        )}`;
+
+        showUnauthorizedDialog(redirectUrl);
+      }
       return;
     }
 

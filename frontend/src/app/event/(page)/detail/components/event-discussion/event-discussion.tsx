@@ -89,13 +89,13 @@ export default function EventDiscussion({ eventId }: EventDiscussionProps) {
     }
   };
 
-  const handlePostCreate = async (content: string, medias?: PostMedia[]) => {
+  const handlePostCreate = async (content: string, medias?: string[]) => {
     try {
       const newPost = await createPost(eventId, content, medias);
-      // Thêm bài viết mới vào đầu danh sách
       setPosts([newPost, ...posts]);
     } catch (error) {
       console.error("Failed to create post:", error);
+      alert("Tạo bài viết không thành công. Vui lòng thử lại!");
     }
   };
 

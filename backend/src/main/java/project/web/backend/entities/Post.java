@@ -28,7 +28,6 @@ public class Post extends AbstractEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @NotBlank(message = "Title must not be blank")
     @Column(name = "title")
     private String title;
 
