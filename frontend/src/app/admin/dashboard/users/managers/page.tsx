@@ -1,7 +1,6 @@
 "use client";
 
-// note: may need changes to setPage
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -12,45 +11,76 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 import UserCard from "../components/UserCard";
-import { mockUsers } from "@/lib/mockData";
 import { generatePaginationItems } from "@/lib/pagination";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useUserList } from "../hooks/useUserList";
 
-export default function VolunteersPage() {
-  const volunteers = mockUsers.filter((u) => u.role.name === "MANAGER");
+export default function ManagersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // read page from URL (1-based)
   const currentPage = Number(searchParams.get("page")) || 1;
-  const [page, setPage] = useState(currentPage);
-  const totalPages = 10;
+  const [page, setPage] = useState<number>(currentPage);
 
+  // fetch managers (role = MANAGER)
+  const { users, pagination, loading } = useUserList(page, 10, "MANAGER");
+  const totalPages = Math.max(1, pagination.totalPage);
+
+  // keep local state in sync when user navigates back/forward
   useEffect(() => {
-    router.push(`?page=${page}`);
-  }, [page]);
+    setPage(currentPage);
+  }, [currentPage]);
 
+  // push only when local page differs from URL to avoid loops
   useEffect(() => {
-    console.log("Fetching managers for page:", page);
-    // fetch(`/api/users/volunteers?page=${page}`)
-  }, [page]);
+    if (page !== currentPage) {
+      router.push(`?page=${page}`);
+    }
+  }, [page, currentPage, router]);
 
-  // Pagination generation
+  // if backend reports fewer pages than requested, replace the route immediately
+  useEffect(() => {
+    // wait until initial fetch completes before deciding
+    if (loading) return;
+
+    const tp = Math.max(1, pagination.totalPage || 1);
+    if (page > tp) {
+      const newPage = tp;
+      // replace the URL first (no render of invalid page)
+      router.replace(`?page=${newPage}`);
+      // update local state so we won't keep trying to redirect
+      setPage(newPage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, pagination.totalPage]); // only when totalPage becomes available
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setPage(newPage);
+  };
+
+  // If we determined the current page is invalid and are redirecting, show nothing / loading
+  // (router.replace will update the URL and currentPage; then page state will sync and component will re-render)
+  if (!loading && page > totalPages) {
+    return null;
+  }
 
   return (
     <div className="space-y-4">
-      {volunteers.map((user) => (
-        <UserCard
-          key={user.id}
-          user={user}
-          onRequestLock={() => {}}
-          onShowDetail={() => {}}
-        />
+      {users.map((user: any) => (
+        <UserCard key={user.id} user={user} />
       ))}
 
       <Pagination>
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              onClick={() => page > 1 && setPage(page - 1)}
+              onClick={(e) => {
+                e.preventDefault();
+                handlePageChange(page - 1);
+              }}
+              aria-disabled={page === 1}
               className={page === 1 ? "pointer-events-none opacity-50" : ""}
             />
           </PaginationItem>
@@ -61,11 +91,10 @@ export default function VolunteersPage() {
                 <PaginationEllipsis />
               ) : (
                 <PaginationLink
-                  href="#"
                   isActive={item === page}
                   onClick={(e) => {
                     e.preventDefault();
-                    setPage(item as number);
+                    handlePageChange(item as number);
                   }}
                 >
                   {item}
@@ -76,7 +105,11 @@ export default function VolunteersPage() {
 
           <PaginationItem>
             <PaginationNext
-              onClick={() => page < totalPages && setPage(page + 1)}
+              onClick={(e) => {
+                e.preventDefault();
+                handlePageChange(page + 1);
+              }}
+              aria-disabled={page === totalPages}
               className={
                 page === totalPages ? "pointer-events-none opacity-50" : ""
               }

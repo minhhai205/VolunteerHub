@@ -11,59 +11,120 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 import UserCard from "../components/UserCard";
-import { mockUsers } from "@/lib/mockData";
 import { generatePaginationItems } from "@/lib/pagination";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useUserList } from "../hooks/useUserList";
+import { User } from "@/lib/mockData";
 
 export default function VolunteersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // get current page from URL (default 1)
+  // read page from URL (1-based)
   const currentPage = Number(searchParams.get("page")) || 1;
-  const [page, setPage] = useState(currentPage);
+  const [page, setPage] = useState<number>(currentPage);
 
-  // const volunteers = mockUsers.filter((u) => u.role.name === "USER");
-  const { users } = useUserList(page, 10);
-  console.log("Fetched users:", users);
-  const volunteers = users.filter((u) => u.role.name === "USER");
-  console.log("Volunteers filtered:", volunteers);
+  // fetch volunteers (role = USER)
+  const { users, pagination, loading } = useUserList(page, 10, "USER");
+  const totalPages = Math.max(1, pagination.totalPage);
 
-  const totalPages = 10;
+  // 3. Tạo state "lạc quan" (optimistic) để render UI
+  // Đây là danh sách mà UI sẽ hiển thị
+  const [optimisticUsers, setOptimisticUsers] = useState<User[]>([]);
 
-  // ✅ keep URL and state in sync
+  // 4. Đồng bộ state GỐC vào state "lạc quan" khi data từ server thay đổi
   useEffect(() => {
-    router.push(`?page=${page}`);
-  }, [page]);
+    setOptimisticUsers(users);
+  }, [users]);
 
-  // simulate fetching data when page changes
+  // Listen for optimistic lock/unlock events and apply or revert changes
   useEffect(() => {
-    console.log("Fetching volunteers for page:", page);
-    // fetch(`/api/users/volunteers?page=${page}`)
-  }, [page]);
+    const onOptimistic = (e: Event) => {
+      const detail = (e as CustomEvent).detail as {
+        userId: string;
+        lock: boolean;
+      };
+      setOptimisticUsers((prev) =>
+        prev.map((u) =>
+          u.id === detail.userId
+            ? { ...u, status: detail.lock ? "locked" : "active" }
+            : u
+        )
+      );
+    };
+
+    const onRevert = (e: Event) => {
+      // revert from latest canonical users list (server state)
+      const detail = (e as CustomEvent).detail as { userId: string };
+      setOptimisticUsers((prev) =>
+        prev.map((u) => {
+          const server = users.find((s) => s.id === detail.userId);
+          return server ? server : u;
+        })
+      );
+    };
+
+    window.addEventListener("user-lock-optimistic", onOptimistic);
+    window.addEventListener("user-lock-revert", onRevert);
+
+    return () => {
+      window.removeEventListener("user-lock-optimistic", onOptimistic);
+      window.removeEventListener("user-lock-revert", onRevert);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [users]);
+
+  // keep local state in sync when user navigates back/forward
+  useEffect(() => {
+    setPage(currentPage);
+  }, [currentPage]);
+
+  // push only when local page differs from URL to avoid loops
+  useEffect(() => {
+    if (page !== currentPage) {
+      router.push(`?page=${page}`);
+    }
+  }, [page, currentPage, router]);
+
+  // if backend reports fewer pages than requested, replace the route immediately
+  useEffect(() => {
+    if (loading) return;
+    const tp = Math.max(1, pagination.totalPage || 1);
+    if (page > tp) {
+      const newPage = tp;
+      // replace the URL first (no render of invalid page)
+      router.replace(`?page=${newPage}`);
+      // update local state so we won't keep trying to redirect
+      setPage(newPage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, pagination.totalPage]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages) return;
     setPage(newPage);
   };
 
+  // If we determined the current page is invalid and are redirecting, show nothing / loading
+  if (!loading && page > totalPages) {
+    return null;
+  }
+
   return (
     <div className="space-y-4">
-      {volunteers.map((user) => (
-        <UserCard
-          key={user.id}
-          user={user}
-          // onRequestLock={() => {}}
-          // onShowDetail={() => {}}
-        />
+      {/* render optimisticUsers so UI updates immediately */}
+      {optimisticUsers.map((user) => (
+        <UserCard key={user.id} user={user} />
       ))}
 
       <Pagination>
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              onClick={() => handlePageChange(page - 1)}
+              onClick={(e) => {
+                e.preventDefault();
+                handlePageChange(page - 1);
+              }}
               aria-disabled={page === 1}
               className={page === 1 ? "pointer-events-none opacity-50" : ""}
             />
@@ -89,7 +150,10 @@ export default function VolunteersPage() {
 
           <PaginationItem>
             <PaginationNext
-              onClick={() => handlePageChange(page + 1)}
+              onClick={(e) => {
+                e.preventDefault();
+                handlePageChange(page + 1);
+              }}
               aria-disabled={page === totalPages}
               className={
                 page === totalPages ? "pointer-events-none opacity-50" : ""

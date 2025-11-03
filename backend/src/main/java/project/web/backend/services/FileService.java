@@ -30,7 +30,7 @@ public class FileService {
     @PostConstruct
     void init() {
         this.strategies = strategyList.stream()
-                .collect(Collectors.toMap(s -> s.getClass().getAnnotation(Component.class).value(), Function.identity()));
+            .collect(Collectors.toMap(s -> s.getClass().getAnnotation(Component.class).value(), Function.identity()));
         log.info("Registered export strategies: {}", strategies.keySet());
     }
 

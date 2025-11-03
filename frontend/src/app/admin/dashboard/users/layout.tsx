@@ -12,15 +12,12 @@ import { User } from "@/lib/mockData";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { UsersModalProvider, useUsersModal } from "./UserModelContext";
+import { useLockUser } from "./hooks/useLockUser";
 
 function UsersInnerLayout({ children }: { children: React.ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
   const router = useRouter();
-  // const [showDetailDialog, setShowDetailDialog] = useState(false);
-  // const [showLockDialog, setShowLockDialog] = useState(false);
-  // const [lockAction, setLockAction] = useState<"lock" | "unlock">("lock");
-  // const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const {
     selectedUser,
     lockAction,
@@ -36,20 +33,43 @@ function UsersInnerLayout({ children }: { children: React.ReactNode }) {
     ) : (
       <Badge variant="destructive">Đã khóa</Badge>
     );
+  const { handleLockToggle } = useLockUser();
 
-  const handleLockToggle = () => {
-    if (selectedUser) {
-      const newStatus = lockAction === "lock" ? "locked" : "active";
-      toast(
-        lockAction === "lock" ? "Đã khóa tài khoản" : "Đã mở khóa tài khoản",
-        {
-          description:
-            lockAction === "lock"
-              ? "Người dùng không thể đăng nhập vào hệ thống"
-              : "Người dùng có thể đăng nhập trở lại",
-        }
+  const handleConfirmLock = async () => {
+    if (!selectedUser) return;
+
+    // optimistic update: broadcast change to UI immediately
+    const lock = lockAction === "lock";
+    window.dispatchEvent(
+      new CustomEvent("user-lock-optimistic", {
+        detail: { userId: selectedUser.id, lock },
+      })
+    );
+
+    // Gọi API bằng hook mới
+    const success = await handleLockToggle(selectedUser.id, lockAction);
+
+    if (success) {
+      // Nếu API thành công:
+      toast.success(
+        lockAction === "lock" ? "Đã khóa tài khoản" : "Đã mở khóa tài khoản"
       );
-      // server call should go here
+      // we could broadcast a committed event if needed
+      window.dispatchEvent(
+        new CustomEvent("user-lock-committed", {
+          detail: { userId: selectedUser.id, lock },
+        })
+      );
+      closeLock(); // Đóng dialog
+      // refresh(); // Tải lại danh sách user (optional)
+    } else {
+      // Nếu API thất bại: revert the optimistic change by asking page to re-sync from server state
+      window.dispatchEvent(
+        new CustomEvent("user-lock-revert", {
+          detail: { userId: selectedUser.id },
+        })
+      );
+      toast.error("Đã xảy ra lỗi. Vui lòng thử lại.");
       closeLock();
     }
   };
@@ -115,7 +135,7 @@ function UsersInnerLayout({ children }: { children: React.ReactNode }) {
           onOpenChange={(v) => (v ? null : closeLock())}
           user={selectedUser}
           lockAction={lockAction}
-          onConfirm={handleLockToggle}
+          onConfirm={handleConfirmLock}
         />
       </div>
     </div>

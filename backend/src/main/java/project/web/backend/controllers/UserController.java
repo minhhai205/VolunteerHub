@@ -1,7 +1,7 @@
 package project.web.backend.controllers;
 
-
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -13,8 +13,10 @@ import project.web.backend.dtos.request.user.LockRequestDTO;
 import project.web.backend.dtos.request.user.UpdateInformationRequestDTO;
 import project.web.backend.dtos.response.ApiSuccessResponse;
 import project.web.backend.dtos.response.PageResponseDTO;
+import project.web.backend.dtos.response.user.InformationUserResponseDTO;
 import project.web.backend.dtos.response.user.UserDetailResponseDTO;
 import project.web.backend.dtos.response.user.UserResponseDTO;
+import project.web.backend.dtos.response.user.WorkingInformationResponseDTO;
 import project.web.backend.services.UserService;
 
 import java.util.List;
@@ -26,6 +28,8 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
+    // may need search param later
+
     /**
      * get all users api for admin site
      *
@@ -35,10 +39,10 @@ public class UserController {
     @GetMapping("/user-list")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiSuccessResponse<PageResponseDTO<List<UserDetailResponseDTO>>> getAllUsers(
-            Pageable pageable
-    ) {
+            Pageable pageable,
+            @RequestParam(required = false) String role) {
         return ApiSuccessResponse.<PageResponseDTO<List<UserDetailResponseDTO>>>builder()
-                .data(userService.getAllUsers(pageable))
+                .data(userService.getAllUsers(pageable, role))
                 .status(HttpStatus.OK.value())
                 .message("Get all users successfully!")
                 .build();
@@ -52,8 +56,7 @@ public class UserController {
      */
     @PatchMapping("/update-information")
     public ApiSuccessResponse<UserResponseDTO> updateInformation(
-            @RequestBody @Valid UpdateInformationRequestDTO dto
-    ) {
+            @RequestBody @Valid UpdateInformationRequestDTO dto) {
         return ApiSuccessResponse.<UserResponseDTO>builder()
                 .data(userService.updateInformation(dto))
                 .status(HttpStatus.OK.value())
@@ -65,12 +68,33 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ApiSuccessResponse<String> lockUser(
             @PathVariable @Min(value = 1, message = "id must bt greater than 0") Long userId,
-            @RequestBody @Valid LockRequestDTO dto
-    ) {
+            @RequestBody @Valid LockRequestDTO dto) {
         return ApiSuccessResponse.<String>builder()
                 .data(userService.lockUser(userId, dto))
                 .status(HttpStatus.OK.value())
                 .message("Update lock status user successfully!")
+                .build();
+    }
+
+    @GetMapping("/information/{email}")
+    public ApiSuccessResponse<InformationUserResponseDTO> userInformation(
+            @PathVariable @Email(message = "Input must be email format") String email
+    ) {
+        return ApiSuccessResponse.<InformationUserResponseDTO>builder()
+                .data(userService.informationUser(email))
+                .status(HttpStatus.OK.value())
+                .message("Get user information successfully!")
+                .build();
+    }
+
+    @GetMapping("/working-information/{email}")
+    public ApiSuccessResponse<WorkingInformationResponseDTO> workingInformation(
+            @PathVariable @Email(message = "Input must be email format") String email
+    ) {
+        return ApiSuccessResponse.<WorkingInformationResponseDTO>builder()
+                .data(userService.workingInformation(email))
+                .status(HttpStatus.OK.value())
+                .message("Get working time statistics successfully!")
                 .build();
     }
 }

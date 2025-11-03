@@ -40,7 +40,9 @@ export default function AdminLayout({
 
   return (
     <ProtectedRoute allowedScopes={["ADMIN"]}>
-      <div className={`${geistSans.variable} ${geistMono.variable} antialiased flex`}>
+      <div
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
