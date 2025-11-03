@@ -221,7 +221,7 @@ export function showUnauthorizedDialog(redirectUrl: string) {
       
       setTimeout(() => {
         window.location.replace(redirectUrl);
-      }, 500);
+      }, 200);
     });
   }
 
