@@ -99,6 +99,17 @@ public class AuthenticationService {
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXIST));
         String accessToken = jwtService.generateToken(user, TokenType.ACCESS);
         String newRefreshToken = jwtService.generateToken(user, TokenType.REFRESH);
+
+        Token access = Token.builder()
+                .jti(jwtService.extractJti(accessToken))
+                .email(email)
+                .build();
+        Token refresh = Token.builder()
+                .jti(jwtService.extractJti(refreshToken))
+                .email(email)
+                .build();
+        tokenRepository.saveAll(List.of(access, refresh));
+        
         return JwtResponseDTO.builder()
                 .accessToken(accessToken)
                 .refreshToken(newRefreshToken)
