@@ -153,8 +153,9 @@ export async function createPost(
       body: JSON.stringify(payload),
     }).then((res) => res.json());
 
+    console.log(response)
     if (response.status !== 200) {
-      const errorText = await response.text();
+      const errorText = await response.message;
       throw new Error(`Tạo bài viết thất bại: ${errorText}`);
     }
 
@@ -232,13 +233,17 @@ export async function addComment(
   content: string
 ): Promise<Comment> {
   try {
-    const response = await fetchWithAuth(`${API_BASE_URL}/post/create-comment`, {
+    const response = await fetchWithAuth(`${API_BASE_URL}/comment/create-comment`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ postId, content }),
     });
 
+
+
     const result = await response.json();
+
+        console.log(result);
 
     if (result.status !== 200) {
       throw new Error(result.message || "Thêm bình luận thất bại");
