@@ -79,7 +79,12 @@ export default function EventDiscussion({ eventId }: EventDiscussionProps) {
       const response = await fetchPosts(eventId, nextPage, pageSize);
 
       if (isPaginatedResponse(response)) {
-        setPosts((prev) => [...prev, ...response.data]);
+        setPosts((prev) => {
+          const map = new Map<number, Post>();
+          [...prev, ...response.data].forEach((p) => map.set(p.id, p));
+          return Array.from(map.values());
+        });
+
         setCurrentPage(nextPage);
         setTotalPages(response.totalPage);
       }
@@ -94,10 +99,10 @@ export default function EventDiscussion({ eventId }: EventDiscussionProps) {
     try {
       const newPost = await createPost(eventId, content, medias);
       setPosts([newPost, ...posts]);
-      toastManager.success("Tạo bài viết thành công.")
+      toastManager.success("Tạo bài viết thành công.");
     } catch (error) {
       console.error("Failed to create post:", error);
-      toastManager.error("Tạo bài viết không thành công. Vui lòng thử lại!")
+      toastManager.error("Tạo bài viết không thành công. Vui lòng thử lại!");
     }
   };
 
