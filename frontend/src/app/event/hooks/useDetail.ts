@@ -216,30 +216,27 @@ export async function createPost(
   }
 }
 
-export async function likePost(postId: number): Promise<Post> {
-  // try {
-  //   const response = await fetch(`${API_BASE_URL}/posts/${postId}/like`, {
-  //     method: "POST",
-  //   })
-  //   if (response.ok) {
-  //     return response.json()
-  //   }
-  // } catch (error) {
-  //   console.warn("API call failed, using mock data:", error)
-  // }
-
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const post = mockPosts.find((p) => p.id === postId);
-      if (post) {
-        post.isLiked = !post.isLiked;
-        post.likesCount = (post.likesCount || 0) + (post.isLiked ? 1 : -1);
-        resolve(post);
+export async function likePost(post: Post): Promise<Post> {
+  try {
+    const response = await fetchWithAuth(
+      `${API_BASE_URL}/post/reaction/${post.id}`,
+      {
+        method: "POST",
       }
-    }, 200);
-  });
-}
+    ).then((res) => res.json());
 
+    if (response.status !== 200) {
+      throw new Error("Like bài viết thất bại");
+    }
+    
+    post.isLiked = !post.isLiked;
+    post.likesCount = (post.likesCount || 0) + (post.isLiked ? 1 : -1);
+
+    return post;
+  } catch (error) {
+    throw error;
+  }
+}
 export async function addComment(
   postId: number,
   content: string
