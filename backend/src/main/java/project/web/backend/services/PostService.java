@@ -1,6 +1,7 @@
 package project.web.backend.services;
 
 
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,23 +12,14 @@ import project.web.backend.dtos.request.post.UpdatePostRequestDTO;
 import project.web.backend.dtos.response.PageResponseDTO;
 import project.web.backend.dtos.response.post.PostBasicResponseDTO;
 import project.web.backend.dtos.response.post.PostResponseDTO;
-import project.web.backend.entities.Event;
-import project.web.backend.entities.Post;
-import project.web.backend.entities.PostMedia;
-import project.web.backend.entities.User;
+import project.web.backend.entities.*;
 import project.web.backend.exceptions.AppException;
 import project.web.backend.mappers.PostMapper;
-import project.web.backend.repositories.EventRepository;
-import project.web.backend.repositories.PostMediaRepository;
-import project.web.backend.repositories.PostRepository;
-import project.web.backend.repositories.UserRepository;
+import project.web.backend.repositories.*;
 import project.web.backend.utils.commons.SecurityUtil;
 import project.web.backend.utils.enums.ErrorCode;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +30,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostMediaRepository postMediaRepository;
     private final PostMapper postMapper;
+    private final LikeRepository likeRepository;
 
     @Transactional
     public PostBasicResponseDTO create(CreatePostRequestDTO dto) {
@@ -126,6 +119,13 @@ public class PostService {
             dto.setCommentsCount(postIdsCommentCountMap.get(dto.getId()));
         });
 
+        // Tìm xem người dùng hiện tại đã like post hay chưa
+        String currentEmail = SecurityUtil.getCurrentEmail();
+        if (currentEmail != null) {
+            Set<Long> likedPostIds = likeRepository.findLikedPostIdsByUser(currentEmail, postIds);
+            dtos.forEach(dto -> dto.setIsLiked(likedPostIds.contains(dto.getId())));
+        }
+
         return PageResponseDTO.<List<PostResponseDTO>>builder()
                 .pageNo(pageable.getPageNumber())
                 .pageSize(pageable.getPageSize())
@@ -139,5 +139,29 @@ public class PostService {
         Map<Long, Post> idPostMap = fetchedPosts.stream()
                 .collect(Collectors.toMap(Post::getId, p -> p));
         return postIds.stream().map(idPostMap::get).toList();
+    }
+
+    @Transactional
+    public String handlePostReaction(long postId) {
+        String currentUserEmail = SecurityUtil.getCurrentEmail();
+        User currentUser = userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXISTED));
+
+        Optional<Like> likeExisted = likeRepository.findByUserIdAndPostId(currentUser.getId(), postId);
+        if(likeExisted.isPresent()){
+            likeRepository.delete(likeExisted.get());
+            return "success";
+        }
+
+        Like like = Like.builder()
+                .user(currentUser)
+                .post(post)
+                .build();
+        likeRepository.save(like);
+
+        return "success";
     }
 }

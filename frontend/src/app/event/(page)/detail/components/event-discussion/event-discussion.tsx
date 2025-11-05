@@ -10,6 +10,7 @@ import {
   PostMedia,
 } from "../../../../hooks/useDetail";
 import styles from "./event-discussion.module.css";
+import { toastManager } from "@/components/static/toast/toast";
 
 interface EventDiscussionProps {
   eventId: string;
@@ -95,7 +96,7 @@ export default function EventDiscussion({ eventId }: EventDiscussionProps) {
       setPosts([newPost, ...posts]);
     } catch (error) {
       console.error("Failed to create post:", error);
-      alert("Tạo bài viết không thành công. Vui lòng thử lại!");
+      toastManager.error("Tạo bài viết không thành công. Vui lòng thử lại!")
     }
   };
 

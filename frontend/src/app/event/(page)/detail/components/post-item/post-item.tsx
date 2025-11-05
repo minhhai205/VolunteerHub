@@ -6,6 +6,7 @@ import { Heart, MessageCircle, Share2 } from "lucide-react"
 import type { Post } from "../../../../hooks/useDetail"
 import { likePost, addComment } from "../../../../hooks/useDetail"
 import styles from "./post-item.module.css"
+import { toastManager } from "@/components/static/toast/toast"
 
 interface PostItemProps {
   post: Post
@@ -21,9 +22,10 @@ export default function PostItem({ post, onUpdate }: PostItemProps) {
   const handleLike = async () => {
     setIsLiking(true)
     try {
-      const updatedPost = await likePost(post.id)
+      const updatedPost = await likePost(post)
       onUpdate(updatedPost)
     } catch (error) {
+      toastManager.error("Like post thất bại!")
       console.error("Failed to like post:", error)
     } finally {
       setIsLiking(false)
