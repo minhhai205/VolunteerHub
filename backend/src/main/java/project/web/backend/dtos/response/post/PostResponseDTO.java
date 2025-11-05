@@ -1,5 +1,6 @@
 package project.web.backend.dtos.response.post;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import project.web.backend.dtos.response.user.UserResponseDTO;
 import project.web.backend.entities.*;
@@ -24,4 +25,7 @@ public class PostResponseDTO implements Serializable {
     private Long likesCount;
     private Long commentsCount;
     private Date createdAt;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Boolean isLiked;
 }

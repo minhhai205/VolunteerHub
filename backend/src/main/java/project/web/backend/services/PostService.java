@@ -119,6 +119,13 @@ public class PostService {
             dto.setCommentsCount(postIdsCommentCountMap.get(dto.getId()));
         });
 
+        // Tìm xem người dùng hiện tại đã like post hay chưa
+        String currentEmail = SecurityUtil.getCurrentEmail();
+        if (currentEmail != null) {
+            Set<Long> likedPostIds = likeRepository.findLikedPostIdsByUser(currentEmail, postIds);
+            dtos.forEach(dto -> dto.setIsLiked(likedPostIds.contains(dto.getId())));
+        }
+
         return PageResponseDTO.<List<PostResponseDTO>>builder()
                 .pageNo(pageable.getPageNumber())
                 .pageSize(pageable.getPageSize())
