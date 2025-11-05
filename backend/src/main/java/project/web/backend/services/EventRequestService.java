@@ -4,15 +4,16 @@ import com.sun.jdi.request.EventRequest;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.web.backend.dtos.request.event.EventRequestDTO;
 import project.web.backend.dtos.request.notification.NotificationPayload;
+import project.web.backend.dtos.response.PageResponseDTO;
+import project.web.backend.dtos.response.event.EventRegistrationResponseDTO;
 import project.web.backend.dtos.response.event.EventRequestResponseDTO;
-import project.web.backend.entities.Category;
-import project.web.backend.entities.Event;
-import project.web.backend.entities.EventCreateRequest;
-import project.web.backend.entities.User;
+import project.web.backend.entities.*;
 import project.web.backend.exceptions.AppException;
 import project.web.backend.mappers.EventMapper;
 import project.web.backend.mappers.EventRequestMapper;
@@ -29,6 +30,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Slf4j
 public class EventRequestService {
+    private final EventRegistrationRepository eventRegistrationRepository;
     private final EventRequestRepository eventRequestRepository;
     private final EventRequestMapper eventRequestMapper;
     private final CategoryRepository categoryRepository;
@@ -84,7 +86,7 @@ public class EventRequestService {
         EventCreateRequest request = eventRequestRepository.findById(requestId)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_EXISTED));
 
-        if(request.getStatus() != EventRequestStatus.PENDING) {
+        if (request.getStatus() != EventRequestStatus.PENDING) {
             throw new AppException(ErrorCode.REQUEST_INVALID);
         }
 
@@ -117,7 +119,7 @@ public class EventRequestService {
         EventCreateRequest request = eventRequestRepository.findById(requestId)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_EXISTED));
 
-        if(request.getStatus() != EventRequestStatus.PENDING) {
+        if (request.getStatus() != EventRequestStatus.PENDING) {
             throw new AppException(ErrorCode.REQUEST_INVALID);
         }
 
@@ -128,5 +130,17 @@ public class EventRequestService {
         // send web push to manager
 
         return eventRequestMapper.toResponseDTO(request);
+    }
+
+    public PageResponseDTO<List<EventRegistrationResponseDTO>> getAllRegistration(Pageable pageable) {
+        Page<EventRegistration> registrations = eventRegistrationRepository.getAll(pageable);
+        List<EventRegistrationResponseDTO> dtos = registrations.stream().map(eventRequestMapper::toEventRegistrationResponseDTO)
+                .toList();
+        return PageResponseDTO.<List<EventRegistrationResponseDTO>>builder()
+                .data(dtos)
+                .totalPage(registrations.getTotalPages())
+                .pageNo(pageable.getPageNumber())
+                .pageSize(pageable.getPageSize())
+                .build();
     }
 }
