@@ -1,11 +1,14 @@
 package project.web.backend.repositories;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import project.web.backend.entities.EventCreateRequest;
+import project.web.backend.entities.EventRegistration;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,3 +27,4 @@ public interface EventRequestRepository extends CrudRepository<EventCreateReques
     })
     List<EventCreateRequest> findAll();
 }
+

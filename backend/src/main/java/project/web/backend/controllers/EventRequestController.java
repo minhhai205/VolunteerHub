@@ -4,12 +4,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.web.backend.dtos.request.event.EventRequestDTO;
 import project.web.backend.dtos.response.ApiSuccessResponse;
+import project.web.backend.dtos.response.PageResponseDTO;
+import project.web.backend.dtos.response.event.EventRegistrationResponseDTO;
 import project.web.backend.dtos.response.event.EventRequestResponseDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.services.EventRequestService;
@@ -65,6 +68,18 @@ public class EventRequestController {
         return ApiSuccessResponse.<EventRequestResponseDTO>builder()
                 .data(eventRequestService.rejectEventRequest(requestId))
                 .message("Rejected!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @GetMapping("/registration-list")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ApiSuccessResponse<PageResponseDTO<List<EventRegistrationResponseDTO>>> allRegistrationRequest(
+            Pageable pageable
+    ) {
+        return ApiSuccessResponse.<PageResponseDTO<List<EventRegistrationResponseDTO>>>builder()
+                .data(eventRequestService.getAllRegistration(pageable))
+                .message("Get all registrations successfully")
                 .status(HttpStatus.OK.value())
                 .build();
     }
