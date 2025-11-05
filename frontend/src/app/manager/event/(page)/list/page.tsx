@@ -66,7 +66,7 @@ export default function EventsPage() {
           throw new Error("Không tìm thấy token. Vui lòng đăng nhập lại.");
         }
         const response = await fetch(
-          "http://localhost:8080/api/event/event-list",
+          "http://localhost:8080/api/event/manager/my-event",
           {
             method: "GET",
             headers: {
@@ -329,7 +329,7 @@ export default function EventsPage() {
                         <button
                           className={styles.detailButton}
                           onClick={() =>
-                            (window.location.href = `http://localhost:8080/api/event/${event.id}`)
+                            (window.location.href = `http://localhost:3000/event/detail/${event.id}`)
                           }
                         >
                           Xem chi tiết
