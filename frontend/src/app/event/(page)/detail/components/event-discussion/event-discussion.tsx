@@ -94,6 +94,7 @@ export default function EventDiscussion({ eventId }: EventDiscussionProps) {
     try {
       const newPost = await createPost(eventId, content, medias);
       setPosts([newPost, ...posts]);
+      toastManager.success("Tạo bài viết thành công.")
     } catch (error) {
       console.error("Failed to create post:", error);
       toastManager.error("Tạo bài viết không thành công. Vui lòng thử lại!")
