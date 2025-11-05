@@ -65,21 +65,6 @@ export interface ApiResponse<T> {
   data: T;
 }
 
-// Mock data based on backend DTOs
-const mockEvent: Event = {
-  id: 1,
-  name: "Chiến dịch Xuân tính nguyện 2025",
-  description:
-    "Chiến dịch Xuân tính nguyện 2025 là một hoạt động ý nghĩa nhằm mang lại niềm vui và sự ấm áp cho cộng đồng trong dịp Tết Nguyên Đán. Chúng tôi sẽ tổ chức các hoạt động trong cây xanh, dọn dẹp môi trường, và trao quà cho các gia đình có hoàn cảnh khó khăn.",
-  location: "Hà Nội, Việt Nam",
-  imageUrl: "/event-banner.jpg",
-  startDate: "2026-01-15T08:00:00",
-  endDate: "2026-01-15T17:00:00",
-  categoryNames: ["Tình nguyện", "Cộng đồng"],
-  countMembers: 156,
-  countPosts: 5,
-};
-
 const mockPosts: Post[] = [
   {
     id: 1,
@@ -163,7 +148,6 @@ export async function fetchEventData(eventId: string): Promise<Event> {
   }
 }
 
-// Cập nhật hàm fetchPosts để nhận tham số phân trang
 export async function fetchPosts(
   eventId: string,
   pageNo: number = 0,
@@ -176,7 +160,6 @@ export async function fetchPosts(
     ).then((res) => res.json());
 
     if (response.status === 200) {
-      // Kiểm tra xem response.data có phải là PaginatedResponse không
       if (
         response.data &&
         typeof response.data === "object" &&
@@ -185,7 +168,6 @@ export async function fetchPosts(
         return response.data as PaginatedPostResponse;
       }
 
-      // Nếu API chưa hỗ trợ phân trang, tạo response giả
       const posts = Array.isArray(response.data)
         ? response.data
         : response.data.data || [];
@@ -199,23 +181,8 @@ export async function fetchPosts(
 
     throw new Error(response.message || "Failed to fetch posts");
   } catch (error) {
-    console.warn("API call failed, using mock data:", error);
-
-    // Mock data với phân trang
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const start = pageNo * pageSize;
-        const end = start + pageSize;
-        const paginatedMockPosts = mockPosts.slice(start, end);
-
-        resolve({
-          pageNo: pageNo,
-          pageSize: pageSize,
-          totalPage: Math.ceil(mockPosts.length / pageSize),
-          data: paginatedMockPosts,
-        });
-      }, 300);
-    });
+    console.error("Lỗi khi lấy bài viết:", error);
+    throw error;
   }
 }
 
@@ -249,30 +216,27 @@ export async function createPost(
   }
 }
 
-export async function likePost(postId: number): Promise<Post> {
-  // try {
-  //   const response = await fetch(`${API_BASE_URL}/posts/${postId}/like`, {
-  //     method: "POST",
-  //   })
-  //   if (response.ok) {
-  //     return response.json()
-  //   }
-  // } catch (error) {
-  //   console.warn("API call failed, using mock data:", error)
-  // }
-
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const post = mockPosts.find((p) => p.id === postId);
-      if (post) {
-        post.isLiked = !post.isLiked;
-        post.likesCount = (post.likesCount || 0) + (post.isLiked ? 1 : -1);
-        resolve(post);
+export async function likePost(post: Post): Promise<Post> {
+  try {
+    const response = await fetchWithAuth(
+      `${API_BASE_URL}/post/reaction/${post.id}`,
+      {
+        method: "POST",
       }
-    }, 200);
-  });
-}
+    ).then((res) => res.json());
 
+    if (response.status !== 200) {
+      throw new Error("Like bài viết thất bại");
+    }
+    
+    post.isLiked = !post.isLiked;
+    post.likesCount = (post.likesCount || 0) + (post.isLiked ? 1 : -1);
+
+    return post;
+  } catch (error) {
+    throw error;
+  }
+}
 export async function addComment(
   postId: number,
   content: string

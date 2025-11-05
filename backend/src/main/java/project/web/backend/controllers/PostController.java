@@ -64,4 +64,16 @@ public class PostController {
                 .message("Update post successfully")
                 .build();
     }
+
+    @PostMapping("/reaction/{postId}")
+    @PreAuthorize("hasRole('USER') OR hasRole('MANAGER')")
+    public ApiSuccessResponse<String>  handlePostReaction(
+            @PathVariable @Min(value = 1, message = "Post id must be greater than 0") long postId
+    ) {
+        return ApiSuccessResponse.<String>builder()
+                .data(postService.handlePostReaction(postId))
+                .status(HttpStatus.OK.value())
+                .message("Reaction post successfully")
+                .build();
+    }
 }
