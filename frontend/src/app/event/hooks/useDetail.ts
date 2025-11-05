@@ -72,64 +72,6 @@ export interface PaginatedCommentResponse {
   data: Comment[];
 }
 
-const mockPosts: Post[] = [
-  {
-    id: 1,
-    title: "Bình luận từ Nguyễn Văn A",
-    content:
-      "Mình rất mong chờ được tham gia sự kiện này! Đây là lần đầu tiên mình tham gia hoạt động tính nguyện và rất hào hức.",
-    userId: 1,
-    eventId: 1,
-    user: { id: 1, fullName: "Nguyễn Văn A", avatar: "" },
-    likesCount: 12,
-    isLiked: false,
-    commentsCount: 2,
-    medias: [],
-    comments: [
-      {
-        id: 1,
-        user: { id: 2, fullName: "Trần Thị B" },
-        content: "Mình cũng vậy, chúng ta cố gắng làm tốt nhé!",
-        createdAt: new Date(Date.now() - 3600000).toISOString(),
-      },
-    ],
-    createdAt: new Date(Date.now() - 7200000).toISOString(),
-  },
-  {
-    id: 2,
-    title: "Bình luận từ Trần Thị B",
-    content:
-      "Các bạn có thể cho mình biết chuẩn bị những gì không? Mình muốn tham gia nhưng chưa rõ về trạng phục và dung cụ cần thiết.",
-    userId: 2,
-    eventId: 1,
-    user: { id: 2, fullName: "Trần Thị B", avatar: "" },
-    likesCount: 8,
-    isLiked: false,
-    commentsCount: 0,
-    medias: [
-      { id: 1, fileUrl: "/images/home1.jpg" },
-      // { id: 1, fileUrl: "/images/home1.jpg" },
-      // { id: 1, fileUrl: "/images/home1.jpg" },
-    ],
-    comments: [],
-    createdAt: new Date(Date.now() - 10800000).toISOString(),
-  },
-  {
-    id: 3,
-    title: "Bình luận từ Lê Minh C",
-    content:
-      "Mình chia sẻ một số tips hữu ích cho những ai sắp tham gia lần đầu. Hãy mang theo nước uống đầy đủ!",
-    userId: 3,
-    eventId: 1,
-    user: { id: 3, fullName: "Lê Minh C", avatar: "" },
-    likesCount: 24,
-    isLiked: false,
-    commentsCount: 3,
-    medias: [],
-    comments: [],
-    createdAt: new Date(Date.now() - 14400000).toISOString(),
-  },
-];
 
 export async function fetchEventData(eventId: string): Promise<Event> {
   try {
@@ -245,8 +187,6 @@ export async function likePost(post: Post): Promise<Post> {
   }
 }
 
-
-/* Cập nhật hàm fetchComments với pagination */
 export async function fetchComments(
   postId: number,
   pageNo: number = 0,
@@ -287,28 +227,25 @@ export async function fetchComments(
 }
 
 
-/* Cập nhật hàm addComment để trả về comment mới thay vì toàn bộ post */
 export async function addComment(
   postId: number,
   content: string
 ): Promise<Comment> {
   try {
-    const response = await fetchWithAuth(
-      `${API_BASE_URL}/post/${postId}/comments`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content }),
-      }
-    ).then((res) => res.json());
+    const response = await fetchWithAuth(`${API_BASE_URL}/post/create-comment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ postId, content }),
+    });
 
-    if (response.status !== 200) {
-      throw new Error("Thêm bình luận thất bại");
+    const result = await response.json();
+
+    if (result.status !== 200) {
+      throw new Error(result.message || "Thêm bình luận thất bại");
     }
 
-    return response.data as Comment;
+    return result.data as Comment;
   } catch (error) {
-    console.error("API call failed:", error);
     throw error;
   }
 }
