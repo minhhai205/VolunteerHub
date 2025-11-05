@@ -3,7 +3,7 @@
 import EventRequestCard from "./event-request-card";
 import styles from "./styles/event-request-list.module.css";
 
-interface Request {
+export interface Request {
   id: number;
   userName: string;
   userEmail: string;

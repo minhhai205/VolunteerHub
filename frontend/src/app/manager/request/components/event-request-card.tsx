@@ -25,28 +25,40 @@ export default function EventRequestCard({
   onReject,
 }: EventRequestCardProps) {
   const getStatusClass = (status: string) => {
-    switch (status) {
-      case "approved":
+    const statusLower = status.toLowerCase();
+    console.log(statusLower);
+    console.log(request);
+    switch (statusLower) {
+      case "approve":
+        console.log(1);
         return styles.statusApproved;
       case "rejected":
+        console.log(2);
         return styles.statusRejected;
       default:
+        console.log(3);
         return styles.statusPending;
     }
   };
 
   const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "approved":
+    const statusLower = status.toLowerCase();
+    console.log(statusLower);
+    console.log(request);
+    switch (statusLower) {
+      case "approve":
+        console.log(1);
         return "Đã Duyệt";
       case "rejected":
+        console.log(2);
         return "Từ Chối";
       default:
+        console.log(3);
         return "Đang Chờ";
     }
   };
 
-  const isProcessed = request.status !== "pending";
+  const isProcessed = request.status.toLowerCase() !== "pending";
 
   return (
     <div className={styles.card}>
