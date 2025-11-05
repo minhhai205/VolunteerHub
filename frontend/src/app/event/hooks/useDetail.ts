@@ -13,7 +13,7 @@ export interface User {
 
 export interface Comment {
   id: number;
-  author: User;
+  user: User;
   content: string;
   createdAt: string;
 }
@@ -65,6 +65,13 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+export interface PaginatedCommentResponse {
+  pageNo: number;
+  pageSize: number;
+  totalPage: number;
+  data: Comment[];
+}
+
 const mockPosts: Post[] = [
   {
     id: 1,
@@ -81,7 +88,7 @@ const mockPosts: Post[] = [
     comments: [
       {
         id: 1,
-        author: { id: 2, fullName: "Trần Thị B" },
+        user: { id: 2, fullName: "Trần Thị B" },
         content: "Mình cũng vậy, chúng ta cố gắng làm tốt nhé!",
         createdAt: new Date(Date.now() - 3600000).toISOString(),
       },
@@ -237,37 +244,71 @@ export async function likePost(post: Post): Promise<Post> {
     throw error;
   }
 }
+
+
+/* Cập nhật hàm fetchComments với pagination */
+export async function fetchComments(
+  postId: number,
+  pageNo: number = 0,
+  pageSize: number = 2
+): Promise<PaginatedCommentResponse> {
+  try {
+    const response = await fetchWithAuth(
+      `${API_BASE_URL}/comment/comment-list/${postId}?page=${pageNo}&size=${pageSize}`,
+      { method: "GET" }
+    ).then((res) => res.json());
+
+    if (response.status === 200) {
+      if (
+        response.data &&
+        typeof response.data === "object" &&
+        "data" in response.data
+      ) {
+        return response.data as PaginatedCommentResponse;
+      }
+      console.log(response)
+
+      const comments = Array.isArray(response.data)
+        ? response.data
+        : response.data.data || [];
+      return {
+        pageNo: pageNo,
+        pageSize: pageSize,
+        totalPage: Math.ceil(comments.length / pageSize),
+        data: comments.slice(pageNo * pageSize, (pageNo + 1) * pageSize),
+      };
+    }
+
+    throw new Error(response.message || "Failed to fetch comments");
+  } catch (error) {
+    console.error("Lỗi khi lấy bình luận:", error);
+    throw error;
+  }
+}
+
+
+/* Cập nhật hàm addComment để trả về comment mới thay vì toàn bộ post */
 export async function addComment(
   postId: number,
   content: string
-): Promise<Post> {
-  // try {
-  //   const response = await fetch(`${API_BASE_URL}/posts/${postId}/comments`, {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({ content }),
-  //   })
-  //   if (response.ok) {
-  //     return response.json()
-  //   }
-  // } catch (error) {
-  //   console.warn("API call failed, using mock data:", error)
-  // }
-
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const post = mockPosts.find((p) => p.id === postId);
-      if (post) {
-        const newComment: Comment = {
-          id: Date.now(),
-          author: { id: 0, fullName: "Bạn" },
-          content,
-          createdAt: new Date().toISOString(),
-        };
-        post.comments = [...(post.comments || []), newComment];
-        post.commentsCount = (post.commentsCount || 0) + 1;
-        resolve(post);
+): Promise<Comment> {
+  try {
+    const response = await fetchWithAuth(
+      `${API_BASE_URL}/post/${postId}/comments`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content }),
       }
-    }, 300);
-  });
+    ).then((res) => res.json());
+
+    if (response.status !== 200) {
+      throw new Error("Thêm bình luận thất bại");
+    }
+
+    return response.data as Comment;
+  } catch (error) {
+    console.error("API call failed:", error);
+    throw error;
+  }
 }

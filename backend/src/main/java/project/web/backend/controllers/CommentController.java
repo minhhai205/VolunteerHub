@@ -31,7 +31,7 @@ public class CommentController {
             @PathVariable @Min(value = 0, message = "Post id must be greater than 0") Long postId
     ) {
         return ApiSuccessResponse.<PageResponseDTO<List<CommentResponseDTO>>>builder()
-                .data(null)
+                .data(commentService.getAllCommentsByPost(pageable, postId))
                 .status(HttpStatus.OK.value())
                 .message("Get all comments successfully!")
                 .build();

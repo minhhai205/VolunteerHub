@@ -1,10 +1,10 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Heart, MessageCircle, Share2 } from "lucide-react"
-import type { Post } from "../../../../hooks/useDetail"
-import { likePost, addComment } from "../../../../hooks/useDetail"
+import type { Post, Comment } from "../../../../hooks/useDetail"
+import { likePost, addComment, fetchComments } from "../../../../hooks/useDetail"
 import styles from "./post-item.module.css"
 import { toastManager } from "@/components/static/toast/toast"
 
@@ -13,11 +13,87 @@ interface PostItemProps {
   onUpdate: (post: Post) => void
 }
 
+interface PaginatedCommentResponse {
+  pageNo: number;
+  pageSize: number;
+  totalPage: number;
+  data: Comment[];
+}
+
+// Type guard function
+function isPaginatedCommentResponse(response: unknown): response is PaginatedCommentResponse {
+  if (!response || typeof response !== "object") return false;
+  const obj = response as Record<string, unknown>;
+  return (
+    typeof obj.pageNo === "number" &&
+    typeof obj.pageSize === "number" &&
+    typeof obj.totalPage === "number" &&
+    Array.isArray(obj.data)
+  );
+}
+
 export default function PostItem({ post, onUpdate }: PostItemProps) {
   const [isLiking, setIsLiking] = useState(false)
   const [showCommentForm, setShowCommentForm] = useState(false)
   const [commentContent, setCommentContent] = useState("")
   const [isCommentLoading, setIsCommentLoading] = useState(false)
+  
+  // Comment pagination states
+  const [comments, setComments] = useState<Comment[]>(post.comments || [])
+  const [loadingComments, setLoadingComments] = useState(false)
+  const [loadingMoreComments, setLoadingMoreComments] = useState(false)
+  const [currentCommentPage, setCurrentCommentPage] = useState(0)
+  const [totalCommentPages, setTotalCommentPages] = useState(1)
+  const [commentPageSize] = useState(2)
+  const [showComments, setShowComments] = useState(false)
+
+  // Load comments khi mở section comments
+  useEffect(() => {
+    if (showComments && comments.length === 0 && (post.commentsCount || 0) > 0) {
+      loadInitialComments()
+    }
+  }, [showComments])
+
+  const loadInitialComments = async () => {
+    setLoadingComments(true)
+    try {
+      const response = await fetchComments(post.id, 0, commentPageSize)
+      
+      if (isPaginatedCommentResponse(response)) {
+        setComments(response.data)
+        setTotalCommentPages(response.totalPage)
+        setCurrentCommentPage(0)
+      } else if (Array.isArray(response)) {
+        setComments(response)
+      }
+    } catch (error) {
+      console.error("Failed to load comments:", error)
+      toastManager.error("Không thể tải bình luận")
+    } finally {
+      setLoadingComments(false)
+    }
+  }
+
+  const loadMoreComments = async () => {
+    if (loadingMoreComments || currentCommentPage >= totalCommentPages - 1) return
+
+    setLoadingMoreComments(true)
+    try {
+      const nextPage = currentCommentPage + 1
+      const response = await fetchComments(post.id, nextPage, commentPageSize)
+
+      if (isPaginatedCommentResponse(response)) {
+        setComments((prev) => [...prev, ...response.data])
+        setCurrentCommentPage(nextPage)
+        setTotalCommentPages(response.totalPage)
+      }
+    } catch (error) {
+      console.error("Failed to load more comments:", error)
+      toastManager.error("Không thể tải thêm bình luận")
+    } finally {
+      setLoadingMoreComments(false)
+    }
+  }
 
   const handleLike = async () => {
     setIsLiking(true)
@@ -38,15 +114,31 @@ export default function PostItem({ post, onUpdate }: PostItemProps) {
 
     setIsCommentLoading(true)
     try {
-      const updatedPost = await addComment(post.id, commentContent)
+      const newComment = await addComment(post.id, commentContent)
+      
+      // Thêm comment mới vào đầu danh sách
+      setComments((prev) => [newComment, ...prev])
+      
+      // Cập nhật count
+      const updatedPost = {
+        ...post,
+        commentsCount: (post.commentsCount || 0) + 1
+      }
       onUpdate(updatedPost)
+      
       setCommentContent("")
       setShowCommentForm(false)
+      setShowComments(true)
     } catch (error) {
       console.error("Failed to add comment:", error)
+      toastManager.error("Không thể thêm bình luận")
     } finally {
       setIsCommentLoading(false)
     }
+  }
+
+  const toggleComments = () => {
+    setShowComments(!showComments)
   }
 
   const formatDate = (dateString: string) => {
@@ -63,6 +155,8 @@ export default function PostItem({ post, onUpdate }: PostItemProps) {
     if (diffDays < 7) return `${diffDays} ngày trước`
     return date.toLocaleDateString("vi-VN")
   }
+
+  const hasMoreComments = currentCommentPage < totalCommentPages - 1
 
   return (
     <div className={styles.postCard}>
@@ -92,7 +186,12 @@ export default function PostItem({ post, onUpdate }: PostItemProps) {
 
       <div className={styles.stats}>
         <span className={styles.stat}>{post.likesCount || 0} lượt thích</span>
-        <span className={styles.stat}>{post.commentsCount || 0} bình luận</span>
+        <span 
+          className={`${styles.stat} ${styles.clickable}`}
+          onClick={toggleComments}
+        >
+          {post.commentsCount || 0} bình luận
+        </span>
       </div>
 
       <div className={styles.actions}>
@@ -129,18 +228,60 @@ export default function PostItem({ post, onUpdate }: PostItemProps) {
         </form>
       )}
 
-      {post.comments && post.comments.length > 0 && (
+      {showComments && (
         <div className={styles.commentsList}>
           <h4 className={styles.commentsTitle}>Bình luận</h4>
-          {post.comments.map((comment) => (
-            <div key={comment.id} className={styles.comment}>
-              <div className={styles.commentAvatar}>{comment.author.fullName.charAt(0).toUpperCase()}</div>
-              <div className={styles.commentContent}>
-                <p className={styles.commentAuthor}>{comment.author.fullName}</p>
-                <p className={styles.commentText}>{comment.content}</p>
-              </div>
+          
+          {loadingComments ? (
+            <div className={styles.loadingComments}>
+              <div className={styles.spinner}></div>
+              <p>Đang tải bình luận...</p>
             </div>
-          ))}
+          ) : comments.length > 0 ? (
+            <>
+              {comments.map((comment) => (
+                <div key={comment.id} className={styles.comment}>
+                  <div className={styles.commentAvatar}>
+                    {comment.user.fullName.charAt(0).toUpperCase()}
+                  </div>
+                  <div className={styles.commentContent}>
+                    <p className={styles.commentAuthor}>{comment.user.fullName}</p>
+                    <p className={styles.commentText}>{comment.content}</p>
+                    <p className={styles.commentTime}>{formatDate(comment.createdAt)}</p>
+                  </div>
+                </div>
+              ))}
+
+              {/* Nút Load More Comments */}
+              {hasMoreComments && (
+                <div className={styles.loadMoreCommentsContainer}>
+                  <button
+                    onClick={loadMoreComments}
+                    disabled={loadingMoreComments}
+                    className={styles.loadMoreCommentsButton}
+                  >
+                    {loadingMoreComments ? (
+                      <>
+                        <div className={styles.smallSpinner}></div>
+                        <span>Đang tải...</span>
+                      </>
+                    ) : (
+                      <span>Xem thêm bình luận ({comments.length}/{post.commentsCount})</span>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {/* Thông báo khi hết comment */}
+              {!hasMoreComments && comments.length > commentPageSize && (
+                <div className={styles.endCommentsMessage}>
+                  <span>Đã hiển thị tất cả bình luận</span>
+                </div>
+              )}
+            </>
+          ) : (
+            <p className={styles.noComments}>Chưa có bình luận nào</p>
+          )}
         </div>
       )}
     </div>
