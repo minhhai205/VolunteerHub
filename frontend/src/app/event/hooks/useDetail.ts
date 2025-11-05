@@ -13,7 +13,7 @@ export interface User {
 
 export interface Comment {
   id: number;
-  author: User;
+  user: User;
   content: string;
   createdAt: string;
 }
@@ -65,64 +65,13 @@ export interface ApiResponse<T> {
   data: T;
 }
 
-const mockPosts: Post[] = [
-  {
-    id: 1,
-    title: "Bình luận từ Nguyễn Văn A",
-    content:
-      "Mình rất mong chờ được tham gia sự kiện này! Đây là lần đầu tiên mình tham gia hoạt động tính nguyện và rất hào hức.",
-    userId: 1,
-    eventId: 1,
-    user: { id: 1, fullName: "Nguyễn Văn A", avatar: "" },
-    likesCount: 12,
-    isLiked: false,
-    commentsCount: 2,
-    medias: [],
-    comments: [
-      {
-        id: 1,
-        author: { id: 2, fullName: "Trần Thị B" },
-        content: "Mình cũng vậy, chúng ta cố gắng làm tốt nhé!",
-        createdAt: new Date(Date.now() - 3600000).toISOString(),
-      },
-    ],
-    createdAt: new Date(Date.now() - 7200000).toISOString(),
-  },
-  {
-    id: 2,
-    title: "Bình luận từ Trần Thị B",
-    content:
-      "Các bạn có thể cho mình biết chuẩn bị những gì không? Mình muốn tham gia nhưng chưa rõ về trạng phục và dung cụ cần thiết.",
-    userId: 2,
-    eventId: 1,
-    user: { id: 2, fullName: "Trần Thị B", avatar: "" },
-    likesCount: 8,
-    isLiked: false,
-    commentsCount: 0,
-    medias: [
-      { id: 1, fileUrl: "/images/home1.jpg" },
-      // { id: 1, fileUrl: "/images/home1.jpg" },
-      // { id: 1, fileUrl: "/images/home1.jpg" },
-    ],
-    comments: [],
-    createdAt: new Date(Date.now() - 10800000).toISOString(),
-  },
-  {
-    id: 3,
-    title: "Bình luận từ Lê Minh C",
-    content:
-      "Mình chia sẻ một số tips hữu ích cho những ai sắp tham gia lần đầu. Hãy mang theo nước uống đầy đủ!",
-    userId: 3,
-    eventId: 1,
-    user: { id: 3, fullName: "Lê Minh C", avatar: "" },
-    likesCount: 24,
-    isLiked: false,
-    commentsCount: 3,
-    medias: [],
-    comments: [],
-    createdAt: new Date(Date.now() - 14400000).toISOString(),
-  },
-];
+export interface PaginatedCommentResponse {
+  pageNo: number;
+  pageSize: number;
+  totalPage: number;
+  data: Comment[];
+}
+
 
 export async function fetchEventData(eventId: string): Promise<Event> {
   try {
@@ -237,37 +186,66 @@ export async function likePost(post: Post): Promise<Post> {
     throw error;
   }
 }
+
+export async function fetchComments(
+  postId: number,
+  pageNo: number = 0,
+  pageSize: number = 2
+): Promise<PaginatedCommentResponse> {
+  try {
+    const response = await fetchWithAuth(
+      `${API_BASE_URL}/comment/comment-list/${postId}?page=${pageNo}&size=${pageSize}`,
+      { method: "GET" }
+    ).then((res) => res.json());
+
+    if (response.status === 200) {
+      if (
+        response.data &&
+        typeof response.data === "object" &&
+        "data" in response.data
+      ) {
+        return response.data as PaginatedCommentResponse;
+      }
+      console.log(response)
+
+      const comments = Array.isArray(response.data)
+        ? response.data
+        : response.data.data || [];
+      return {
+        pageNo: pageNo,
+        pageSize: pageSize,
+        totalPage: Math.ceil(comments.length / pageSize),
+        data: comments.slice(pageNo * pageSize, (pageNo + 1) * pageSize),
+      };
+    }
+
+    throw new Error(response.message || "Failed to fetch comments");
+  } catch (error) {
+    console.error("Lỗi khi lấy bình luận:", error);
+    throw error;
+  }
+}
+
+
 export async function addComment(
   postId: number,
   content: string
-): Promise<Post> {
-  // try {
-  //   const response = await fetch(`${API_BASE_URL}/posts/${postId}/comments`, {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({ content }),
-  //   })
-  //   if (response.ok) {
-  //     return response.json()
-  //   }
-  // } catch (error) {
-  //   console.warn("API call failed, using mock data:", error)
-  // }
+): Promise<Comment> {
+  try {
+    const response = await fetchWithAuth(`${API_BASE_URL}/post/create-comment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ postId, content }),
+    });
 
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const post = mockPosts.find((p) => p.id === postId);
-      if (post) {
-        const newComment: Comment = {
-          id: Date.now(),
-          author: { id: 0, fullName: "Bạn" },
-          content,
-          createdAt: new Date().toISOString(),
-        };
-        post.comments = [...(post.comments || []), newComment];
-        post.commentsCount = (post.commentsCount || 0) + 1;
-        resolve(post);
-      }
-    }, 300);
-  });
+    const result = await response.json();
+
+    if (result.status !== 200) {
+      throw new Error(result.message || "Thêm bình luận thất bại");
+    }
+
+    return result.data as Comment;
+  } catch (error) {
+    throw error;
+  }
 }
