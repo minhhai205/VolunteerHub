@@ -75,6 +75,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({Exception.class})
     public ApiResponse handleServerError(Exception e, WebRequest request) throws AccessDeniedException {
         log.info("---------------------------Server error 500 exception handler start---------------------------");
+        log.error(e.getMessage());
         String error = e.getMessage();
         return ApiErrorResponse.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())

@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import styles from "./events.module.css";
-import { Header } from "@/components/static/HeaderManager";
-import { Footer } from "@/components/static/Footer";
+import styles from "./page1.module.css";
 import { getAccessToken } from "@/lib/token";
 
 interface Event {
@@ -66,7 +64,7 @@ export default function EventsPage() {
           throw new Error("Không tìm thấy token. Vui lòng đăng nhập lại.");
         }
         const response = await fetch(
-          "http://localhost:8080/api/event/manager/my-event",
+          "http://localhost:8080/api/event/my-event",
           {
             method: "GET",
             headers: {
@@ -141,13 +139,11 @@ export default function EventsPage() {
 
   return (
     <div className={styles.page}>
-      <Header />
-
       <main className={styles.main}>
         <div className={styles.header}>
-          <h1 className={styles.title}>Quản lý sự kiện tình nguyện</h1>
+          <h1 className={styles.title}>Các sự kiện tôi đã tham gia</h1>
           <p className={styles.subtitle}>
-            Theo dõi và quản lý các hoạt động tình nguyện của UET
+            Theo dõi và quản lý các hoạt động tình nguyện của tôi
           </p>
         </div>
 
@@ -363,7 +359,6 @@ export default function EventsPage() {
           </>
         )}
       </main>
-      <Footer />
     </div>
   );
 }
