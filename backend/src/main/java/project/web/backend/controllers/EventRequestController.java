@@ -15,6 +15,7 @@ import project.web.backend.dtos.response.PageResponseDTO;
 import project.web.backend.dtos.response.event.EventRegistrationResponseDTO;
 import project.web.backend.dtos.response.event.EventRequestResponseDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
+import project.web.backend.dtos.response.event.RegistrationStatusResponseDTO;
 import project.web.backend.services.EventRequestService;
 
 import java.util.List;
@@ -118,6 +119,18 @@ public class EventRequestController {
         return ApiSuccessResponse.<EventRegistrationResponseDTO>builder()
                 .data(eventRequestService.rejectRegistration(requestId))
                 .message("Reject!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @GetMapping("/registration-status/{eventId}")
+    @PreAuthorize("hasRole('USER')")
+    public ApiSuccessResponse<RegistrationStatusResponseDTO> getRegistrationStatus(
+            @PathVariable @Min(value = 1, message = "Event id must be greater than 0") Long eventId
+    ) {
+        return ApiSuccessResponse.<RegistrationStatusResponseDTO>builder()
+                .data(eventRequestService.getRegistrationStatus(eventId))
+                .message("Get successfully!")
                 .status(HttpStatus.OK.value())
                 .build();
     }

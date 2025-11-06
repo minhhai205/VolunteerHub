@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import project.web.backend.entities.Event;
 import project.web.backend.entities.EventRegistration;
 
 import java.util.Optional;
@@ -34,4 +35,10 @@ public interface EventRegistrationRepository extends JpaRepository<EventRegistra
             WHERE er.id=:id
             """)
     Optional<EventRegistration> findByIdWithUserAndEvent(@Param("id") Long id);
+
+    @Query("""
+            SELECT er FROM EventRegistration er
+            WHERE er.id=:eventId AND er.user.email=:email
+            """)
+    Optional<EventRegistration> findByEventIdAndUserEmail(@Param("eventId") Long eventId, @Param("email") String email);
 }
