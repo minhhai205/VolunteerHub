@@ -197,7 +197,7 @@ public class EventRequestService {
     }
 
     public RegistrationStatusResponseDTO getRegistrationStatus(Long eventId) {
-        log.info("Get registration status for event {}", eventId);
+        log.info("----------- Get registration status for event {} ------------", eventId);
 
         RegistrationStatusResponseDTO response = RegistrationStatusResponseDTO.builder()
                 .status("NOT_REGISTERED")
@@ -212,4 +212,23 @@ public class EventRequestService {
 
         return response;
     }
+
+    @Transactional
+    public String cancelMyRegistrationRequest(Long eventId) {
+        log.info("----------- Cancel registration request for event {} ------------", eventId);
+
+        String email = SecurityUtil.getCurrentEmail();
+        EventRegistration eventRegistration = eventRegistrationRepository.findByEventIdAndUserEmail(eventId, email)
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_EXISTED));
+
+        if (eventRegistration.getStatus() != EventRequestStatus.PENDING) {
+            throw new AppException(ErrorCode.REQUEST_INVALID);
+        }
+
+        eventRegistrationRepository.delete(eventRegistration);
+
+        return "OK";
+    }
+
+
 }

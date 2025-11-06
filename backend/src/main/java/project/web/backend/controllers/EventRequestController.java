@@ -134,4 +134,16 @@ public class EventRequestController {
                 .status(HttpStatus.OK.value())
                 .build();
     }
+
+    @PatchMapping("/registration/cancel-registration/{eventId}")
+    @PreAuthorize("hasAnyRole({'USER'})")
+    public ApiSuccessResponse<String> cancelMyRegistrationRequest(
+            @PathVariable @Min(value = 1, message = "Request id must be greater than 0") Long eventId
+    ) {
+        return ApiSuccessResponse.<String>builder()
+                .data(eventRequestService.cancelMyRegistrationRequest(eventId))
+                .message("Canceled!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
 }
