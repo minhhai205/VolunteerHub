@@ -48,7 +48,7 @@ export function LoginForm() {
       const result = await res.json();
 
       if (result.status !== 200) {
-        throw new Error("Invalid email or password!");
+        throw new Error("Your credentials were invalid");
       }
 
       saveTokens(result.data.accessToken, result.data.refreshToken);
@@ -86,7 +86,9 @@ export function LoginForm() {
       }
     } catch (err) {
       console.error("Login error:", err);
-      toastManager.error("Thông tin đăng nhập hoặc mật khẩu không chính xác !");
+      toastManager.error(
+        err instanceof Error ? err.message : "Đăng nhập thất bại!"
+      );
       setError(err instanceof Error ? err.message : "Đăng nhập thất bại!");
     } finally {
       setLoading(false);

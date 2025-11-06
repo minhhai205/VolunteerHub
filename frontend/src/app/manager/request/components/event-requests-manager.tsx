@@ -45,6 +45,13 @@ export default function EventRequestsManager() {
         throw new Error("Không thể tải danh sách yêu cầu");
       }
       const result: ApiResponse = await response.json();
+      if (
+        result.data === null ||
+        result.data.data === null ||
+        result.data.data.length === 0
+      ) {
+        throw new Error("Không thể tải danh sách yêu cầu");
+      }
       setRequests(result.data.data);
       setError(null);
     } catch (err) {
@@ -93,7 +100,7 @@ export default function EventRequestsManager() {
       }
     } catch (err) {
       console.error("Error approving request:", err);
-      alert("Không thể phê duyệt yêu cầu. Vui lòng thử lại.");
+      toastManager.error("Không thể phê duyệt yêu cầu. Vui lòng thử lại.");
     }
   };
 
