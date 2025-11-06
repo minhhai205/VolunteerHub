@@ -3,6 +3,7 @@
 import { Mail, MapPin, Calendar, Heart } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button as UIButton } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface UserProfile {
   name: string;
@@ -18,6 +19,10 @@ interface ProfileCardProps {
 }
 
 export function ProfileCard({ user }: ProfileCardProps) {
+  const router = useRouter();
+  const handleEdit = () => {
+    router.push("/profile/update");
+  };
   return (
     <Card className="mb-8 overflow-hidden border-primary/10 bg-card shadow-lg">
       <div className="h-24 bg-gradient-to-r from-primary/20 to-primary/10" />
@@ -52,7 +57,7 @@ export function ProfileCard({ user }: ProfileCardProps) {
             <MapPin className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
             <div>
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                Địa điểm
+                Số điện thoại
               </p>
               <p className="text-foreground font-medium">{user.location}</p>
             </div>
@@ -78,7 +83,10 @@ export function ProfileCard({ user }: ProfileCardProps) {
         </div>
 
         <div className="flex">
-          <UIButton className="bg-primary hover:bg-primary/90 text-primary-foreground">
+          <UIButton
+            onClick={handleEdit}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+          >
             Chỉnh sửa thông tin
           </UIButton>
         </div>

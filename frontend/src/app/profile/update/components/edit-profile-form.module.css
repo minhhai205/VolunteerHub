@@ -1,0 +1,136 @@
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fieldLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: oklch(0.2 0 0);
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: oklch(0.97 0 0);
+  border: 1.5px solid oklch(0.93 0.01 155);
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+.inputWrapper:focus-within {
+  border-color: oklch(0.55 0.12 155);
+  box-shadow: 0 0 0 3px oklch(0.55 0.12 155 / 0.1);
+}
+
+.fieldInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  color: oklch(0.2 0 0);
+}
+
+.fieldInput::placeholder {
+  color: oklch(0.5 0 0);
+}
+
+.fieldInput:disabled {
+  color: oklch(0.2 0 0);
+  cursor: default;
+  opacity: 0.8;
+}
+
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: oklch(0.55 0.12 155);
+  flex-shrink: 0;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+}
+
+.buttonBase {
+  flex: 1;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: auto;
+}
+
+.buttonPrimary {
+  background-color: oklch(0.55 0.12 155);
+  color: oklch(0.98 0 0);
+}
+
+.buttonPrimary:hover {
+  background-color: oklch(0.5 0.12 155);
+  box-shadow: 0 4px 12px oklch(0.55 0.12 155 / 0.2);
+}
+
+.buttonSecondary {
+  background-color: oklch(0.98 0 0);
+  color: oklch(0.55 0.12 155);
+  border: 1.5px solid oklch(0.93 0.01 155);
+}
+
+.buttonSecondary:hover {
+  background-color: oklch(0.92 0.04 155);
+  border-color: oklch(0.55 0.12 155);
+}
+
+.backButton {
+  position: absolute;
+  top: 3rem;
+  right: 1.5rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  font-size: 1.875rem; /* 30px */
+  font-weight: 700; /* bold */
+  padding: 0; /* Xóa padding mặc định */
+
+  /* SỬ DỤNG BIẾN TỪ .accountTheme */
+  border: 1px solid var(--border);
+  background-color: var(--muted); /* Nền xám nhạt (oklch(0.94 0 0)) */
+  color: var(--secondary-foreground); /* Màu chữ tối (oklch(0.3 0 0)) */
+
+  /* Căn giữa mũi tên */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Hiệu ứng chuyển động */
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Thêm hiệu ứng hover "chuyển màu" */
+.backButton:hover {
+  /* Chuyển sang màu xanh nhạt (từ theme) */
+  background-color: var(--secondary);
+  /* Chuyển màu chữ sang xanh đậm (từ theme) */
+  color: var(--primary);
+  /* Hiệu ứng phóng to nhẹ */
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}

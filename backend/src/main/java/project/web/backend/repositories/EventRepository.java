@@ -59,22 +59,31 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
 
     @Query("""
-        SELECT e FROM Event e
-        WHERE e.manager.id = :managerId
-        ORDER BY e.createdAt DESC
-    """)
+                SELECT e FROM Event e
+                WHERE e.manager.id = :managerId
+                ORDER BY e.createdAt DESC
+            """)
     List<Event> findNewestPublishedEventsByManager(@Param("managerId") Long managerId, Pageable pageable);
 
     @Query("""
-        SELECT e FROM Event e
-        WHERE e.manager.id = :managerId
-        AND SIZE(e.members) >= :minMembers
-        ORDER BY SIZE(e.members) DESC, e.createdAt DESC
-        """)
+            SELECT e FROM Event e
+            WHERE e.manager.id = :managerId
+            AND SIZE(e.members) >= :minMembers
+            ORDER BY SIZE(e.members) DESC, e.createdAt DESC
+            """)
     List<Event> findTopTrendingEventsByManager(
             @Param("managerId") Long managerId,
             @Param("minMembers") int minMembers,
             Pageable pageable
     );
 
+    @Query("""
+                SELECT COUNT(e),
+                       COUNT(CASE WHEN e.endDate < CURRENT_TIMESTAMP THEN 1 END)
+                FROM User u
+                JOIN u.members m
+                JOIN m.event e
+                WHERE u.email = :email
+            """)
+    Object countAllEventsByEmailUser(@Param("email") String email);
 }
