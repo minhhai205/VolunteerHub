@@ -1,14 +1,53 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { useState, useEffect } from "react";
 import type { Event } from "../../../../hooks/useDetail";
+import {
+  isUserRole,
+  isEventEnded,
+  fetchRegistrationStatus,
+  registerForEvent,
+  cancelRegistration,
+  leaveEvent,
+} from "../../../../hooks/useDetail";
 import { Calendar, MapPin, Users, Clock } from "lucide-react";
 import styles from "./event-header.module.css";
+import { toastManager } from "@/components/static/toast/toast";
 
 interface EventHeaderProps {
   event: Event;
+  onStatusChange?: () => void;
 }
 
-export default function EventHeader({ event }: EventHeaderProps) {
+export default function EventHeader({
+  event,
+  onStatusChange,
+}: EventHeaderProps) {
+  const [registrationStatus, setRegistrationStatus] = useState<
+    "NOT_REGISTERED" | "PENDING" | "APPROVED" | "REJECTED"
+  >("NOT_REGISTERED");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>("");
+  const userRole = isUserRole();
+  const eventEnded = isEventEnded(event.endDate);
+
+  // Fetch registration status khi component mount
+  useEffect(() => {
+    const loadRegistrationStatus = async () => {
+      if (userRole && !eventEnded) {
+        try {
+          const status = await fetchRegistrationStatus(event.id.toString());
+          setRegistrationStatus(status);
+        } catch (err) {
+          console.error("Failed to fetch registration status:", err);
+        }
+      }
+    };
+
+    loadRegistrationStatus();
+  }, [event.id, userRole, eventEnded]);
+
   // Format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -38,6 +77,151 @@ export default function EventHeader({ event }: EventHeaderProps) {
     if (now < start) return "Sắp diễn ra";
     if (now > end) return "Đã kết thúc";
     return "Đang diễn ra";
+  };
+
+  // Xử lý đăng ký
+  const handleRegister = async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      await registerForEvent(event.id.toString());
+      setRegistrationStatus("PENDING");
+      onStatusChange?.();
+      toastManager.success("Đăng kí thành công!")
+    } catch (err: any) {
+      toastManager.error("Đăng kí thất bại!")
+      setError(err.message || "Đăng ký thất bại");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Xử lý hủy đăng ký (khi status = PENDING)
+  const handleCancelRegistration = async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      await cancelRegistration(event.id.toString());
+      setRegistrationStatus("NOT_REGISTERED");
+      onStatusChange?.();
+      toastManager.success("Hủy đăng kí thành công!")
+    } catch (err: any) {
+      toastManager.error("Hủy đăng kí thất bại!")
+      setError(err.message || "Hủy đăng ký thất bại");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Xử lý hủy tham gia (khi status = APPROVED)
+  const handleLeaveEvent = async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      await leaveEvent(event.id.toString());
+      setRegistrationStatus("NOT_REGISTERED");
+      onStatusChange?.();
+      toastManager.success("Hủy tham gia thành công!")
+    } catch (err: any) {
+      toastManager.error("Hủy tham gia thất bại!")
+      setError(err.message || "Hủy tham gia thất bại");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Render button dựa trên trạng thái
+  const renderActionButton = () => {
+    // Nếu không phải USER role
+    if (!userRole) {
+      return (
+        <button className={`${styles.registerBtn} ${styles.disabled}`} disabled>
+          Chỉ tình nguyện viên mới được đăng ký
+        </button>
+      );
+    }
+
+    // Nếu sự kiện đã kết thúc
+    if (eventEnded) {
+      return (
+        <button className={`${styles.registerBtn} ${styles.disabled}`} disabled>
+          Sự kiện đã kết thúc
+        </button>
+      );
+    }
+
+    // Dựa vào registration status
+    switch (registrationStatus) {
+      case "NOT_REGISTERED":
+        return (
+          <button
+            className={styles.registerBtn}
+            onClick={handleRegister}
+            disabled={isLoading}
+          >
+            {isLoading ? "Đang xử lý..." : "Đăng ký tham gia"}
+          </button>
+        );
+
+      case "PENDING":
+        return (
+          <button
+            className={`${styles.registerBtn} ${styles.pending}`}
+            onClick={handleCancelRegistration}
+            disabled={isLoading}
+          >
+            {isLoading ? "Đang xử lý..." : "Hủy đăng ký"}
+          </button>
+        );
+
+      case "APPROVED":
+        return (
+          <button
+            className={`${styles.registerBtn} ${styles.approved}`}
+            onClick={handleLeaveEvent}
+            disabled={isLoading}
+          >
+            {isLoading ? "Đang xử lý..." : "Hủy tham gia"}
+          </button>
+        );
+
+      case "REJECTED":
+        return (
+          <button className={`${styles.registerBtn} ${styles.disabled}`} disabled>
+            Đăng ký bị từ chối
+          </button>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  // Render status text
+  const getStatusText = () => {
+    if (!userRole) {
+      return "Bạn cần có quyền USER để đăng ký";
+    }
+
+    if (eventEnded) {
+      return "Sự kiện đã kết thúc, không thể đăng ký";
+    }
+
+    switch (registrationStatus) {
+      case "NOT_REGISTERED":
+        return "Đăng ký ngay để không bỏ lỡ!";
+      case "PENDING":
+        return "Đơn đăng ký đang chờ duyệt";
+      case "APPROVED":
+        return "Bạn đã tham gia sự kiện này";
+      case "REJECTED":
+        return "Đơn đăng ký của bạn bị từ chối";
+      default:
+        return "";
+    }
   };
 
   return (
@@ -89,14 +273,19 @@ export default function EventHeader({ event }: EventHeaderProps) {
             <div className={styles.registerCard}>
               <div className={styles.cardContent}>
                 <div className={styles.priceTag}>
-                  <span className={styles.priceLabel}>Đăng kí tham gia</span>
+                  <span className={styles.priceLabel}>
+                    {registrationStatus === "APPROVED"
+                      ? "Đã tham gia"
+                      : registrationStatus === "PENDING"
+                      ? "Chờ duyệt"
+                      : "Đăng kí tham gia"}
+                  </span>
                   <Clock className={styles.clockIcon} />
                 </div>
-                <p className={styles.registerText}>
-                  Đăng ký ngay để không bỏ lỡ!
-                </p>
+                <p className={styles.registerText}>{getStatusText()}</p>
+                {error && <p className={styles.errorText}>{error}</p>}
               </div>
-              <button className={styles.registerBtn}>Đăng ký tham gia</button>
+              {renderActionButton()}
             </div>
           </div>
         </div>

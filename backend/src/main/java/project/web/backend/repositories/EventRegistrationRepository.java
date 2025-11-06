@@ -38,7 +38,7 @@ public interface EventRegistrationRepository extends JpaRepository<EventRegistra
 
     @Query("""
             SELECT er FROM EventRegistration er
-            WHERE er.id=:eventId AND er.user.email=:email
+            WHERE er.event.id=:eventId AND er.user.email=:email
             """)
     Optional<EventRegistration> findByEventIdAndUserEmail(@Param("eventId") Long eventId, @Param("email") String email);
 }

@@ -155,6 +155,7 @@ public class EventService {
     }
 
     public String eventRegistration(Long eventId) {
+        log.info("------------ Event registration -------------");
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
 
