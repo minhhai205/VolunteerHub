@@ -46,6 +46,12 @@ public class AuthenticationService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new AppException(ErrorCode.PASSWORD_INVALID);
         }
+
+        // if locked, throw 401
+        if (user.getStatus().equals(UserStatus.LOCKED)) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
         // gen token
         String accessToken = jwtService.generateToken(user, TokenType.ACCESS);
         String refreshToken = jwtService.generateToken(user, TokenType.REFRESH);
@@ -109,7 +115,7 @@ public class AuthenticationService {
                 .email(email)
                 .build();
         tokenRepository.saveAll(List.of(access, refresh));
-        
+
         return JwtResponseDTO.builder()
                 .accessToken(accessToken)
                 .refreshToken(newRefreshToken)
