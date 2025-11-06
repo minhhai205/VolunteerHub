@@ -108,4 +108,16 @@ public class EventController {
                 .message("Update event successfully!")
                 .build();
     }
+
+    @PatchMapping("/leave/{eventId}")
+    @PreAuthorize("hasAnyRole({'USER'})")
+    public ApiSuccessResponse<String> leaveMyEvent(
+            @PathVariable @Min(value = 1, message = "Request id must be greater than 0") Long eventId
+    ) {
+        return ApiSuccessResponse.<String>builder()
+                .data(eventService.leaveMyEvent(eventId))
+                .message("Leaved!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
 }

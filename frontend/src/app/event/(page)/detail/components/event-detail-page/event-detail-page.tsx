@@ -20,7 +20,7 @@ export default function EventDetailPage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        console.log(eventId)
+        console.log(eventId);
         if (!eventId) return;
         const data = await fetchEventData(eventId);
         setEvent(data);
@@ -87,9 +87,6 @@ export default function EventDetailPage() {
                     Đang tuyển
                   </span>
                 </div>
-                <button className="w-full bg-primary text-primary-foreground py-2.5 rounded-lg font-semibold hover:bg-primary/90 transition-all hover:shadow-lg active:scale-95">
-                  Đăng ký tham gia
-                </button>
               </div>
             </div>
           </aside>

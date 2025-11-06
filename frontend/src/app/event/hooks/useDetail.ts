@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import { getAccessToken } from "@/lib/token";
+import { jwtDecode } from "jwt-decode";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
@@ -50,6 +52,7 @@ export interface Event {
   countMembers?: number;
   countPosts?: number;
   posts?: Post[];
+  registrationStatus?: "NOT_REGISTERED" | "PENDING" | "APPROVED" | "REJECTED";
 }
 
 export interface PaginatedPostResponse {
@@ -72,6 +75,49 @@ export interface PaginatedCommentResponse {
   data: Comment[];
 }
 
+type JwtPayload = {
+  sub: string;
+  scope: string;
+  exp: number;
+};
+
+/* ---------- Helper Functions ---------- */
+
+/**
+ * Lấy role từ JWT token
+ */
+export function getUserRole(): string | null {
+  try {
+    const accessToken = getAccessToken();
+    if (!accessToken) return null;
+
+    const decoded = jwtDecode<JwtPayload>(accessToken);
+    const role = decoded.scope?.replace("ROLE_", "");
+    return role || null;
+  } catch (error) {
+    console.error("Failed to decode token:", error);
+    return null;
+  }
+}
+
+/**
+ * Kiểm tra xem user có phải là USER role không
+ */
+export function isUserRole(): boolean {
+  const role = getUserRole();
+  return role === "USER";
+}
+
+/**
+ * Kiểm tra xem event đã kết thúc chưa
+ */
+export function isEventEnded(endDate: string): boolean {
+  const now = new Date();
+  const end = new Date(endDate);
+  return now > end;
+}
+
+/* ---------- API Functions ---------- */
 
 export async function fetchEventData(eventId: string): Promise<Event> {
   try {
@@ -81,7 +127,6 @@ export async function fetchEventData(eventId: string): Promise<Event> {
 
     const response = await res.json();
 
-    // Kiểm tra status logic từ backend
     if (response.status !== 200) {
       const error: any = new Error(
         response.message || "Failed to fetch event detail"
@@ -93,6 +138,108 @@ export async function fetchEventData(eventId: string): Promise<Event> {
     return response.data as Event;
   } catch (error) {
     console.error("Failed to fetch event:", error);
+    throw error;
+  }
+}
+
+/**
+ * Lấy trạng thái đăng ký của user cho event
+ */
+export async function fetchRegistrationStatus(
+  eventId: string
+): Promise<"NOT_REGISTERED" | "PENDING" | "APPROVED" | "REJECTED"> {
+  try {
+    const res = await fetchWithAuth(
+      `${API_BASE_URL}/event-request/registration-status/${eventId}`,
+      {
+        method: "GET",
+      }
+    );
+
+    const response = await res.json();
+
+    console.log(response)
+
+    if (response.status !== 200) {
+      return "NOT_REGISTERED";
+    }
+
+    return response.data.status || "NOT_REGISTERED";
+  } catch (error) {
+    console.error("Failed to fetch registration status:", error);
+    return "NOT_REGISTERED";
+  }
+}
+
+/**
+ * Đăng ký tham gia event
+ */
+export async function registerForEvent(eventId: string): Promise<boolean> {
+  try {
+    const res = await fetchWithAuth(
+      `${API_BASE_URL}/event/registration/${eventId}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    const response = await res.json();
+
+    if (response.status !== 200) {
+      throw new Error(response.message || "Đăng ký thất bại");
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Failed to register for event:", error);
+    throw error;
+  }
+}
+
+/**
+ * Hủy đăng ký tham gia event (khi status = PENDING)
+ */
+export async function cancelRegistration(eventId: string): Promise<boolean> {
+  try {
+    const res = await fetchWithAuth(
+      `${API_BASE_URL}/event-request/registration/cancel-registration/${eventId}`,
+      {
+        method: "PATCH",
+      }
+    );
+
+    const response = await res.json();
+
+    if (response.status !== 200) {
+      throw new Error(response.message || "Hủy đăng ký thất bại");
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Failed to cancel registration:", error);
+    throw error;
+  }
+}
+
+/**
+ * Hủy tham gia event (khi status = APPROVED)
+ */
+export async function leaveEvent(eventId: string): Promise<boolean> {
+  try {
+    const res = await fetchWithAuth(`${API_BASE_URL}/event/leave/${eventId}`, {
+      method: "PATCH",
+    });
+
+    const response = await res.json();
+
+    if (response.status !== 200) {
+      throw new Error(response.message || "Hủy tham gia thất bại");
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Failed to leave event:", error);
     throw error;
   }
 }
@@ -153,7 +300,7 @@ export async function createPost(
       body: JSON.stringify(payload),
     }).then((res) => res.json());
 
-    console.log(response)
+    console.log(response);
     if (response.status !== 200) {
       const errorText = await response.message;
       throw new Error(`Tạo bài viết thất bại: ${errorText}`);
@@ -178,7 +325,7 @@ export async function likePost(post: Post): Promise<Post> {
     if (response.status !== 200) {
       throw new Error("Like bài viết thất bại");
     }
-    
+
     post.isLiked = !post.isLiked;
     post.likesCount = (post.likesCount || 0) + (post.isLiked ? 1 : -1);
 
@@ -207,7 +354,7 @@ export async function fetchComments(
       ) {
         return response.data as PaginatedCommentResponse;
       }
-      console.log(response)
+      console.log(response);
 
       const comments = Array.isArray(response.data)
         ? response.data
@@ -227,23 +374,23 @@ export async function fetchComments(
   }
 }
 
-
 export async function addComment(
   postId: number,
   content: string
 ): Promise<Comment> {
   try {
-    const response = await fetchWithAuth(`${API_BASE_URL}/comment/create-comment`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ postId, content }),
-    });
-
-
+    const response = await fetchWithAuth(
+      `${API_BASE_URL}/comment/create-comment`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ postId, content }),
+      }
+    );
 
     const result = await response.json();
 
-        console.log(result);
+    console.log(result);
 
     if (result.status !== 200) {
       throw new Error(result.message || "Thêm bình luận thất bại");
