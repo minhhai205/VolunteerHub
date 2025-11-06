@@ -33,6 +33,26 @@ public class EventController {
                 .build();
     }
 
+    @GetMapping("/manager/my-event")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ApiSuccessResponse<List<EventResponseDTO>> getManagerMyEvent() {
+        return ApiSuccessResponse.<List<EventResponseDTO>>builder()
+                .data(eventService.getManagerMyEvent())
+                .status(HttpStatus.OK.value())
+                .message("Get all events successfully!")
+                .build();
+    }
+
+    @GetMapping("/my-event")
+    @PreAuthorize("hasRole('USER')")
+    public ApiSuccessResponse<List<EventResponseDTO>> getUserMyEvent() {
+        return ApiSuccessResponse.<List<EventResponseDTO>>builder()
+                .data(eventService.getMyEvent())
+                .status(HttpStatus.OK.value())
+                .message("Get all events successfully!")
+                .build();
+    }
+
     @GetMapping("/manager/newest")
     @PreAuthorize("hasRole('MANAGER')")
     public ApiSuccessResponse<List<EventResponseDTO>> getNewestPublishedEventsByManager() {
@@ -45,7 +65,7 @@ public class EventController {
 
     @GetMapping("/manager/trending")
     @PreAuthorize("hasRole('MANAGER')")
-    public ApiSuccessResponse<List<EventResponseDTO>> getTrendingEventsByManager(){
+    public ApiSuccessResponse<List<EventResponseDTO>> getTrendingEventsByManager() {
         return ApiSuccessResponse.<List<EventResponseDTO>>builder()
                 .data(eventService.getTrendingEventsByManager())
                 .status(HttpStatus.OK.value())

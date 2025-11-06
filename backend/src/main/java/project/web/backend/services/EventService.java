@@ -51,6 +51,45 @@ public class EventService {
         return eventResponses;
     }
 
+    public List<EventResponseDTO> getManagerMyEvent() {
+        log.info("------------ Get manager events --------------");
+        List<Event> events = eventRepository.findManagerEventWithCategories(
+                SecurityUtil.getCurrentEmail());
+        List<EventResponseDTO> eventResponses = events.stream().map(eventMapper::toResponseDTO).toList();
+
+        List<Long> eventsIds = events.stream().map(Event::getId).toList();
+
+        Map<Long, Long> memberCountMap = findCountMemberForEvents(eventsIds);
+        Map<Long, Long> postCountMap = findCountPostForEvents(eventsIds);
+
+        eventResponses.forEach(eventResponse -> {
+            eventResponse.setCountMembers(memberCountMap.get(eventResponse.getId()));
+            eventResponse.setCountPosts(postCountMap.get(eventResponse.getId()));
+        });
+
+        return eventResponses;
+    }
+
+
+    public List<EventResponseDTO> getMyEvent() {
+        log.info("------------ Get my events --------------");
+        List<Event> events = eventRepository.findMyEventWithCategories(
+                SecurityUtil.getCurrentEmail());
+        List<EventResponseDTO> eventResponses = events.stream().map(eventMapper::toResponseDTO).toList();
+
+        List<Long> eventsIds = events.stream().map(Event::getId).toList();
+
+        Map<Long, Long> memberCountMap = findCountMemberForEvents(eventsIds);
+        Map<Long, Long> postCountMap = findCountPostForEvents(eventsIds);
+
+        eventResponses.forEach(eventResponse -> {
+            eventResponse.setCountMembers(memberCountMap.get(eventResponse.getId()));
+            eventResponse.setCountPosts(postCountMap.get(eventResponse.getId()));
+        });
+
+        return eventResponses;
+    }
+
     /**
      * Get the 4 latest events.
      *
@@ -81,7 +120,7 @@ public class EventService {
     }
 
     /**
-     *  Get top trending events ( members > minMembers, limit 6)
+     * Get top trending events ( members > minMembers, limit 6)
      *
      * @return List event.
      */
@@ -156,7 +195,7 @@ public class EventService {
 
         String email = SecurityUtil.getCurrentEmail();
 
-        if(!event.getManager().getEmail().equals(email)) {
+        if (!event.getManager().getEmail().equals(email)) {
             throw new AppException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -175,7 +214,7 @@ public class EventService {
     }
 
     private Map<Long, Long> findCountMemberForEvents(List<Long> eventsIds) {
-        return  eventRepository.findCountMemberForEvents(eventsIds).stream()
+        return eventRepository.findCountMemberForEvents(eventsIds).stream()
                 .collect(Collectors.toMap(
                         row -> (Long) row[0],
                         row -> (Long) row[1]
