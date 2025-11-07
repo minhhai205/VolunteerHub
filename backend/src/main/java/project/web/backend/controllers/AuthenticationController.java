@@ -9,10 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import project.web.backend.dtos.request.auth.LoginRequestDTO;
-import project.web.backend.dtos.request.auth.LogoutRequestDTO;
-import project.web.backend.dtos.request.auth.RefreshRequestDTO;
-import project.web.backend.dtos.request.auth.RegisterRequestDTO;
+import project.web.backend.dtos.request.auth.*;
 import project.web.backend.dtos.response.ApiSuccessResponse;
 import project.web.backend.dtos.response.auth.JwtResponseDTO;
 import project.web.backend.dtos.response.user.UserResponseDTO;
@@ -62,7 +59,7 @@ public class AuthenticationController {
                 .build();
     }
 
-    
+
     @PostMapping("/logout")
     public ApiSuccessResponse<String> logout(
             @RequestBody @Valid LogoutRequestDTO dto
@@ -71,6 +68,17 @@ public class AuthenticationController {
                 .status(HttpStatus.OK.value())
                 .message("Logout successfully")
                 .data(authenticationService.logout(dto))
+                .build();
+    }
+
+    @PostMapping("/change-password")
+    public ApiSuccessResponse<String> changePassword(
+            @RequestBody @Valid ChangePasswordRequestDTO dto
+    ) {
+        return ApiSuccessResponse.<String>builder()
+                .status(HttpStatus.OK.value())
+                .message("Change password successfully")
+                .data(authenticationService.changePassword(dto))
                 .build();
     }
 }
