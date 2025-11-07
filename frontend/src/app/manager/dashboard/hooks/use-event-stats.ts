@@ -1,20 +1,13 @@
 "use client"
 
+import { fetchWithAuth } from "@/lib/fetchWithAuth"
 import { useState, useEffect } from "react"
 
 export interface EventStatsData {
   totalEvents: number
   totalVolunteers: number
   trendingEvents: number
-  newDiscussions: number
-}
-
-// Mock data for testing
-const mockStatsData: EventStatsData = {
-  totalEvents: 24,
-  totalVolunteers: 156,
-  trendingEvents: 5,
-  newDiscussions: 42,
+  totalNewDiscussionPosts: number
 }
 
 export function useEventStats() {
@@ -26,14 +19,14 @@ export function useEventStats() {
     const fetchStats = async () => {
       try {
         setLoading(true)
-        // For now, use mock data. Replace with API call when ready
-        // const response = await fetch("/api/dashboard/stats")
-        // if (!response.ok) throw new Error("Failed to fetch stats")
-        // const result = await response.json()
-        // setData(result)
+        const response = await fetchWithAuth(
+          "http://localhost:8080/api/manager/dashboard/statistics"
+        )
+        .then((res) => res.json());
 
-        // Using mock data for testing
-        setData(mockStatsData)
+        if (!response.status) throw new Error("Failed to fetch stats")
+        setData(response.data)
+
         setError(null)
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred")

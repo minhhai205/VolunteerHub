@@ -13,6 +13,7 @@ import project.web.backend.dtos.request.notification.NotificationPayload;
 import project.web.backend.dtos.response.PageResponseDTO;
 import project.web.backend.dtos.response.event.EventRegistrationResponseDTO;
 import project.web.backend.dtos.response.event.EventRequestResponseDTO;
+import project.web.backend.dtos.response.event.RegistrationStatusResponseDTO;
 import project.web.backend.entities.*;
 import project.web.backend.exceptions.AppException;
 import project.web.backend.mappers.EventMapper;
@@ -24,6 +25,7 @@ import project.web.backend.utils.enums.EventRequestStatus;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -193,4 +195,40 @@ public class EventRequestService {
         // send push reject to user
         return eventRequestMapper.toEventRegistrationResponseDTO(eventRegistration);
     }
+
+    public RegistrationStatusResponseDTO getRegistrationStatus(Long eventId) {
+        log.info("----------- Get registration status for event {} ------------", eventId);
+
+        RegistrationStatusResponseDTO response = RegistrationStatusResponseDTO.builder()
+                .status("NOT_REGISTERED")
+                .build();
+
+        String email = SecurityUtil.getCurrentEmail();
+        Optional<EventRegistration> eventRegistration = eventRegistrationRepository
+                .findByEventIdAndUserEmail(eventId, email);
+
+        eventRegistration.ifPresent(registration ->
+                response.setStatus(registration.getStatus().name()));
+
+        return response;
+    }
+
+    @Transactional
+    public String cancelMyRegistrationRequest(Long eventId) {
+        log.info("----------- Cancel registration request for event {} ------------", eventId);
+
+        String email = SecurityUtil.getCurrentEmail();
+        EventRegistration eventRegistration = eventRegistrationRepository.findByEventIdAndUserEmail(eventId, email)
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_EXISTED));
+
+        if (eventRegistration.getStatus() != EventRequestStatus.PENDING) {
+            throw new AppException(ErrorCode.REQUEST_INVALID);
+        }
+
+        eventRegistrationRepository.delete(eventRegistration);
+
+        return "OK";
+    }
+
+
 }

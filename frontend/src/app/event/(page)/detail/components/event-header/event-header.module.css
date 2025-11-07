@@ -197,6 +197,14 @@
   margin: 0;
 }
 
+.errorText {
+  font-size: 0.85rem;
+  color: #ef4444;
+  margin: 0.5rem 0 0 0;
+  font-weight: 500;
+}
+
+/* Register Button */
 .registerBtn {
   width: 100%;
   background: linear-gradient(135deg, #4dab75 0%, #3d9861 100%);
@@ -235,6 +243,46 @@
 
 .registerBtn:active {
   transform: translateY(0);
+}
+
+/* Button States */
+.registerBtn.pending {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+}
+
+.registerBtn.pending:hover {
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
+}
+
+.registerBtn.approved {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+}
+
+.registerBtn.approved:hover {
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+}
+
+.registerBtn.disabled {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.registerBtn.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.registerBtn.disabled::before {
+  display: none;
+}
+
+.registerBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .spotsLeft {
