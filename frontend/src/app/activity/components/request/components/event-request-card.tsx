@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import styles from "./styles/event-request-card.module.css";
 
 interface Request {
@@ -18,41 +19,35 @@ interface EventRequestCardProps {
 }
 
 export default function EventRequestCard({ request }: EventRequestCardProps) {
+  const router = useRouter();
+
   const getStatusClass = (status: string) => {
     const statusLower = status.toLowerCase();
-    console.log(statusLower);
-    console.log(request);
     switch (statusLower) {
       case "approve":
-        console.log(1);
         return styles.statusApproved;
       case "rejected":
-        console.log(2);
         return styles.statusRejected;
       default:
-        console.log(3);
         return styles.statusPending;
     }
   };
 
   const getStatusLabel = (status: string) => {
     const statusLower = status.toLowerCase();
-    console.log(statusLower);
-    console.log(request);
     switch (statusLower) {
       case "approve":
-        console.log(1);
         return "Đã Duyệt";
       case "rejected":
-        console.log(2);
         return "Từ Chối";
       default:
-        console.log(3);
         return "Đang Chờ";
     }
   };
 
-  const isProcessed = request.status.toLowerCase() !== "pending";
+  const handleViewEventDetail = () => {
+    router.push(`/event/detail/${request.eventId}`);
+  };
 
   return (
     <div className={styles.card}>
@@ -88,6 +83,17 @@ export default function EventRequestCard({ request }: EventRequestCardProps) {
         >
           {getStatusLabel(request.status)}
         </span>
+      </div>
+
+      <div className={styles.columnActions}>
+        <span className={styles.label}>Hành Động</span>
+        <Button
+          onClick={handleViewEventDetail}
+          className={styles.viewButton}
+          variant="outline"
+        >
+          Xem Chi Tiết
+        </Button>
       </div>
     </div>
   );

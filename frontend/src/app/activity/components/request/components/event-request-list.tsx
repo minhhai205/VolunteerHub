@@ -27,7 +27,7 @@ export default function EventRequestList({ requests }: EventRequestListProps) {
         <div className={styles.columnEventName}>Tên Sự Kiện</div>
         <div className={styles.columnDate}>Ngày Đăng Ký</div>
         <div className={styles.columnStatus}>Trạng Thái</div>
-        <div className={styles.columnActions}>Hành Động</div>
+        <div className={styles.columnActions}>Chi tiết sự kiện</div>
       </div>
 
       <div className={styles.listContent}>
