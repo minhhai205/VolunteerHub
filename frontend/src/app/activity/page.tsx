@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import ActivityLayout from "./components/layout";
+import ActivityLayout from "./components/ActivityLayout";
 import ActivityPage1 from "./components/page1";
 import ActivityPage2 from "./components/page2";
 import { useRouter } from "next/navigation";
