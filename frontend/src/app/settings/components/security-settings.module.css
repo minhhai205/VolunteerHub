@@ -138,45 +138,122 @@
 
 .deviceItem {
   display: flex;
+  align-items: flex-start;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+  gap: 12px;
+}
+
+.deviceItem:hover {
+  border-color: #ccc;
+  background-color: #fafafa;
+}
+
+.deviceIcon {
+  flex-shrink: 0;
+  display: flex;
   align-items: center;
+  color: #666;
+}
+
+.deviceInfoWrapper {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  padding: 1rem;
-  background-color: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
+  gap: 12px;
+  min-width: 0;
 }
 
 .deviceInfo {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 4px;
+  min-width: 0;
 }
 
 .deviceName {
-  color: var(--foreground);
   font-weight: 500;
+  font-size: 14px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .deviceTime {
-  color: var(--muted-foreground);
-  font-size: 0.9rem;
+  font-size: 13px;
+  color: #666;
 }
 
-/* Removed .logoutButton styles as they are no longer used */
+.deviceType {
+  font-size: 12px;
+  color: #999;
+}
 
-@media (max-width: 768px) {
-  .title {
-    font-size: 1.5rem;
-  }
+.currentDevice {
+  border-left: 3px solid #4caf50;
+  background-color: #f0f9f0;
+}
 
-  .deviceItem {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
+.currentBadge {
+  padding: 2px 8px;
+  background-color: #4caf50;
+  color: white;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
 
-  .toggleSection {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+.removeButton {
+  flex-shrink: 0;
+  padding: 6px;
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.removeButton:hover {
+  background-color: #fee;
+  color: #f44336;
+}
+
+.logoutAllButton {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.logoutAllButton:hover {
+  background-color: #d32f2f;
+}
+
+.noDevices {
+  text-align: center;
+  padding: 32px;
+  color: #999;
+}
+
+.deviceList {
+  margin-top: 16px;
 }
