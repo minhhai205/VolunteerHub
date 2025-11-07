@@ -127,7 +127,7 @@ export function Header() {
           <Link
             href="/manager/request"
             className={`${styles.navLink} ${
-              isActive("/activity") ? styles.navLinkActive : ""
+              isActive("/manager/request") ? styles.navLinkActive : ""
             }`}
           >
             Quản lý đăng ký
