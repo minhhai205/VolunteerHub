@@ -59,7 +59,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findByIdWithCreatedUserAndPostMedia(@Param("id") Long id);
 
     @Query("""
-        SELECT COUNT(p)
+        SELECT COUNT(p.id)
         FROM Post p
         WHERE p.event.manager.email = :email
           AND p.createdAt >= :daysAgo

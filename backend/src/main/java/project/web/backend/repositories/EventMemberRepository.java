@@ -18,7 +18,7 @@ public interface EventMemberRepository extends JpaRepository<EventMember, Long> 
     """)
     void deleteByEventIdAndUserEmail(@Param("eventId") Long eventId, @Param("email") String email);
 
-    @Query("SELECT COUNT(em) FROM EventMember em WHERE em.event.manager.email = :email")
+    @Query("SELECT COUNT(em.id) FROM EventMember em WHERE em.event.manager.email = :email")
     Long countByManagerEmail(@Param("email") String email);
 
 }
