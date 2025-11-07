@@ -49,6 +49,16 @@ export default function EventRequestCard({ request }: EventRequestCardProps) {
     router.push(`/event/detail/${request.eventId}`);
   };
 
+  // Format lại ngày đăng ký
+  const formatDate = (isoString: string) => {
+    if (!isoString) return "—";
+    const date = new Date(isoString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
   return (
     <div className={styles.card}>
       <div className={styles.columnUserName}>
@@ -61,11 +71,6 @@ export default function EventRequestCard({ request }: EventRequestCardProps) {
         <span className={styles.value}>{request.userEmail}</span>
       </div>
 
-      <div className={styles.columnEventId}>
-        <span className={styles.label}>ID Sự Kiện</span>
-        <span className={styles.value}>{request.eventId}</span>
-      </div>
-
       <div className={styles.columnEventName}>
         <span className={styles.label}>Tên Sự Kiện</span>
         <span className={styles.value}>{request.eventName}</span>
@@ -73,7 +78,10 @@ export default function EventRequestCard({ request }: EventRequestCardProps) {
 
       <div className={styles.columnDate}>
         <span className={styles.label}>Ngày Đăng Ký</span>
-        <span className={styles.value}>{request.registeredDate}</span>
+        {/* ✅ Gọi hàm formatDate ở đây */}
+        <span className={styles.value}>
+          {formatDate(request.registeredDate)}
+        </span>
       </div>
 
       <div className={styles.columnStatus}>
