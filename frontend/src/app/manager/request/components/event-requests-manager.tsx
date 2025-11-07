@@ -87,10 +87,11 @@ export default function EventRequestsManager() {
 
       const result = await response.json();
       if (result.status === 200) {
+        toastManager.success("Đã duyệt đơn đăng ký");
         // Cập nhật trạng thái local
         setRequests(
           requests.map((req) =>
-            req.id === id ? { ...req, status: "approved" } : req
+            req.id === id ? { ...req, status: "approve" } : req
           )
         );
       } else {
@@ -123,6 +124,7 @@ export default function EventRequestsManager() {
       }
       const result = await response.json();
       if (result.status === 200) {
+        toastManager.success("Đã từ chối đơn đăng ký");
         // Cập nhật trạng thái local
         setRequests(
           requests.map((req) =>
