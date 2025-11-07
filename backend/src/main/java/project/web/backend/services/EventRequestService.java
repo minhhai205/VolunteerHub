@@ -79,6 +79,26 @@ public class EventRequestService {
                 .map(eventRequestMapper::toResponseDTO).toList();
     }
 
+    public List<EventRequestResponseDTO> getAllPendingEventRequest() {
+        log.info("------------ Get all pending events request --------------");
+
+        List<EventCreateRequest> eventRequests = eventRequestRepository
+                .findByStatusIn(List.of(EventRequestStatus.PENDING));
+
+        return eventRequests.stream()
+                .map(eventRequestMapper::toResponseDTO).toList();
+    }
+
+    public List<EventRequestResponseDTO> getAllProcessedEventRequest() {
+        log.info("------------ Get all processed events request --------------");
+
+        List<EventCreateRequest> eventRequests = eventRequestRepository
+                .findByStatusIn(List.of(EventRequestStatus.APPROVED, EventRequestStatus.REJECTED));
+
+        return eventRequests.stream()
+                .map(eventRequestMapper::toResponseDTO).toList();
+    }
+
     @Transactional
     public EventRequestResponseDTO approveEventRequest(Long requestId) {
         log.info("------------ Approve event request --------------");
@@ -134,7 +154,8 @@ public class EventRequestService {
 
     public PageResponseDTO<List<EventRegistrationResponseDTO>> getAllRegistration(Pageable pageable) {
         Page<EventRegistration> registrations = eventRegistrationRepository.getAll(pageable);
-        List<EventRegistrationResponseDTO> dtos = registrations.stream().map(eventRequestMapper::toEventRegistrationResponseDTO)
+        List<EventRegistrationResponseDTO> dtos = registrations.stream()
+                .map(eventRequestMapper::toEventRegistrationResponseDTO)
                 .toList();
         return PageResponseDTO.<List<EventRegistrationResponseDTO>>builder()
                 .data(dtos)
