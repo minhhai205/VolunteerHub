@@ -2,6 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: #f7fff2;
 }
 
 .main {
@@ -113,6 +114,7 @@
   gap: 1.5rem;
   transition: all 0.2s;
   cursor: pointer;
+  background-color: #f3ffeb;
 }
 
 .eventCard:hover {
