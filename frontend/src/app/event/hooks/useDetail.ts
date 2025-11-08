@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
-import { getAccessToken } from "@/lib/token";
-import { jwtDecode } from "jwt-decode";
+import { getUserRole } from "@/lib/getDataFromToken";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
@@ -73,31 +72,6 @@ export interface PaginatedCommentResponse {
   pageSize: number;
   totalPage: number;
   data: Comment[];
-}
-
-type JwtPayload = {
-  sub: string;
-  scope: string;
-  exp: number;
-};
-
-/* ---------- Helper Functions ---------- */
-
-/**
- * Lấy role từ JWT token
- */
-export function getUserRole(): string | null {
-  try {
-    const accessToken = getAccessToken();
-    if (!accessToken) return null;
-
-    const decoded = jwtDecode<JwtPayload>(accessToken);
-    const role = decoded.scope?.replace("ROLE_", "");
-    return role || null;
-  } catch (error) {
-    console.error("Failed to decode token:", error);
-    return null;
-  }
 }
 
 /**
