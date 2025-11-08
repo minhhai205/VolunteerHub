@@ -2,25 +2,27 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { Header } from "@/components/static/Header";
 import { Footer } from "@/components/static/Footer";
 import EventHeader from "../event-header/event-header";
 import EventInfo from "../event-info/event-info";
 import EventAbout from "../event-about/event-about";
 import EventDiscussion from "../event-discussion/event-discussion";
 import { fetchEventData, Event } from "../../../../hooks/useDetail";
+import { getUserRole } from "@/lib/getDataFromToken";
 
 export default function EventDetailPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
+  const [role, setRole] = useState<string | null>(null);
+  const [HeaderComponent, setHeaderComponent] = useState<React.ComponentType | null>(null);
 
   const params = useParams();
   const eventId = params.eventId as string;
 
+  // Load event data
   useEffect(() => {
     const loadData = async () => {
       try {
-        console.log(eventId);
         if (!eventId) return;
         const data = await fetchEventData(eventId);
         setEvent(data);
@@ -30,11 +32,22 @@ export default function EventDetailPage() {
         setLoading(false);
       }
     };
-
     loadData();
+  }, [eventId]);
+
+  // Load user role and select header
+  useEffect(() => {
+    const role = getUserRole()
+    setRole(role);
+
+    if (role === "MANAGER") {
+      import("@/components/static/HeaderManager").then((mod) => setHeaderComponent(() => mod.Header));
+    } else {
+      import("@/components/static/Header").then((mod) => setHeaderComponent(() => mod.Header));
+    }
   }, []);
 
-  if (loading) {
+  if (loading || !HeaderComponent) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
@@ -55,7 +68,7 @@ export default function EventDetailPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <Header />
+      <HeaderComponent />
 
       <main className="flex-1">
         <EventHeader event={event} />
@@ -68,21 +81,15 @@ export default function EventDetailPage() {
           </div>
 
           <aside className="hidden lg:block">
-            <div className="bg-white rounded-lg border border-border p-6 sticky top-24 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+            <div className="bg-white rounded-lg border border-border p-6 sticky top-24">
               <h3 className="font-bold text-primary mb-4">Chi tiết sự kiện</h3>
               <div className="space-y-4 text-sm">
                 <div>
-                  <p className="text-muted-foreground text-xs font-semibold mb-1">
-                    DANH MỤC
-                  </p>
-                  <p className="font-semibold text-foreground">
-                    {event.categoryNames?.join(", ") || "Sự kiện"}
-                  </p>
+                  <p className="text-muted-foreground text-xs font-semibold mb-1">DANH MỤC</p>
+                  <p className="font-semibold text-foreground">{event.categoryNames?.join(", ") || "Sự kiện"}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs font-semibold mb-1">
-                    TRẠNG THÁI
-                  </p>
+                  <p className="text-muted-foreground text-xs font-semibold mb-1">TRẠNG THÁI</p>
                   <span className="inline-block px-3 py-1.5 bg-primary/10 text-primary rounded-full text-xs font-semibold">
                     Đang tuyển
                   </span>

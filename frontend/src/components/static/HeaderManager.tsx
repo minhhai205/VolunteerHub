@@ -88,11 +88,15 @@ export function Header() {
   };
 
   // Helper function để kiểm tra active link
-  const isActive = (path: string) => {
-    if (path === "/home") {
-      return pathname === "/home" || pathname === "/";
-    }
-    return pathname.startsWith(path);
+  const isActive = (paths: string | string[]) => {
+    const pathArray = Array.isArray(paths) ? paths : [paths];
+
+    return pathArray.some((path) => {
+      if (path === "/home") {
+        return pathname === "/home" || pathname === "/";
+      }
+      return pathname.startsWith(path);
+    });
   };
 
   return (
@@ -119,7 +123,7 @@ export function Header() {
           <Link
             href="/manager/event/list"
             className={`${styles.navLink} ${
-              isActive("/manager/event") ? styles.navLinkActive : ""
+              isActive(["/manager/event", "/event"]) ? styles.navLinkActive : ""
             }`}
           >
             Sự kiện
