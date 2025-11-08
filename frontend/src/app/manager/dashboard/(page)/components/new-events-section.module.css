@@ -1,13 +1,13 @@
 
 .cardGreen {
-  background-color: #e6f8e6; 
+  background-color: #f7fcf6; 
   border: 1px solid hsl(var(--color-border));
   border-radius: 0.75rem;
 }
 
 /* Card con từng sự kiện */
 .eventCard {
-  background-color: #e6f8e6; /* đồng bộ nền */
+  background-color: #f7fcf6; /* đồng bộ nền */
   border: 1px solid hsl(var(--color-border));
   border-radius: 0.625rem;
   padding: 1rem;

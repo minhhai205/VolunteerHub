@@ -6,7 +6,7 @@
 
 /* Nền xanh lá nhạt cho từng ô */
 .statCard {
-  background-color: #e6f8e6;
+  background-color: #f7fcf6;
   border: 1px solid hsl(var(--color-border));
   border-radius: 0.75rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;

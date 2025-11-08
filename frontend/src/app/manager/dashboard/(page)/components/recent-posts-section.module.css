@@ -1,6 +1,6 @@
 /* Nền xanh lá nhạt cho toàn card tổng */
 .cardGreen {
-  background-color: #e6f8e6; /* xanh lá nhạt */
+  background-color: #f7fcf6; /* xanh lá nhạt */
   border: 1px solid hsl(var(--color-border));
   border-radius: 0.75rem;
 }
@@ -10,7 +10,7 @@
   padding: 1rem;
   border: 1px solid hsl(var(--color-border));
   border-radius: 0.625rem;
-  background-color: #e6f8e6; /* đồng bộ với card tổng */
+  background-color: #f7fcf6; /* đồng bộ với card tổng */
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
