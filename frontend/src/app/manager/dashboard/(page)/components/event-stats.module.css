@@ -4,6 +4,19 @@
   gap: 1rem;
 }
 
+/* Nền xanh lá nhạt cho từng ô */
+.statCard {
+  background-color: #f7fcf6;
+  border: 1px solid hsl(var(--color-border));
+  border-radius: 0.75rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
 @media (max-width: 768px) {
   .statsGrid {
     grid-template-columns: repeat(2, 1fr);
