@@ -62,7 +62,15 @@ export function EventRequestCard({
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-accent shrink-0" />
               <span className="text-sm text-foreground">
-                {eventRequest.start_date} - {eventRequest.end_date}
+                {new Date(eventRequest.startDate).toLocaleString("vi-VN", {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                })}{" "}
+                -{" "}
+                {new Date(eventRequest.endDate).toLocaleString("vi-VN", {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                })}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -90,30 +98,35 @@ export function EventRequestCard({
           </div>
 
           {/* Buttons */}
-          <div className="flex flex-wrap gap-3 pt-2">
-            {/* Example approve/reject buttons kept for future use */}
-            {/* <Button size="default" className="bg-accent text-accent-foreground hover:bg-accent/90 flex-1 sm:flex-none">
-              <Check className="mr-2 h-4 w-4" /> Duyệt sự kiện
-            </Button>
-            <Button size="default" variant="destructive" className="flex-1 sm:flex-none">
-              <X className="mr-2 h-4 w-4" /> Từ chối
-            </Button> */}
-            <Button
-              size="default"
-              variant="outline"
-              onClick={() => onViewDetail?.()}
-            >
-              <Eye className="mr-2 h-4 w-4" />
-              Chi tiết
-            </Button>
-            <Button
-              size="default"
-              variant="outline"
-              className="text-destructive hover:bg-destructive hover:text-destructive-foreground bg-transparent"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Xóa
-            </Button>
+          <div className="flex flex-wrap justify-between gap-3 pt-2">
+            {/* Left side */}
+            <div>
+              <Button
+                size="default"
+                className="cursor-pointer"
+                variant="outline"
+                onClick={() => onViewDetail?.()}
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                Chi tiết
+              </Button>
+            </div>
+            {/* Right side */}
+            <div className="flex gap-3">
+              <Button
+                size="default"
+                className="bg-accent text-accent-foreground hover:bg-accent/90 flex-1 sm:flex-none cursor-pointer"
+              >
+                <Check className="mr-2 h-4 w-4" /> Duyệt sự kiện
+              </Button>
+              <Button
+                size="default"
+                variant="destructive"
+                className="flex-1 sm:flex-none cursor-pointer"
+              >
+                <X className="mr-2 h-4 w-4" /> Từ chối
+              </Button>
+            </div>
           </div>
         </div>
       </CardContent>

@@ -13,8 +13,8 @@ export interface EventRequest {
   name: string;
   description: string;
   location: string;
-  start_date: string;
-  end_date: string;
+  startDate: string;
+  endDate: string;
   imageUrl: string;
   category: string[];
   status: "PENDING" | "APPROVED" | "REJECTED";
@@ -51,24 +51,24 @@ export const useEventRequests = (initialPage = 0, size = 10) => {
     fetchRequests();
   }, [fetchRequests]);
 
-  // const handleApprove = async (id: number) => {
-  //   try {
-  //     const response = await fetchWithAuth(
-  //       `/api/v1/admin/events/requests/${id}/approve`,
-  //       { method: "PUT" }
-  //     );
-  //     if (!response.ok) {
-  //       throw new Error("Failed to approve request");
-  //     }
-  //     toastManager.success("Event request approved");
-  //     // Refresh list
-  //     setRequests((prev) => prev.filter((req) => req.id !== id));
-  //   } catch (err) {
-  //     toastManager.error(
-  //       err instanceof Error ? err.message : "Failed to approve"
-  //     );
-  //   }
-  // };
+  const handleApprove = async (id: number) => {
+    try {
+      const response = await fetchWithAuth(
+        `http://localhost:8080/api/event-request/approve/${id}`,
+        { method: "PATCH" }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to approve request");
+      }
+      toastManager.success("Event request approved");
+      // Refresh list
+      setEventRequests((prev) => prev.filter((req) => req.id !== id));
+    } catch (err) {
+      toastManager.error(
+        err instanceof Error ? err.message : "Failed to approve"
+      );
+    }
+  };
 
   // const handleReject = async (id: number) => {
   //   try {

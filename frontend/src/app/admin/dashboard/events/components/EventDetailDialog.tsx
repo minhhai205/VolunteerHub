@@ -36,7 +36,16 @@ export function EventDetailDialog({
             <strong>Địa điểm:</strong> {event.location}
           </p>
           <p>
-            <strong>Ngày tổ chức:</strong> {event.start_date} → {event.end_date}
+            <strong>Ngày tổ chức:</strong>{" "}
+            {new Date(event.startDate).toLocaleString("vi-VN", {
+              dateStyle: "short",
+              timeStyle: "short",
+            })}{" "}
+            →{" "}
+            {new Date(event.endDate).toLocaleString("vi-VN", {
+              dateStyle: "short",
+              timeStyle: "short",
+            })}
           </p>
           <p>
             <strong>Trạng thái:</strong> {event.status}

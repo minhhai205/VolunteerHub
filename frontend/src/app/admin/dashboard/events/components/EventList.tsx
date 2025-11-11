@@ -17,7 +17,7 @@ export default function EventList({ eventRequests = [] }: EventListProps) {
 
   return (
     <div>
-      <Card className="border-yellow-500/50 bg-yellow-500/5">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
             <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
