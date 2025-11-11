@@ -33,6 +33,26 @@ public class EventController {
                 .build();
     }
 
+    @GetMapping("/manager/my-event")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ApiSuccessResponse<List<EventResponseDTO>> getManagerMyEvent() {
+        return ApiSuccessResponse.<List<EventResponseDTO>>builder()
+                .data(eventService.getManagerMyEvent())
+                .status(HttpStatus.OK.value())
+                .message("Get all events successfully!")
+                .build();
+    }
+
+    @GetMapping("/my-event")
+    @PreAuthorize("hasRole('USER')")
+    public ApiSuccessResponse<List<EventResponseDTO>> getUserMyEvent() {
+        return ApiSuccessResponse.<List<EventResponseDTO>>builder()
+                .data(eventService.getMyEvent())
+                .status(HttpStatus.OK.value())
+                .message("Get all events successfully!")
+                .build();
+    }
+
     @GetMapping("/manager/newest")
     @PreAuthorize("hasRole('MANAGER')")
     public ApiSuccessResponse<List<EventResponseDTO>> getNewestPublishedEventsByManager() {
@@ -45,7 +65,7 @@ public class EventController {
 
     @GetMapping("/manager/trending")
     @PreAuthorize("hasRole('MANAGER')")
-    public ApiSuccessResponse<List<EventResponseDTO>> getTrendingEventsByManager(){
+    public ApiSuccessResponse<List<EventResponseDTO>> getTrendingEventsByManager() {
         return ApiSuccessResponse.<List<EventResponseDTO>>builder()
                 .data(eventService.getTrendingEventsByManager())
                 .status(HttpStatus.OK.value())
@@ -86,6 +106,18 @@ public class EventController {
                 .data(eventService.updateEvent(eventId, eventRequestDTO))
                 .status(HttpStatus.OK.value())
                 .message("Update event successfully!")
+                .build();
+    }
+
+    @PatchMapping("/leave/{eventId}")
+    @PreAuthorize("hasAnyRole({'USER'})")
+    public ApiSuccessResponse<String> leaveMyEvent(
+            @PathVariable @Min(value = 1, message = "Request id must be greater than 0") Long eventId
+    ) {
+        return ApiSuccessResponse.<String>builder()
+                .data(eventService.leaveMyEvent(eventId))
+                .message("Leaved!")
+                .status(HttpStatus.OK.value())
                 .build();
     }
 }

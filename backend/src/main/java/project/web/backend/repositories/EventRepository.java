@@ -39,6 +39,28 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT DISTINCT e FROM Event e")
     List<Event> findAllWithCategories();
 
+    @EntityGraph(attributePaths = {
+            "categories"
+    })
+    @Query("""
+            SELECT DISTINCT e FROM Event e
+            INNER JOIN e.manager em
+            WHERE em.email=:email
+            """)
+    List<Event> findManagerEventWithCategories(@Param("email") String email);
+
+
+    @EntityGraph(attributePaths = {
+            "categories"
+    })
+    @Query("""
+            SELECT DISTINCT e FROM Event e
+            INNER JOIN e.members em
+            INNER JOIN em.user u
+            WHERE u.email=:email
+            """)
+    List<Event> findMyEventWithCategories(@Param("email") String email);
+
     @Query("""
                 SELECT e.id, COUNT(m.id)
                 FROM Event e
@@ -86,4 +108,18 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                 WHERE u.email = :email
             """)
     Object countAllEventsByEmailUser(@Param("email") String email);
+
+    @Query("SELECT COUNT(e.id) FROM Event e WHERE e.manager.email = :email")
+    Long countByManagerEmail(@Param("email") String email);
+
+    @Query("""
+        SELECT COUNT(e.id) FROM Event e
+        WHERE e.manager.email = :email
+          AND SIZE(e.members) >= :minMembers
+    """)
+    Long countTopTrendingEventsByManagerEmail(
+            @Param("email") String email,
+            @Param("minMembers") int minMembers
+    );
+
 }

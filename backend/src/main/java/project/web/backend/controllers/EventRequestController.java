@@ -15,6 +15,7 @@ import project.web.backend.dtos.response.PageResponseDTO;
 import project.web.backend.dtos.response.event.EventRegistrationResponseDTO;
 import project.web.backend.dtos.response.event.EventRequestResponseDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
+import project.web.backend.dtos.response.event.RegistrationStatusResponseDTO;
 import project.web.backend.services.EventRequestService;
 
 import java.util.List;
@@ -98,4 +99,65 @@ public class EventRequestController {
                                 .build();
         }
 
+    @GetMapping("/my-registration")
+    @PreAuthorize("hasRole('USER')")
+    public ApiSuccessResponse<PageResponseDTO<List<EventRegistrationResponseDTO>>> allMyRegistrations(
+            Pageable pageable
+    ) {
+        return ApiSuccessResponse.<PageResponseDTO<List<EventRegistrationResponseDTO>>>builder()
+                .data(eventRequestService.getAllMyRegistration(pageable))
+                .message("Get my registrations successfully")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+    
+
+    @PatchMapping("/registration/approve/{requestId}")
+    @PreAuthorize("hasAnyRole({'MANAGER'})")
+    public ApiSuccessResponse<EventRegistrationResponseDTO> approveRegistrationRequest(
+            @PathVariable @Min(value = 1, message = "Request id must be greater than 0") Long requestId
+    ) {
+        return ApiSuccessResponse.<EventRegistrationResponseDTO>builder()
+                .data(eventRequestService.approveRegistration(requestId))
+                .message("Approved!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+
+    @PatchMapping("/registration/reject/{requestId}")
+    @PreAuthorize("hasAnyRole({'MANAGER'})")
+    public ApiSuccessResponse<EventRegistrationResponseDTO> rejectRegistrationRequest(
+            @PathVariable @Min(value = 1, message = "Request id must be greater than 0") Long requestId
+    ) {
+        return ApiSuccessResponse.<EventRegistrationResponseDTO>builder()
+                .data(eventRequestService.rejectRegistration(requestId))
+                .message("Reject!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @GetMapping("/registration-status/{eventId}")
+    @PreAuthorize("hasRole('USER')")
+    public ApiSuccessResponse<RegistrationStatusResponseDTO> getRegistrationStatus(
+            @PathVariable @Min(value = 1, message = "Event id must be greater than 0") Long eventId
+    ) {
+        return ApiSuccessResponse.<RegistrationStatusResponseDTO>builder()
+                .data(eventRequestService.getRegistrationStatus(eventId))
+                .message("Get successfully!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @PatchMapping("/registration/cancel-registration/{eventId}")
+    @PreAuthorize("hasAnyRole({'USER'})")
+    public ApiSuccessResponse<String> cancelMyRegistrationRequest(
+            @PathVariable @Min(value = 1, message = "Request id must be greater than 0") Long eventId
+    ) {
+        return ApiSuccessResponse.<String>builder()
+                .data(eventRequestService.cancelMyRegistrationRequest(eventId))
+                .message("Canceled!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
 }

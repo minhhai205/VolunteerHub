@@ -16,6 +16,7 @@ import project.web.backend.entities.User;
 import project.web.backend.exceptions.AppException;
 import project.web.backend.mappers.UserMapper;
 import project.web.backend.repositories.EventRepository;
+import project.web.backend.repositories.TokenRepository;
 import project.web.backend.repositories.UserRepository;
 import project.web.backend.utils.commons.SecurityUtil;
 import project.web.backend.utils.enums.ErrorCode;
@@ -32,6 +33,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final EventRepository eventRepository;
+    private final TokenRepository tokenRepository;
 
     public PageResponseDTO<List<UserDetailResponseDTO>> getAllUsers(Pageable pageable, String role) {
         Page<User> users;
@@ -73,6 +75,9 @@ public class UserService {
             throw new AppException(ErrorCode.ACCESS_DENIED);
         }
         user.setStatus((dto.getLock()) ? UserStatus.LOCKED : UserStatus.ACTIVE);
+
+        // disable all their tokens
+        tokenRepository.deleteAllByEmail(user.getEmail());
         userRepository.save(user);
         return "Update lock status successfully";
     }

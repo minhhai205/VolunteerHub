@@ -13,6 +13,7 @@ import project.web.backend.dtos.request.notification.NotificationPayload;
 import project.web.backend.dtos.response.PageResponseDTO;
 import project.web.backend.dtos.response.event.EventRegistrationResponseDTO;
 import project.web.backend.dtos.response.event.EventRequestResponseDTO;
+import project.web.backend.dtos.response.event.RegistrationStatusResponseDTO;
 import project.web.backend.entities.*;
 import project.web.backend.exceptions.AppException;
 import project.web.backend.mappers.EventMapper;
@@ -24,6 +25,7 @@ import project.web.backend.utils.enums.EventRequestStatus;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -38,6 +40,7 @@ public class EventRequestService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final PushNotificationService pushNotificationService;
+    private final EventMemberRepository eventMemberRepository;
 
     public EventRequestResponseDTO createEventRequest(EventRequestDTO eventRequestDTO) {
         log.info("------------ Create new event request --------------");
@@ -164,4 +167,89 @@ public class EventRequestService {
                 .pageSize(pageable.getPageSize())
                 .build();
     }
+
+    public PageResponseDTO<List<EventRegistrationResponseDTO>> getAllMyRegistration(Pageable pageable) {
+        String email = SecurityUtil.getCurrentEmail();
+        Page<EventRegistration> registrations = eventRegistrationRepository.getMyUserRegistration(pageable, email);
+        List<EventRegistrationResponseDTO> dtos = registrations.stream().map(eventRequestMapper::toEventRegistrationResponseDTO)
+                .toList();
+        return PageResponseDTO.<List<EventRegistrationResponseDTO>>builder()
+                .data(dtos)
+                .totalPage(registrations.getTotalPages())
+                .pageNo(pageable.getPageNumber())
+                .pageSize(pageable.getPageSize())
+                .build();
+    }
+
+
+    @Transactional
+    public EventRegistrationResponseDTO approveRegistration(Long requestId) {
+        EventRegistration eventRegistration = eventRegistrationRepository.findByIdWithUserAndEvent(requestId)
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_EXISTED));
+        if (eventRegistration.getStatus() != EventRequestStatus.PENDING) {
+            throw new AppException(ErrorCode.REQUEST_INVALID);
+        }
+        eventRegistration.setStatus(EventRequestStatus.APPROVED);
+        eventRegistrationRepository.save(eventRegistration);
+        // after update status, add user to event, create EventMember
+        Event event = eventRegistration.getEvent();
+        User user = eventRegistration.getUser();
+        EventMember eventMember = EventMember.builder()
+                .event(event)
+                .user(user)
+                .build();
+        eventMemberRepository.save(eventMember);
+        // send push approve to user
+        return eventRequestMapper.toEventRegistrationResponseDTO(eventRegistration);
+    }
+
+
+    @Transactional
+    public EventRegistrationResponseDTO rejectRegistration(Long requestId) {
+        EventRegistration eventRegistration = eventRegistrationRepository.findByIdWithUserAndEvent(requestId)
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_EXISTED));
+        if (eventRegistration.getStatus() != EventRequestStatus.PENDING) {
+            throw new AppException(ErrorCode.REQUEST_INVALID);
+        }
+        eventRegistration.setStatus(EventRequestStatus.REJECTED);
+        eventRegistrationRepository.save(eventRegistration);
+        // send push reject to user
+        return eventRequestMapper.toEventRegistrationResponseDTO(eventRegistration);
+    }
+
+    public RegistrationStatusResponseDTO getRegistrationStatus(Long eventId) {
+        log.info("----------- Get registration status for event {} ------------", eventId);
+
+        RegistrationStatusResponseDTO response = RegistrationStatusResponseDTO.builder()
+                .status("NOT_REGISTERED")
+                .build();
+
+        String email = SecurityUtil.getCurrentEmail();
+        Optional<EventRegistration> eventRegistration = eventRegistrationRepository
+                .findByEventIdAndUserEmail(eventId, email);
+
+        eventRegistration.ifPresent(registration ->
+                response.setStatus(registration.getStatus().name()));
+
+        return response;
+    }
+
+    @Transactional
+    public String cancelMyRegistrationRequest(Long eventId) {
+        log.info("----------- Cancel registration request for event {} ------------", eventId);
+
+        String email = SecurityUtil.getCurrentEmail();
+        EventRegistration eventRegistration = eventRegistrationRepository.findByEventIdAndUserEmail(eventId, email)
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_EXISTED));
+
+        if (eventRegistration.getStatus() != EventRequestStatus.PENDING) {
+            throw new AppException(ErrorCode.REQUEST_INVALID);
+        }
+
+        eventRegistrationRepository.delete(eventRegistration);
+
+        return "OK";
+    }
+
+
 }

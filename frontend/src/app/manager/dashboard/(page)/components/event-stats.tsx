@@ -32,7 +32,7 @@ export function EventStats() {
     },
     {
       title: "Bài Trao đổi Mới",
-      value: data?.newDiscussions || "0",
+      value: data?.totalNewDiscussionPosts || "0",
       icon: MessageSquare,
       color: "text-purple-500",
       bgColor: "bg-purple-50 dark:bg-purple-950",
@@ -44,7 +44,7 @@ export function EventStats() {
       {stats.map((stat) => {
         const Icon = stat.icon;
         return (
-          <Card key={stat.title} className="border-border">
+          <Card key={stat.title} className={styles.statCard}>
             <CardContent className="pt-6">
               <div className="flex items-start justify-between">
                 <div>
