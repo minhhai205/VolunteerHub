@@ -96,7 +96,7 @@ export const useEventRequests = (initialPage = 0, size = 10) => {
     // page,
     // setPage,
     // totalPages,
-    // handleApprove,
+    handleApprove,
     // handleReject,
   };
 };
