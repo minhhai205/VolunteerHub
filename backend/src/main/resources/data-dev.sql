@@ -63,3 +63,198 @@ JOIN (
 ) AS numbers
 WHERE r.name = 'USER'
   AND NOT EXISTS (SELECT 1 FROM users u WHERE u.email = CONCAT('user', n, '@example.com'));
+
+--
+-- Insert sample categories
+--
+INSERT INTO categories (name, description, created_at, updated_at)
+SELECT 'Environment', 'Events related to environmental protection and conservation.', NOW(), NOW()
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'Environment');
+
+INSERT INTO categories (name, description, created_at, updated_at)
+SELECT 'Health', 'Events focused on health, wellness, and medical support.', NOW(), NOW()
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'Health');
+
+INSERT INTO categories (name, description, created_at, updated_at)
+SELECT 'Education', 'Events related to teaching, learning, and skill development.', NOW(), NOW()
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'Education');
+
+INSERT INTO categories (name, description, created_at, updated_at)
+SELECT 'Community', 'Events that support local community building and social welfare.', NOW(), NOW()
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'Community');
+
+--
+-- Insert sample events (managed by 'manager@example.com')
+--
+INSERT INTO events (name, description, location, image_url, start_date, end_date, manager_id, created_at, updated_at)
+SELECT
+    'Beach Cleanup Day',
+    'Join us to clean up our local beach and protect marine life. Gloves and bags will be provided.',
+    'Sunnyvale Beach, Main Entrance',
+    'https://i.imgur.com/example-beach.jpg',
+    '2025-11-20 09:00:00',
+    '2025-11-20 12:00:00',
+    u.id,
+    NOW(),
+    NOW()
+FROM users u
+WHERE u.email = 'manager@example.com'
+  AND NOT EXISTS (SELECT 1 FROM events WHERE name = 'Beach Cleanup Day');
+
+INSERT INTO events (name, description, location, image_url, start_date, end_date, manager_id, created_at, updated_at)
+SELECT
+    'Run for Hope Charity Marathon',
+    'Annual 5K marathon to raise funds for the children''s hospital. All participants get a t-shirt!',
+    'City Center Park',
+    'https://i.imgur.com/example-marathon.jpg',
+    '2025-12-05 08:00:00',
+    '2025-12-05 11:00:00',
+    u.id,
+    NOW(),
+    NOW()
+FROM users u
+WHERE u.email = 'manager@example.com'
+  AND NOT EXISTS (SELECT 1 FROM events WHERE name = 'Run for Hope Charity Marathon');
+
+INSERT INTO events (name, description, location, image_url, start_date, end_date, manager_id, created_at, updated_at)
+SELECT
+    'Code for a Cause Workshop',
+    'A workshop teaching basic web development skills to help non-profits build their websites.',
+    'Community Tech Hub, 123 Main St',
+    'https://i.imgur.com/example-code.jpg',
+    '2025-12-10 10:00:00',
+    '2025-12-10 16:00:00',
+    u.id,
+    NOW(),
+    NOW()
+FROM users u
+WHERE u.email = 'manager@example.com'
+  AND NOT EXISTS (SELECT 1 FROM events WHERE name = 'Code for a Cause Workshop');
+
+--
+-- Link events to categories
+--
+INSERT INTO events_categories (event_id, category_id)
+SELECT
+    (SELECT id FROM events WHERE name = 'Beach Cleanup Day'),
+    (SELECT id FROM categories WHERE name = 'Environment')
+WHERE NOT EXISTS (
+    SELECT 1 FROM events_categories
+    WHERE event_id = (SELECT id FROM events WHERE name = 'Beach Cleanup Day')
+      AND category_id = (SELECT id FROM categories WHERE name = 'Environment')
+);
+
+INSERT INTO events_categories (event_id, category_id)
+SELECT
+    (SELECT id FROM events WHERE name = 'Run for Hope Charity Marathon'),
+    (SELECT id FROM categories WHERE name = 'Health')
+WHERE NOT EXISTS (
+    SELECT 1 FROM events_categories
+    WHERE event_id = (SELECT id FROM events WHERE name = 'Run for Hope Charity Marathon')
+      AND category_id = (SELECT id FROM categories WHERE name = 'Health')
+);
+
+INSERT INTO events_categories (event_id, category_id)
+SELECT
+    (SELECT id FROM events WHERE name = 'Code for a Cause Workshop'),
+    (SELECT id FROM categories WHERE name = 'Education')
+WHERE NOT EXISTS (
+    SELECT 1 FROM events_categories
+    WHERE event_id = (SELECT id FROM events WHERE name = 'Code for a Cause Workshop')
+      AND category_id = (SELECT id FROM categories WHERE name = 'Education')
+);
+
+INSERT INTO events_categories (event_id, category_id)
+SELECT
+    (SELECT id FROM events WHERE name = 'Code for a Cause Workshop'),
+    (SELECT id FROM categories WHERE name = 'Community')
+WHERE NOT EXISTS (
+    SELECT 1 FROM events_categories
+    WHERE event_id = (SELECT id FROM events WHERE name = 'Code for a Cause Workshop')
+      AND category_id = (SELECT id FROM categories WHERE name = 'Community')
+); 
+
+
+--
+-- Insert sample event create requests (in PENDING status)
+--
+INSERT INTO event_create_requests (
+    name,  -- Changed from 'title'
+    description, 
+    location, 
+    image_url, 
+    start_date, 
+    end_date, 
+    status, 
+    manager_id, 
+    created_at, 
+    updated_at
+)
+SELECT
+    'Community Park Planting Day',
+    'Let''s plant new trees and flowers in the local park. This event is open to all ages. We will provide all the tools and saplings.',
+    'City Park, North Entrance',
+    'https://i.imgur.com/example-plant.jpg',
+    '2026-01-15 10:00:00',
+    '2026-01-15 14:00:00',
+    'PENDING',
+    u.id,
+    NOW(),
+    NOW()
+FROM users u
+WHERE u.email = 'manager@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_create_requests WHERE name = 'Community Park Planting Day'); -- Changed from 'title'
+
+INSERT INTO event_create_requests (
+    name,
+    description, 
+    location, 
+    image_url, 
+    start_date, 
+    end_date, 
+    status, 
+    manager_id, 
+    created_at, 
+    updated_at
+)
+SELECT
+    'Fundraising Bake Sale for Shelter',
+    'Raising money for the animal shelter. All proceeds go directly to helping animals in need. We need volunteers to bake and to help sell.',
+    'Town Hall Square',
+    'https://i.imgur.com/example-bake.jpg',
+    '2026-01-20 11:00:00',
+    '2026-01-20 16:00:00',
+    'PENDING',
+    u.id,
+    NOW(),
+    NOW()
+FROM users u
+WHERE u.email = 'manager@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_create_requests WHERE name = 'Fundraising Bake Sale for Shelter'); -- Changed from 'title'
+
+INSERT INTO event_create_requests (
+    name,  -- Changed from 'title'
+    description, 
+    location, 
+    image_url, 
+    start_date, 
+    end_date, 
+    status, 
+    manager_id, 
+    created_at, 
+    updated_at
+)
+SELECT
+    'Elderly Home Visit',
+    'Spend an afternoon with residents at the SunnyDays Elderly Home. We will play board games, read, and chat. A small act of kindness goes a long way.',
+    'SunnyDays Elderly Home, 456 Old Rd',
+    'https://i.imgur.com/example-visit.jpg',
+    '2026-01-22 14:00:00',
+    '2026-01-22 17:00:00',
+    'PENDING',
+    u.id,
+    NOW(),
+    NOW()
+FROM users u
+WHERE u.email = 'manager@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_create_requests WHERE name = 'Elderly Home Visit'); -- Changed from 'title'

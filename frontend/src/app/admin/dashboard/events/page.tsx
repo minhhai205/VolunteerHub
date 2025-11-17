@@ -28,8 +28,19 @@ import {
 import EventSearch from "./components/EventSearch";
 import SummaryCard from "./components/SummaryCard";
 import EventList from "./components/EventList";
+import { useEventRequests } from "./hooks/useEventRequest";
+import { useEffect } from "react";
 
 export default function EventsPage() {
+  // sử dụng hook để lấy dữ liệu yêu cầu sự kiện
+  const { eventRequests, isLoading, error } = useEventRequests();
+
+  useEffect(() => {
+    console.log("EventRequests:", eventRequests);
+    console.log("Loading:", isLoading);
+    console.log("Error:", error);
+  }, [eventRequests, isLoading, error]);
+
   return (
     <div className="flex h-screen bg-background">
       <main className="flex-1 overflow-y-auto">
@@ -50,8 +61,8 @@ export default function EventsPage() {
           {/* Search bar */}
           <EventSearch />
 
-          {/* Example event list */}
-          <EventList />
+          {/* Event list (pass data down) */}
+          <EventList eventRequests={eventRequests} />
         </div>
       </main>
     </div>
