@@ -16,12 +16,12 @@ import java.util.concurrent.ExecutionException;
 @RestController
 @Validated
 @RequiredArgsConstructor
-@RequestMapping("/api/manager/dashboard")
+@RequestMapping("/api/dashboard")
 public class ManagerDashboardController {
     private final ManagerDashboardService managerDashboardService;
 
     @GetMapping("/statistics")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
     public ApiSuccessResponse<ManagerDashboardResponseDTO> getManagerDashboardStatistics() throws ExecutionException, InterruptedException {
         return ApiSuccessResponse.<ManagerDashboardResponseDTO>builder()
                 .data(managerDashboardService.getManagerDashboardStatistics())
