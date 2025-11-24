@@ -44,7 +44,7 @@ export function EventStats() {
       {stats.map((stat) => {
         const Icon = stat.icon;
         return (
-          <Card key={stat.title} className="border-border">
+          <Card key={stat.title} className={styles.statCard}>
             <CardContent className="pt-6">
               <div className="flex items-start justify-between">
                 <div>

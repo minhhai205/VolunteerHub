@@ -1,15 +1,8 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  TrendingUp,
-  MessageSquare,
-  Heart,
-  Users,
-  ArrowRight,
-} from "lucide-react";
+import { TrendingUp, MessageSquare, Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useTrendingEvents } from "../../hooks/use-trending-events";
 import styles from "./trending-events-section.module.css";
@@ -18,15 +11,14 @@ export function TrendingEventsSection() {
   const { events, loading } = useTrendingEvents();
 
   return (
-    <Card className="border-border">
+    <Card className={`${styles.cardGreen} border-border`}>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-xl flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-green-600" />
-            Sự kiện Trending
-          </CardTitle>
-        </div>
+        <CardTitle className="text-xl flex items-center gap-2">
+          <TrendingUp className="w-5 h-5 text-green-600" />
+          Sự kiện Trending
+        </CardTitle>
       </CardHeader>
+
       <CardContent className={styles.contentContainer}>
         {loading ? (
           <p className="text-muted-foreground">Đang tải...</p>
@@ -44,19 +36,16 @@ export function TrendingEventsSection() {
               </div>
 
               <div className={styles.contentWrapper}>
-                {/* Dòng 1: Tiêu đề */}
                 <div className={styles.headerSection}>
                   <h3 className={styles.eventTitle}>{event.name}</h3>
                 </div>
 
-                {/* Dòng 2: Mô tả */}
                 <div className={styles.descriptionSection}>
                   <p className={styles.eventDescription}>
                     {event.description || "Không có mô tả"}
                   </p>
                 </div>
 
-                {/* Dòng 3: Thống kê và nút xem chi tiết */}
                 <div className={styles.footerSection}>
                   <div className={styles.statsSection}>
                     <div className={styles.statItem}>
@@ -70,7 +59,7 @@ export function TrendingEventsSection() {
                   </div>
 
                   <div className={styles.actionSection}>
-                    <Link href={`/events/${event.id}`}>
+                    <Link href={`/event/detail/${event.id}`}>
                       <Button
                         variant="outline"
                         size="sm"

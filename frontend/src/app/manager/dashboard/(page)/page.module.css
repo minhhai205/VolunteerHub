@@ -1,0 +1,85 @@
+/* Added page-level CSS module with light green theme */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f7fff2;
+}
+
+.mainContent {
+  flex: 1;
+  container-type: inline-size;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 2rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header {
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #016405;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.gridLayout {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 2rem;
+  width: 100%;
+}
+
+.leftColumn {
+  grid-column: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .gridLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .leftColumn {
+    grid-column: 1;
+  }
+
+  .mainContent {
+    padding: 1.5rem 1rem;
+    gap: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.875rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .mainContent {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.875rem;
+  }
+}

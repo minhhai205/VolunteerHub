@@ -1,19 +1,54 @@
+/* Nền xanh lá nhạt cho toàn card tổng */
+.cardGreen {
+  background-color: #f7fcf6; /* xanh lá nhạt */
+  border: 1px solid hsl(var(--color-border));
+  border-radius: 0.75rem;
+}
+
+/* Card con cho từng post */
 .postCard {
   padding: 1rem;
-  border: 1px solid hsl(var(--border));
-  border-radius: 0.5rem;
-  background-color: hsl(var(--card));
-  transition: all 0.2s ease-in-out;
+  border: 1px solid hsl(var(--color-border));
+  border-radius: 0.625rem;
+  background-color: #f7fcf6; /* đồng bộ với card tổng */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* Hover nổi nhẹ, không đổi màu */
 .postCard:hover {
-  border-color: hsl(var(--primary));
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Thống kê likes / comments */
 .postStats {
   display: flex;
   gap: 1rem;
   padding-top: 0.75rem;
-  border-top: 1px solid hsl(var(--border));
+  border-top: 1px solid hsl(var(--color-border));
+}
+
+/* Nút Xem chi tiết đẹp hơn, hover đổi màu */
+.detailButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid hsl(var(--color-primary));
+  color: hsl(var(--color-primary));
+  background-color: transparent;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+}
+
+.detailButton:hover {
+  background-color: hsl(120, 60%, 85%); /* xanh lá nhạt khi hover */
+  color: hsl(120, 50%, 20%); /* chữ xanh đậm */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  border-color: hsl(120, 50%, 25%);
 }

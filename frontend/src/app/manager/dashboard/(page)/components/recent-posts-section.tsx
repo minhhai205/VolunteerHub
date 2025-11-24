@@ -16,7 +16,7 @@ export function RecentPostsSection() {
   };
 
   return (
-    <Card className="border-border h-fit">
+    <Card className={`border-border h-fit ${styles.cardGreen}`}>
       <CardHeader>
         <CardTitle className="text-lg">Bài Post Gần đây</CardTitle>
       </CardHeader>
@@ -30,6 +30,7 @@ export function RecentPostsSection() {
           posts.map((post, index) => (
             <div key={post.id}>
               <div className={styles.postCard}>
+                {/* Thông tin tác giả */}
                 <div className="flex items-start gap-3 mb-3">
                   <img
                     src={post.author.avatar || "/placeholder.svg"}
@@ -46,18 +47,21 @@ export function RecentPostsSection() {
                   </div>
                 </div>
 
+                {/* Nội dung post */}
                 <p className="text-sm text-foreground mb-3 line-clamp-3">
                   {post.content}
                 </p>
 
+                {/* Ảnh post nếu có */}
                 {post.image && (
                   <img
-                    src={post.image || "/placeholder.svg"}
+                    src={post.image}
                     alt="Post image"
                     className="w-full h-32 object-cover rounded-lg mb-3"
                   />
                 )}
 
+                {/* Thống kê likes/comments */}
                 <div className={styles.postStats}>
                   <div className="flex items-center gap-1 text-muted-foreground">
                     <Heart className="w-4 h-4" />
@@ -69,10 +73,9 @@ export function RecentPostsSection() {
                   </div>
                 </div>
 
+                {/* Nút Xem chi tiết */}
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-between text-green-600 hover:text-green-700 mt-3"
+                  className={styles.detailButton}
                   onClick={() => handleViewPostDetails(post.id)}
                 >
                   Xem chi tiết
@@ -80,7 +83,7 @@ export function RecentPostsSection() {
                 </Button>
               </div>
 
-              {/* Dòng kẻ ngăn cách ở DƯỚI mỗi bài post (trừ bài cuối cùng) */}
+              {/* Divider giữa các post */}
               {index < posts.length - 1 && (
                 <div className="border-t border-border my-4" />
               )}
