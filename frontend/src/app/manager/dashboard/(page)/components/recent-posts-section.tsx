@@ -72,15 +72,6 @@ export function RecentPostsSection() {
                     <span className="text-xs">{post.comments.length}</span>
                   </div>
                 </div>
-
-                {/* Nút Xem chi tiết */}
-                <Button
-                  className={styles.detailButton}
-                  onClick={() => handleViewPostDetails(post.id)}
-                >
-                  Xem chi tiết
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
               </div>
 
               {/* Divider giữa các post */}

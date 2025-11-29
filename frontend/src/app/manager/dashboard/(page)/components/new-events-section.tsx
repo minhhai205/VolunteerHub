@@ -53,22 +53,26 @@ export function NewEventsSection() {
                       {event.description}
                     </p>
                   </div>
-                  <Badge variant="outline" className="ml-2">
-                    Mới
-                  </Badge>
+                  <Badge className={`${styles.badgeNew} ml-2`}>Mới</Badge>
                 </div>
 
                 {/* Thông tin chi tiết */}
                 <div className={styles.eventDetails}>
-                  <div className="flex items-center gap-2 text-muted-foreground">
+                  <div
+                    className={`${styles.eventDetail} text-muted-foreground`}
+                  >
                     <Calendar className="w-4 h-4" />
                     {formatDateRange(event.startDate, event.endDate)}
                   </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
+                  <div
+                    className={`${styles.eventDetail} text-muted-foreground`}
+                  >
                     <MapPin className="w-4 h-4" />
                     {event.location}
                   </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
+                  <div
+                    className={`${styles.eventDetail} text-muted-foreground`}
+                  >
                     <Users className="w-4 h-4" />
                     {event.countMembers} tình nguyện viên
                   </div>

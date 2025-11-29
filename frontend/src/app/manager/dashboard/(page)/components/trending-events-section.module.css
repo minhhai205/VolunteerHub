@@ -1,6 +1,6 @@
 /* Card tổng của toàn bộ section */
 .cardGreen {
-  background-color: #f7fcf6; /* nền xanh lá nhạt */
+  background-color: #f7fff2;
   border: 1px solid hsl(var(--color-border));
   border-radius: 0.75rem;
 }
@@ -14,21 +14,21 @@
 
 /* Card từng event */
 .trendingCard {
-  border: 1px solid hsl(var(--color-border));
+  background-color: #ffffff; /* đồng bộ nền */
+  border: 0.5px solid #e8eae8;
   border-radius: 0.75rem;
   overflow: hidden;
   display: flex;
   gap: 1.25rem;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background-color: hsl(var(--color-card));
   padding: 1rem;
 }
 
 /* Hover card con chỉ nổi lên */
-.trendingCard:hover {
+/* .trendingCard:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 12px rgba(0, 0, 0, 0.08);
-}
+} */
 
 .imageContainer {
   flex-shrink: 0;
@@ -108,7 +108,10 @@
 }
 
 .statItem svg {
-  color: hsl(var(--color-primary));
+  color: #22c55e;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
 .actionSection {
