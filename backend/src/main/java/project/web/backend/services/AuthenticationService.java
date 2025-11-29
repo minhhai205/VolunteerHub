@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.web.backend.dtos.request.auth.*;
+import project.web.backend.dtos.response.auth.ForgotPasswordResponseDTO;
 import project.web.backend.dtos.response.auth.JwtResponseDTO;
 import project.web.backend.dtos.response.user.UserResponseDTO;
 import project.web.backend.entities.Role;
@@ -158,5 +159,48 @@ public class AuthenticationService {
         // disable all token, force user re-login with new password
         tokenRepository.deleteAllByEmail(user.getEmail());
         return "Changed password";
+    }
+
+
+    @Transactional
+    public ForgotPasswordResponseDTO forgotPassword(ForgotPasswordRequestDTO dto) {
+        String email = dto.getEmail();
+        User user = userRepository.findByEmailWithNoReferences(email)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXIST));
+
+        String resetToken = jwtService.generateToken(user, TokenType.RESET);
+        tokenRepository.save(
+                Token.builder()
+                        .email(email)
+                        .jti(jwtService.extractJti(resetToken))
+                        .build());
+
+        return ForgotPasswordResponseDTO.builder()
+                .resetToken(resetToken)
+                .build();
+    }
+
+
+    @Transactional
+    public String reset(ResetPasswordRequestDTO dto) {
+        String resetToken = dto.getResetToken();
+        String newPassword = dto.getNewPassword();
+
+        // validate
+        jwtService.checkValid(resetToken, TokenType.RESET);
+        String userEmail = jwtService.extractEmail(resetToken);
+        User user = userRepository.findByEmailWithNoReferences(userEmail)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXIST));
+
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new AppException(ErrorCode.CURRENT_PASSWORD_DUPLICATED);
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+
+        // reset complete , disable reset token
+        tokenRepository.deleteByJti(jwtService.extractJti(resetToken));
+        return "ok";
     }
 }

@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import project.web.backend.dtos.request.auth.*;
+import project.web.backend.dtos.response.ApiResponse;
 import project.web.backend.dtos.response.ApiSuccessResponse;
+import project.web.backend.dtos.response.auth.ForgotPasswordResponseDTO;
 import project.web.backend.dtos.response.auth.JwtResponseDTO;
 import project.web.backend.dtos.response.user.UserResponseDTO;
 import project.web.backend.services.AuthenticationService;
@@ -51,11 +53,24 @@ public class AuthenticationController {
     }
 
     @PostMapping("/forgot-password")
-    public ApiSuccessResponse<?> forgot() {
-        return ApiSuccessResponse.builder()
+    public ApiSuccessResponse<ForgotPasswordResponseDTO> forgot(
+            @RequestBody ForgotPasswordRequestDTO dto
+    ) {
+        return ApiSuccessResponse.<ForgotPasswordResponseDTO>builder()
                 .status(HttpStatus.OK.value())
                 .message("Forgot password successfully")
-                .data(null)
+                .data(authenticationService.forgotPassword(dto))
+                .build();
+    }
+
+    @PostMapping("/reset-password")
+    public ApiSuccessResponse<String> resetPassword(
+            @RequestBody ResetPasswordRequestDTO dto
+    ) {
+        return ApiSuccessResponse.<String>builder()
+                .status(HttpStatus.OK.value())
+                .message("Reset password successfully")
+                .data(authenticationService.reset(dto))
                 .build();
     }
 
