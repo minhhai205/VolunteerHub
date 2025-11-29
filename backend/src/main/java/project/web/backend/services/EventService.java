@@ -1,6 +1,7 @@
 package project.web.backend.services;
 
 
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +32,8 @@ public class EventService {
     private final UserRepository userRepository;
     private final EventRegistrationRepository eventRegistrationRepository;
     private final CategoryRepository categoryRepository;
+    private final EventMemberRepository memberRepository;
+    private final EventMemberRepository eventMemberRepository;
 
     public List<EventResponseDTO> getAllEvents() {
         log.info("------------ Get all events --------------");
@@ -152,6 +155,7 @@ public class EventService {
     }
 
     public String eventRegistration(Long eventId) {
+        log.info("------------ Event registration -------------");
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
 
@@ -211,6 +215,24 @@ public class EventService {
         eventRepository.save(event);
 
         return eventMapper.toResponseDTO(event);
+    }
+
+    @Transactional
+    public String leaveMyEvent(Long eventId) {
+        log.info("------------ Leave my event --------------");
+
+        String email = SecurityUtil.getCurrentEmail();
+        EventRegistration eventRegistration = eventRegistrationRepository.findByEventIdAndUserEmail(eventId, email)
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_EXISTED));
+
+        if (eventRegistration.getStatus() != EventRequestStatus.APPROVED) {
+            throw new AppException(ErrorCode.REQUEST_INVALID);
+        }
+
+        eventRegistrationRepository.delete(eventRegistration);
+        eventMemberRepository.deleteByEventIdAndUserEmail(eventId, email);
+
+        return "OK";
     }
 
     private Map<Long, Long> findCountMemberForEvents(List<Long> eventsIds) {

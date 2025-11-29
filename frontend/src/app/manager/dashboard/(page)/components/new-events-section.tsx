@@ -13,12 +13,12 @@ export function NewEventsSection() {
   const router = useRouter();
 
   const handleViewEventDetails = (eventId: number) => {
-    router.push(`/events/${eventId}`);
+    router.push(`/event/detail/${eventId}`);
   };
 
   if (error) {
     return (
-      <Card className="border-border">
+      <Card className={`${styles.cardGreen} border-border`}>
         <CardHeader>
           <CardTitle className="text-xl">Sự kiện Mới Công bố</CardTitle>
         </CardHeader>
@@ -30,7 +30,7 @@ export function NewEventsSection() {
   }
 
   return (
-    <Card className="border-border">
+    <Card className={`${styles.cardGreen} border-border`}>
       <CardHeader>
         <CardTitle className="text-xl">Sự kiện Mới Công bố</CardTitle>
       </CardHeader>
@@ -76,8 +76,7 @@ export function NewEventsSection() {
 
                 {/* Nút chi tiết */}
                 <Button
-                  variant="ghost"
-                  className="w-full justify-between text-green-600 hover:text-green-700"
+                  className={styles.detailButton}
                   onClick={() => handleViewEventDetails(event.id)}
                 >
                   Xem chi tiết

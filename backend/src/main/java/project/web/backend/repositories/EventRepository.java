@@ -108,4 +108,18 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                 WHERE u.email = :email
             """)
     Object countAllEventsByEmailUser(@Param("email") String email);
+
+    @Query("SELECT COUNT(e.id) FROM Event e WHERE e.manager.email = :email")
+    Long countByManagerEmail(@Param("email") String email);
+
+    @Query("""
+        SELECT COUNT(e.id) FROM Event e
+        WHERE e.manager.email = :email
+          AND SIZE(e.members) >= :minMembers
+    """)
+    Long countTopTrendingEventsByManagerEmail(
+            @Param("email") String email,
+            @Param("minMembers") int minMembers
+    );
+
 }

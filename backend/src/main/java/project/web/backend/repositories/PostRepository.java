@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import project.web.backend.entities.Post;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,4 +57,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             WHERE p.id=:id
             """)
     Optional<Post> findByIdWithCreatedUserAndPostMedia(@Param("id") Long id);
+
+    @Query("""
+        SELECT COUNT(p.id)
+        FROM Post p
+        WHERE p.event.manager.email = :email
+          AND p.createdAt >= :daysAgo
+    """)
+    Long countRecentPostsByManager(
+            @Param("email") String email,
+            @Param("daysAgo") LocalDateTime daysAgo
+    );
 }

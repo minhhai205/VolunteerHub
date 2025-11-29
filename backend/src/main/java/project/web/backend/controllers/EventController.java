@@ -53,8 +53,7 @@ public class EventController {
                 .build();
     }
 
-    @GetMapping("/manager/newest")
-    @PreAuthorize("hasRole('MANAGER')")
+    @GetMapping("/newest")
     public ApiSuccessResponse<List<EventResponseDTO>> getNewestPublishedEventsByManager() {
         return ApiSuccessResponse.<List<EventResponseDTO>>builder()
                 .data(eventService.getNewestPublishedEventsByManager())
@@ -63,8 +62,7 @@ public class EventController {
                 .build();
     }
 
-    @GetMapping("/manager/trending")
-    @PreAuthorize("hasRole('MANAGER')")
+    @GetMapping("/trending")
     public ApiSuccessResponse<List<EventResponseDTO>> getTrendingEventsByManager() {
         return ApiSuccessResponse.<List<EventResponseDTO>>builder()
                 .data(eventService.getTrendingEventsByManager())
@@ -85,7 +83,12 @@ public class EventController {
                 .build();
     }
 
-    @GetMapping("/{eventId}")
+    /**
+     * Get event details by event id
+     * @param eventId the event id using regex to validate
+     * @return EventResponseDTO
+     */
+    @GetMapping("/{eventId:[\\d]+}")
     public ApiSuccessResponse<EventResponseDTO> getEventDetails(
             @PathVariable @Min(value = 1, message = "Event id must be greater than 0") Long eventId
     ) {
@@ -106,6 +109,18 @@ public class EventController {
                 .data(eventService.updateEvent(eventId, eventRequestDTO))
                 .status(HttpStatus.OK.value())
                 .message("Update event successfully!")
+                .build();
+    }
+
+    @PatchMapping("/leave/{eventId}")
+    @PreAuthorize("hasAnyRole({'USER'})")
+    public ApiSuccessResponse<String> leaveMyEvent(
+            @PathVariable @Min(value = 1, message = "Request id must be greater than 0") Long eventId
+    ) {
+        return ApiSuccessResponse.<String>builder()
+                .data(eventService.leaveMyEvent(eventId))
+                .message("Leaved!")
+                .status(HttpStatus.OK.value())
                 .build();
     }
 }

@@ -1,24 +1,33 @@
+/* Card tổng của toàn bộ section */
+.cardGreen {
+  background-color: #f7fcf6; /* nền xanh lá nhạt */
+  border: 1px solid hsl(var(--color-border));
+  border-radius: 0.75rem;
+}
+
+/* Container các card con */
 .contentContainer {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
+/* Card từng event */
 .trendingCard {
   border: 1px solid hsl(var(--color-border));
   border-radius: 0.75rem;
   overflow: hidden;
   display: flex;
   gap: 1.25rem;
-  transition: all 0.3s ease;
-  background: hsl(var(--color-card));
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: hsl(var(--color-card));
   padding: 1rem;
 }
 
+/* Hover card con chỉ nổi lên */
 .trendingCard:hover {
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.08);
-  border-color: hsl(var(--color-primary) / 0.3);
   transform: translateY(-2px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.08);
 }
 
 .imageContainer {
@@ -32,6 +41,7 @@
   border-radius: 0.625rem;
 }
 
+/* Nội dung */
 .contentWrapper {
   flex: 1;
   display: flex;
@@ -97,10 +107,6 @@
   color: hsl(var(--color-muted-foreground));
 }
 
-.statItem:last-child {
-  margin-left: 1rem;
-}
-
 .statItem svg {
   color: hsl(var(--color-primary));
 }
@@ -114,16 +120,25 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  border-color: hsl(var(--color-primary));
+  border: 1px solid hsl(var(--color-primary));
   color: hsl(var(--color-primary));
-  transition: all 0.2s ease;
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  font-weight: 500;
+  background-color: transparent;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
 }
 
 .viewButton:hover {
-  background: hsl(var(--color-primary) / 0.1);
-  border-color: hsl(var(--color-primary));
+  background-color: hsl(120, 60%, 85%);
+  color: hsl(120, 50%, 20%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  border-color: hsl(120, 50%, 25%);
 }
 
+/* Responsive */
 @media (max-width: 768px) {
   .trendingCard {
     flex-direction: column;
