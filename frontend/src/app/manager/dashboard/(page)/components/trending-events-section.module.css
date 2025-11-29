@@ -22,13 +22,13 @@
   gap: 1.25rem;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   padding: 1rem;
+  cursor: pointer;
 }
 
-/* Hover card con chỉ nổi lên */
-/* .trendingCard:hover {
-  transform: translateY(-2px);
+.trendingCard:hover {
+  /* transform: translateY(-2px); */
   box-shadow: 0 8px 12px rgba(0, 0, 0, 0.08);
-} */
+}
 
 .imageContainer {
   flex-shrink: 0;
@@ -83,11 +83,11 @@
   text-overflow: ellipsis;
 }
 
-/* Dòng 3: Thống kê và nút */
+/* Dòng 3: Thống kê */
 .footerSection {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1rem;
   padding-top: 0.5rem;
   border-top: 1px solid hsl(var(--color-border));
@@ -112,33 +112,6 @@
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-}
-
-.actionSection {
-  display: flex;
-  flex-shrink: 0;
-}
-
-.viewButton {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  border: 1px solid hsl(var(--color-primary));
-  color: hsl(var(--color-primary));
-  border-radius: 0.5rem;
-  padding: 0.4rem 0.75rem;
-  font-weight: 500;
-  background-color: transparent;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-}
-
-.viewButton:hover {
-  background-color: hsl(120, 60%, 85%);
-  color: hsl(120, 50%, 20%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-  border-color: hsl(120, 50%, 25%);
 }
 
 /* Responsive */
