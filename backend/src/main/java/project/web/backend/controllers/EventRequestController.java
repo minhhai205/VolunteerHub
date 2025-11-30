@@ -14,6 +14,7 @@ import project.web.backend.dtos.response.ApiSuccessResponse;
 import project.web.backend.dtos.response.PageResponseDTO;
 import project.web.backend.dtos.response.event.EventRegistrationResponseDTO;
 import project.web.backend.dtos.response.event.EventRequestResponseDTO;
+import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.dtos.response.event.RegistrationStatusResponseDTO;
 import project.web.backend.services.EventRequestService;
 
@@ -39,9 +40,11 @@ public class EventRequestController {
     }
 
     @GetMapping("/request-list")
-    public ApiSuccessResponse<List<EventRequestResponseDTO>> getAllEventRequest() {
-        return ApiSuccessResponse.<List<EventRequestResponseDTO>>builder()
-                .data(eventRequestService.getAllEventRequest())
+    public ApiSuccessResponse<PageResponseDTO<List<EventRequestResponseDTO>>> getAllEventRequest(
+            Pageable pageable
+    ) {
+        return ApiSuccessResponse.<PageResponseDTO<List<EventRequestResponseDTO>>>builder()
+                .data(eventRequestService.getAllEventRequest(pageable))
                 .status(HttpStatus.OK.value())
                 .message("Get all event request successfully!")
                 .build();
@@ -97,6 +100,7 @@ public class EventRequestController {
                 .message("Get all processed event requests successfully!")
                 .build();
     }
+
 
     @GetMapping("/my-registration")
     @PreAuthorize("hasRole('USER')")
