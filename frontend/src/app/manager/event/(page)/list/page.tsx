@@ -155,7 +155,7 @@ export default function EventsPage() {
     filter: "all" | "upcoming" | "ongoing" | "completed"
   ) => {
     setActiveFilter(filter);
-    setCurrentPage(0);
+    // setCurrentPage(0);
   };
 
   const handlePageChange = (newPage: number) => {
@@ -164,7 +164,23 @@ export default function EventsPage() {
     }
   };
 
-  const getStatusText = (status: string) => {
+  const getStatusText = (startDateStr: string, endDateStr: string) => {
+    const now = new Date();
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
+
+    let status: "upcoming" | "ongoing" | "completed";
+
+    if (now < startDate) {
+      status = "upcoming";
+    } else if (now >= startDate && now <= endDate) {
+      status = "ongoing";
+    } else {
+      status = "completed";
+    }
+
+    console.log(status);
+
     switch (status) {
       case "upcoming":
         return "Sắp diễn ra";
@@ -173,7 +189,7 @@ export default function EventsPage() {
       case "completed":
         return "Đã kết thúc";
       default:
-        return status;
+        return "";
     }
   };
 
@@ -311,7 +327,7 @@ export default function EventsPage() {
                               styles[event.status]
                             }`}
                           >
-                            {getStatusText(event.status)}
+                            {getStatusText(event.startDate, event.endDate)}
                           </span>
                         </div>
                         <p className={styles.eventDescription}>
