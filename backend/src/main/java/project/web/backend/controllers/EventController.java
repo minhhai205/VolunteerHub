@@ -5,14 +5,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.web.backend.dtos.request.event.EventRequestDTO;
 import project.web.backend.dtos.response.ApiSuccessResponse;
+import project.web.backend.dtos.response.PageResponseDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.services.EventService;
+
 
 import java.util.List;
 
@@ -25,9 +28,12 @@ public class EventController {
     private final EventService eventService;
 
     @GetMapping("/event-list")
-    public ApiSuccessResponse<List<EventResponseDTO>> getAllEvents() {
-        return ApiSuccessResponse.<List<EventResponseDTO>>builder()
-                .data(eventService.getAllEvents())
+    public ApiSuccessResponse<PageResponseDTO<List<EventResponseDTO>>> getAllEvents(
+            Pageable pageable,
+            @RequestParam String search
+    ) {
+        return ApiSuccessResponse.<PageResponseDTO<List<EventResponseDTO>>>builder()
+                .data(eventService.getAllEvents(pageable, search))
                 .status(HttpStatus.OK.value())
                 .message("Get all events successfully!")
                 .build();
@@ -35,9 +41,12 @@ public class EventController {
 
     @GetMapping("/manager/my-event")
     @PreAuthorize("hasRole('MANAGER')")
-    public ApiSuccessResponse<List<EventResponseDTO>> getManagerMyEvent() {
-        return ApiSuccessResponse.<List<EventResponseDTO>>builder()
-                .data(eventService.getManagerMyEvent())
+    public ApiSuccessResponse<PageResponseDTO<List<EventResponseDTO>>> getManagerMyEvent(
+            Pageable pageable,
+            @RequestParam String search
+    ) {
+        return ApiSuccessResponse.<PageResponseDTO<List<EventResponseDTO>>>builder()
+                .data(eventService.getManagerMyEvent(pageable, search))
                 .status(HttpStatus.OK.value())
                 .message("Get all events successfully!")
                 .build();
@@ -85,6 +94,7 @@ public class EventController {
 
     /**
      * Get event details by event id
+     *
      * @param eventId the event id using regex to validate
      * @return EventResponseDTO
      */
