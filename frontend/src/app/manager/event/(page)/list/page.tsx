@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "./events.module.css";
 import { Header } from "@/components/static/HeaderManager";
 import { Footer } from "@/components/static/Footer";
@@ -68,6 +68,7 @@ export default function EventsPage() {
   const pageSize = 4;
   const [totalPages, setTotalPages] = useState(0);
 
+
   const getStatusParam = (
     filter: "all" | "upcoming" | "ongoing" | "completed"
   ): string => {
@@ -85,6 +86,8 @@ export default function EventsPage() {
     }
   };
 
+  // Debounce timer ref
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
     const fetchEvents = async () => {
       setIsLoading(true);
@@ -148,7 +151,11 @@ export default function EventsPage() {
           status: getEventStatus(apiEvent.startDate, apiEvent.endDate),
         }));
 
-        setAllEvents(mappedEvents);
+        // Thêm delay để hiển thị skeleton lâu hơn
+        setTimeout(() => {
+          setAllEvents(mappedEvents);
+          setIsLoading(false);
+        }, 100);
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -156,17 +163,35 @@ export default function EventsPage() {
           setError("Một lỗi không xác định đã xảy ra.");
         }
         console.error("Failed to fetch events:", err);
-      } finally {
         setIsLoading(false);
       }
     };
 
     fetchEvents();
-  }, [currentPage, pageSize, searchQuery, activeFilter]);
+  }, [currentPage, pageSize, searchQuery]);
+
+  // Cleanup timeout khi component unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    setCurrentPage(0);
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Reset page khi search thay đổi, nhưng delay một chút để tránh giật
+    searchTimeoutRef.current = setTimeout(() => {
+      setCurrentPage(0);
+    }, 300);
   };
 
   const handleFilterChange = (
@@ -178,6 +203,9 @@ export default function EventsPage() {
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 0 && newPage < totalPages) {
+      // Scroll to top with smooth animation
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      // Change page
       setCurrentPage(newPage);
     }
   };
@@ -313,8 +341,36 @@ export default function EventsPage() {
         </div>
 
         {isLoading && (
-          <div className={styles.emptyState}>
-            <h3 className={styles.emptyTitle}>Đang tải sự kiện...</h3>
+          <div className={styles.eventList}>
+            {[...Array(pageSize)].map((_, index) => (
+              <div key={index} className={styles.eventCard}>
+                <div className={`${styles.eventImage} ${styles.skeleton}`} />
+                <div className={styles.eventContent}>
+                  <div className={styles.eventHeader}>
+                    <div
+                      className={`${styles.skeletonText} ${styles.skeletonTitle}`}
+                    />
+                    <div
+                      className={`${styles.skeletonText} ${styles.skeletonBadge}`}
+                    />
+                  </div>
+                  <div
+                    className={`${styles.skeletonText} ${styles.skeletonDescription}`}
+                  />
+                  <div className={styles.eventMeta}>
+                    <div
+                      className={`${styles.skeletonText} ${styles.skeletonMeta}`}
+                    />
+                    <div
+                      className={`${styles.skeletonText} ${styles.skeletonMeta}`}
+                    />
+                    <div
+                      className={`${styles.skeletonText} ${styles.skeletonMeta}`}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
