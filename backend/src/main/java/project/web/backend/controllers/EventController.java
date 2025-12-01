@@ -16,7 +16,6 @@ import project.web.backend.dtos.response.PageResponseDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.services.EventService;
 
-
 import java.util.List;
 
 @RestController
@@ -62,7 +61,7 @@ public class EventController {
                 .build();
     }
 
-    @GetMapping("/newest")
+    @GetMapping("/manager/newest")
     public ApiSuccessResponse<List<EventResponseDTO>> getNewestPublishedEventsByManager() {
         return ApiSuccessResponse.<List<EventResponseDTO>>builder()
                 .data(eventService.getNewestPublishedEventsByManager())
@@ -71,7 +70,7 @@ public class EventController {
                 .build();
     }
 
-    @GetMapping("/trending")
+    @GetMapping("/manager/trending")
     public ApiSuccessResponse<List<EventResponseDTO>> getTrendingEventsByManager() {
         return ApiSuccessResponse.<List<EventResponseDTO>>builder()
                 .data(eventService.getTrendingEventsByManager())

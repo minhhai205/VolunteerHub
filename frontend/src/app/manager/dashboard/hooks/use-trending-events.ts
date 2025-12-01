@@ -28,7 +28,7 @@ export function useTrendingEvents() {
         // For now, use mock data. Replace with API call when ready
 
         const response = await fetchWithAuth(
-          "http://localhost:8080/api/event/trending",
+          "http://localhost:8080/api/event/manager/trending",
           { method: "GET" }
         ).then((res) => res.json());
 
