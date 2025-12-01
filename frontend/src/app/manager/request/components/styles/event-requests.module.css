@@ -12,9 +12,7 @@
   align-items: center;
   padding: 1.5rem;
   margin-top: 2rem;
-  background-color: #f0fdf4;
   border-radius: 8px;
-  border: 1px solid #86efac;
   flex-wrap: wrap;
   gap: 1.5rem;
 }
