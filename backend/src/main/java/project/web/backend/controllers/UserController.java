@@ -40,9 +40,11 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ApiSuccessResponse<PageResponseDTO<List<UserDetailResponseDTO>>> getAllUsers(
             Pageable pageable,
-            @RequestParam(required = false) String role) {
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false, defaultValue = "") String search
+    ) {
         return ApiSuccessResponse.<PageResponseDTO<List<UserDetailResponseDTO>>>builder()
-                .data(userService.getAllUsers(pageable, role))
+                .data(userService.getAllUsers(pageable, role, search))
                 .status(HttpStatus.OK.value())
                 .message("Get all users successfully!")
                 .build();

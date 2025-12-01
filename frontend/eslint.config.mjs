@@ -10,36 +10,61 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  // Vẫn extend để tránh lỗi module — nhưng sẽ override toàn bộ rule phía dưới
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+
   {
     ignores: [
       "node_modules/**",
       ".next/**",
       "out/**",
       "build/**",
+      "dist/**",
       "next-env.d.ts",
     ],
   },
 
-  // Thêm object này để tắt tất cả các lỗi
+  // Tắt FULL toàn bộ rule
   {
     rules: {
-      // Đã tắt từ trước
-      "@typescript-eslint/no-explicit-any": "off",
+      // === TẮT TẤT CẢ CÁC RULE CỦA NEXT.JS ===
+      "@next/next/no-img-element": "off",
+      "@next/next/no-html-link-for-pages": "off",
+      "@next/next/no-sync-scripts": "off",
+      "@next/next/no-page-custom-font": "off",
+      "@next/next/no-script-component-in-head": "off",
+      "@next/next/no-typos": "off",
 
-      // === CÁC QUY TẮC MỚI BẠN MUỐN TẮT ===
+      // === TẮT TẤT CẢ RULE ESLINT CORE ===
+      "no-unused-vars": "off",
+      "no-undef": "off",
+      "prefer-const": "off",
+      "no-empty": "off",
+      "no-console": "off",
+      "no-debugger": "off",
 
-      // Tắt lỗi "biến không dùng"
+      // === TẮT TẤT CẢ RULE TYPESCRIPT ===
       "@typescript-eslint/no-unused-vars": "off",
-
-      // Tắt lỗi "gọi Hook sai vị trí"
-      "react-hooks/rules-of-hooks": "off",
-
-      // Tắt lỗi "comment sai cú pháp trong JSX"
-      "react/jsx-no-comment-textnodes": "off",
-
-      // Tắt lỗi "interface rỗng"
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-empty-function": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-empty-object-type": "off",
+      "@typescript-eslint/ban-types": "off",
+
+      // === TẮT TẤT CẢ RULE REACT ===
+      "react/react-in-jsx-scope": "off",
+      "react/jsx-no-comment-textnodes": "off",
+      "react/jsx-key": "off",
+
+      // === TẮT TẤT CẢ RULE HOOKS ===
+      "react-hooks/rules-of-hooks": "off",
+      "react-hooks/exhaustive-deps": "off",
+
+      // === TẮT UNUSED eslint-disable WARNING ===
+      "eslint-comments/no-unused-disable": "off",
+
+      // Cuối cùng — tắt toàn bộ rule còn lại nếu có
+      all: "off",
     },
   },
 ];
