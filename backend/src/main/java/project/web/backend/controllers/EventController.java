@@ -42,10 +42,11 @@ public class EventController {
     @PreAuthorize("hasRole('MANAGER')")
     public ApiSuccessResponse<PageResponseDTO<List<EventResponseDTO>>> getManagerMyEvent(
             Pageable pageable,
-            @RequestParam String search
+            @RequestParam String search,
+            @RequestParam(required = false, defaultValue = "0") Integer status
     ) {
         return ApiSuccessResponse.<PageResponseDTO<List<EventResponseDTO>>>builder()
-                .data(eventService.getManagerMyEvent(pageable, search))
+                .data(eventService.getManagerMyEvent(pageable, search, status))
                 .status(HttpStatus.OK.value())
                 .message("Get all events successfully!")
                 .build();
