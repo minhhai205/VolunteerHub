@@ -2,6 +2,7 @@ import { Header } from "@/components/static/Header";
 import { Footer } from "@/components/static/Footer";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -34,10 +35,12 @@ export default function Home() {
               trị ý nghĩa cho cộng đồng.
             </p>
             <div className={styles.heroActions}>
-              <Button size="lg" className={styles.heroPrimaryButton}>
-                Tham gia ngay
-                <ArrowRight className={styles.heroArrowIcon} />
-              </Button>
+              <Link href="/event/list">
+                <Button size="lg" className={styles.heroPrimaryButton}>
+                  Tham gia ngay
+                  <ArrowRight className={styles.heroArrowIcon} />
+                </Button>
+              </Link>
               <Button size="lg" variant="outline">
                 Tìm hiểu thêm
               </Button>
@@ -243,9 +246,11 @@ export default function Home() {
               gia cùng chúng tôi!
             </p>
             <div className={styles.ctaActions}>
-              <Button size="lg" className={styles.ctaPrimaryButton}>
-                Đăng ký tình nguyện
-              </Button>
+              <Link href="/event/list">
+                <Button size="lg" className={styles.ctaPrimaryButton}>
+                  Đăng ký tình nguyện
+                </Button>
+              </Link>
               <Button size="lg" variant="outline">
                 Liên hệ với chúng tôi
               </Button>
