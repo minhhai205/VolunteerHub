@@ -103,7 +103,7 @@ public class EventService {
     }
 
     /**
-     * Get the 4 latest events by manager.
+     * Get the 4 latest events for a manager.
      *
      * @return List event
      */
@@ -148,12 +148,12 @@ public class EventService {
     }
 
     /**
-     * Get top trending events ( members > minMembers, limit 6)
+     * Get top trending events for a manager( members > minMembers, limit 6)
      *
      * @return List event.
      */
     public List<EventResponseDTO> getTrendingEventsByManager() {
-        log.info("------------ Get trending events --------------");
+        log.info("------------ Get trending events by manager --------------");
 
         String email = SecurityUtil.getCurrentEmail();
         User currentUser = userRepository.findByEmailWithNoReferences(email)
@@ -163,6 +163,28 @@ public class EventService {
         Pageable pageable = PageRequest.of(0, 6);
         int minMembers = 0;
         List<Long> eventsIds = eventRepository.findTopTrendingEventsByManager(currentUser.getId(), minMembers, pageable)
+                .stream().map(Event::getId).toList();
+
+        List<Event> events = eventRepository.findEventByIdIn(eventsIds);
+        List<EventResponseDTO> eventResponses = events.stream().map(eventMapper::toResponseDTO).toList();
+
+        findCountMemberAndPostForEvents(eventsIds, eventResponses);
+
+        return eventResponses;
+    }
+
+    /**
+     * Get top trending events ( members > minMembers, limit 6)
+     *
+     * @return List event.
+     */
+    public List<EventResponseDTO> getTrendingEvents() {
+        log.info("------------ Get trending events --------------");
+
+        // Tránh phân trang trên memory
+        Pageable pageable = PageRequest.of(0, 6);
+        int minMembers = 0;
+        List<Long> eventsIds = eventRepository.findTopTrendingEvents(minMembers, pageable)
                 .stream().map(Event::getId).toList();
 
         List<Event> events = eventRepository.findEventByIdIn(eventsIds);

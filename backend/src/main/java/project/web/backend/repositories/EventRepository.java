@@ -123,6 +123,16 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     );
 
     @Query("""
+            SELECT e FROM Event e
+            WHERE SIZE(e.members) >= :minMembers
+            ORDER BY SIZE(e.members) DESC, e.createdAt DESC
+            """)
+    List<Event> findTopTrendingEvents(
+            @Param("minMembers") int minMembers,
+            Pageable pageable
+    );
+
+    @Query("""
                 SELECT COUNT(e),
                        COUNT(CASE WHEN e.endDate < CURRENT_TIMESTAMP THEN 1 END)
                 FROM User u
