@@ -57,14 +57,23 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("""
             SELECT DISTINCT e FROM Event e
             INNER JOIN e.manager em
-            WHERE em.email=:email
-            AND
-            ( e.name LIKE %:search%
-            OR
-            e.description LIKE %:search% )
+            WHERE em.email = :email
+              AND (e.name LIKE %:search% OR e.description LIKE %:search%)
+              AND (
+                   CASE
+                           WHEN :status = 0 THEN true
+                           WHEN :status = 1 THEN (e.startDate > CURRENT_TIMESTAMP)
+                           WHEN :status = 2 THEN (e.startDate <= CURRENT_TIMESTAMP AND e.endDate >= CURRENT_TIMESTAMP)
+                           WHEN :status = 3 THEN (e.endDate < CURRENT_TIMESTAMP)
+                   END
+              )
             ORDER BY e.createdAt DESC
             """)
-    Page<Event> findManagerEvent(@Param("email") String email, @Param("search") String search, Pageable pageable);
+    Page<Event> findManagerEvent(
+            @Param("email") String email,
+            @Param("search") String search,
+            @Param("status") Integer status,
+            Pageable pageable);
 
 
     @EntityGraph(attributePaths = {
