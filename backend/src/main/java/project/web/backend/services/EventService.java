@@ -1,7 +1,6 @@
 package project.web.backend.services;
 
 
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -12,7 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import project.web.backend.dtos.request.event.EventRequestDTO;
 import project.web.backend.dtos.response.PageResponseDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
-import project.web.backend.entities.*;
+import project.web.backend.entities.Category;
+import project.web.backend.entities.Event;
+import project.web.backend.entities.EventRegistration;
+import project.web.backend.entities.User;
 import project.web.backend.exceptions.AppException;
 import project.web.backend.mappers.EventMapper;
 import project.web.backend.repositories.*;
@@ -34,7 +36,6 @@ public class EventService {
     private final UserRepository userRepository;
     private final EventRegistrationRepository eventRegistrationRepository;
     private final CategoryRepository categoryRepository;
-    private final EventMemberRepository memberRepository;
     private final EventMemberRepository eventMemberRepository;
 
     public PageResponseDTO<List<EventResponseDTO>> getAllEvents(Pageable pageable, String search) {
@@ -52,13 +53,7 @@ public class EventService {
                 .map(eventMapper::toResponseDTO)
                 .toList();
 
-        Map<Long, Long> memberCountMap = findCountMemberForEvents(eventsIds);
-        Map<Long, Long> postCountMap = findCountPostForEvents(eventsIds);
-
-        eventResponses.forEach(eventResponse -> {
-            eventResponse.setCountMembers(memberCountMap.get(eventResponse.getId()));
-            eventResponse.setCountPosts(postCountMap.get(eventResponse.getId()));
-        });
+        findCountMemberAndPostForEvents(eventsIds, eventResponses);
 
         return PageResponseDTO.<List<EventResponseDTO>>builder()
                 .pageSize(pageable.getPageSize())
@@ -83,13 +78,7 @@ public class EventService {
                 .map(eventMapper::toResponseDTO)
                 .toList();
 
-        Map<Long, Long> memberCountMap = findCountMemberForEvents(eventsIds);
-        Map<Long, Long> postCountMap = findCountPostForEvents(eventsIds);
-
-        eventResponses.forEach(eventResponse -> {
-            eventResponse.setCountMembers(memberCountMap.get(eventResponse.getId()));
-            eventResponse.setCountPosts(postCountMap.get(eventResponse.getId()));
-        });
+        findCountMemberAndPostForEvents(eventsIds, eventResponses);
 
         return PageResponseDTO.<List<EventResponseDTO>>builder()
                 .pageSize(pageable.getPageSize())
@@ -108,24 +97,18 @@ public class EventService {
 
         List<Long> eventsIds = events.stream().map(Event::getId).toList();
 
-        Map<Long, Long> memberCountMap = findCountMemberForEvents(eventsIds);
-        Map<Long, Long> postCountMap = findCountPostForEvents(eventsIds);
-
-        eventResponses.forEach(eventResponse -> {
-            eventResponse.setCountMembers(memberCountMap.get(eventResponse.getId()));
-            eventResponse.setCountPosts(postCountMap.get(eventResponse.getId()));
-        });
+        findCountMemberAndPostForEvents(eventsIds, eventResponses);
 
         return eventResponses;
     }
 
     /**
-     * Get the 4 latest events.
+     * Get the 4 latest events for a manager.
      *
      * @return List event
      */
     public List<EventResponseDTO> getNewestPublishedEventsByManager() {
-        log.info("------------ Get new est published events --------------");
+        log.info("------------ Get new est published events by manager --------------");
 
         String email = SecurityUtil.getCurrentEmail();
         User currentUser = userRepository.findByEmailWithNoReferences(email)
@@ -139,22 +122,38 @@ public class EventService {
         List<Event> events = eventRepository.findEventByIdIn(eventsIds);
         List<EventResponseDTO> eventResponses = events.stream().map(eventMapper::toResponseDTO).toList();
 
-        Map<Long, Long> memberCountMap = findCountMemberForEvents(eventsIds);
-
-        eventResponses.forEach(eventResponse -> {
-            eventResponse.setCountMembers(memberCountMap.get(eventResponse.getId()));
-        });
+        findCountMemberAndPostForEvents(eventsIds, eventResponses);
 
         return eventResponses;
     }
 
     /**
-     * Get top trending events ( members > minMembers, limit 6)
+     * Get the 6 latest events.
+     *
+     * @return List event
+     */
+    public List<EventResponseDTO> getNewestPublishedEvents() {
+        log.info("------------ Get new est published events --------------");
+
+        Pageable pageable = PageRequest.of(0, 6);
+        List<Long> eventsIds = eventRepository.findNewestPublishedEvents(pageable)
+                .stream().map(Event::getId).toList();
+
+        List<Event> events = eventRepository.findEventByIdIn(eventsIds);
+        List<EventResponseDTO> eventResponses = events.stream().map(eventMapper::toResponseDTO).toList();
+
+        findCountMemberAndPostForEvents(eventsIds, eventResponses);
+
+        return eventResponses;
+    }
+
+    /**
+     * Get top trending events for a manager( members > minMembers, limit 6)
      *
      * @return List event.
      */
     public List<EventResponseDTO> getTrendingEventsByManager() {
-        log.info("------------ Get trending events --------------");
+        log.info("------------ Get trending events by manager --------------");
 
         String email = SecurityUtil.getCurrentEmail();
         User currentUser = userRepository.findByEmailWithNoReferences(email)
@@ -169,13 +168,29 @@ public class EventService {
         List<Event> events = eventRepository.findEventByIdIn(eventsIds);
         List<EventResponseDTO> eventResponses = events.stream().map(eventMapper::toResponseDTO).toList();
 
-        Map<Long, Long> memberCountMap = findCountMemberForEvents(eventsIds);
-        Map<Long, Long> postCountMap = findCountPostForEvents(eventsIds);
+        findCountMemberAndPostForEvents(eventsIds, eventResponses);
 
-        eventResponses.forEach(eventResponse -> {
-            eventResponse.setCountMembers(memberCountMap.get(eventResponse.getId()));
-            eventResponse.setCountPosts(postCountMap.get(eventResponse.getId()));
-        });
+        return eventResponses;
+    }
+
+    /**
+     * Get top trending events ( members > minMembers, limit 6)
+     *
+     * @return List event.
+     */
+    public List<EventResponseDTO> getTrendingEvents() {
+        log.info("------------ Get trending events --------------");
+
+        // Tránh phân trang trên memory
+        Pageable pageable = PageRequest.of(0, 6);
+        int minMembers = 0;
+        List<Long> eventsIds = eventRepository.findTopTrendingEvents(minMembers, pageable)
+                .stream().map(Event::getId).toList();
+
+        List<Event> events = eventRepository.findEventByIdIn(eventsIds);
+        List<EventResponseDTO> eventResponses = events.stream().map(eventMapper::toResponseDTO).toList();
+
+        findCountMemberAndPostForEvents(eventsIds, eventResponses);
 
         return eventResponses;
     }
@@ -275,5 +290,15 @@ public class EventService {
                         row -> (Long) row[0],
                         row -> (Long) row[1]
                 ));
+    }
+
+    private void findCountMemberAndPostForEvents(List<Long> eventsIds, List<EventResponseDTO> eventResponses) {
+        Map<Long, Long> memberCountMap = findCountMemberForEvents(eventsIds);
+        Map<Long, Long> postCountMap = findCountPostForEvents(eventsIds);
+
+        eventResponses.forEach(eventResponse -> {
+            eventResponse.setCountMembers(memberCountMap.get(eventResponse.getId()));
+            eventResponse.setCountPosts(postCountMap.get(eventResponse.getId()));
+        });
     }
 }

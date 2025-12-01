@@ -2,8 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Users, ArrowRight } from "lucide-react";
+import { Calendar, MapPin, Users } from "lucide-react";
 import { useNewEvents } from "../../hooks/use-new-events";
 import { useRouter } from "next/navigation";
 import styles from "./new-events-section.module.css";
@@ -42,46 +41,60 @@ export function NewEventsSection() {
         ) : (
           events.map((event, index) => (
             <div key={event.id}>
-              <div className={styles.eventCard}>
-                {/* Tiêu đề và mô tả */}
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-foreground text-lg">
-                      {event.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {event.description}
-                    </p>
-                  </div>
-                  <Badge variant="outline" className="ml-2">
-                    Mới
-                  </Badge>
-                </div>
+              <div
+                className={styles.eventCard}
+                onClick={() => handleViewEventDetails(event.id)}
+                style={{ cursor: "pointer" }}
+              >
+                <div className={styles.eventCardRow}>
+                  {/* Ảnh sự kiện */}
+                  {event.imageUrl && (
+                    <div className={styles.eventImageContainer}>
+                      <img
+                        src={event.imageUrl}
+                        alt={event.name}
+                        className={styles.eventImage}
+                      />
+                    </div>
+                  )}
 
-                {/* Thông tin chi tiết */}
-                <div className={styles.eventDetails}>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Calendar className="w-4 h-4" />
-                    {formatDateRange(event.startDate, event.endDate)}
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <MapPin className="w-4 h-4" />
-                    {event.location}
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Users className="w-4 h-4" />
-                    {event.countMembers} tình nguyện viên
+                  <div className={styles.eventContent}>
+                    {/* Tiêu đề và mô tả */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-foreground text-lg">
+                          {event.name}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {event.description}
+                        </p>
+                      </div>
+                      <Badge className={`${styles.badgeNew} ml-2`}>Mới</Badge>
+                    </div>
+
+                    {/* Thông tin chi tiết */}
+                    <div className={styles.eventDetails}>
+                      <div
+                        className={`${styles.eventDetail} text-muted-foreground`}
+                      >
+                        <Calendar className="w-4 h-4" />
+                        {formatDateRange(event.startDate, event.endDate)}
+                      </div>
+                      <div
+                        className={`${styles.eventDetail} text-muted-foreground`}
+                      >
+                        <MapPin className="w-4 h-4" />
+                        {event.location}
+                      </div>
+                      <div
+                        className={`${styles.eventDetail} text-muted-foreground`}
+                      >
+                        <Users className="w-4 h-4" />
+                        {event.countMembers} tình nguyện viên
+                      </div>
+                    </div>
                   </div>
                 </div>
-
-                {/* Nút chi tiết */}
-                <Button
-                  className={styles.detailButton}
-                  onClick={() => handleViewEventDetails(event.id)}
-                >
-                  Xem chi tiết
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
               </div>
 
               {/* Divider giữa các event */}

@@ -1,14 +1,18 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { TrendingUp, MessageSquare, Users, ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { TrendingUp, MessageSquare, Users } from "lucide-react";
 import { useTrendingEvents } from "../../hooks/use-trending-events";
+import { useRouter } from "next/navigation";
 import styles from "./trending-events-section.module.css";
 
 export function TrendingEventsSection() {
   const { events, loading } = useTrendingEvents();
+  const router = useRouter();
+
+  const handleViewEventDetails = (eventId: number) => {
+    router.push(`/event/detail/${eventId}`);
+  };
 
   return (
     <Card className={`${styles.cardGreen} border-border`}>
@@ -26,7 +30,11 @@ export function TrendingEventsSection() {
           <p className="text-muted-foreground">Không có sự kiện trending</p>
         ) : (
           events.map((event) => (
-            <div key={event.id} className={styles.trendingCard}>
+            <div
+              key={event.id}
+              className={styles.trendingCard}
+              onClick={() => handleViewEventDetails(event.id)}
+            >
               <div className={styles.imageContainer}>
                 <img
                   src={event.imageUrl || "/placeholder.svg"}
@@ -37,7 +45,9 @@ export function TrendingEventsSection() {
 
               <div className={styles.contentWrapper}>
                 <div className={styles.headerSection}>
-                  <h3 className={styles.eventTitle}>{event.name}</h3>
+                  <h3 className="font-semibold text-foreground text-lg">
+                    {event.name}
+                  </h3>
                 </div>
 
                 <div className={styles.descriptionSection}>
@@ -56,19 +66,6 @@ export function TrendingEventsSection() {
                       <MessageSquare className="w-4 h-4" />
                       <span>{event.countPosts} bài trao đổi</span>
                     </div>
-                  </div>
-
-                  <div className={styles.actionSection}>
-                    <Link href={`/event/detail/${event.id}`}>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className={styles.viewButton}
-                      >
-                        Xem chi tiết
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </Link>
                   </div>
                 </div>
               </div>

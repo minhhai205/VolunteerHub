@@ -1,23 +1,58 @@
-
 .cardGreen {
-  background-color: #f7fcf6; 
+  background-color: #f7fff2;
   border: 1px solid hsl(var(--color-border));
   border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 /* Card con từng sự kiện */
 .eventCard {
-  background-color: #f7fcf6; /* đồng bộ nền */
-  border: 1px solid hsl(var(--color-border));
+  background-color: #ffffff; /* đồng bộ nền */
+  border: 0.5px solid #e8eae8;
   border-radius: 0.625rem;
   padding: 1rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  cursor: pointer;
 }
 
 .eventCard:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  /* transform: translateY(-3px); */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-color: #d0d8d0;
 }
+
+.eventCardRow {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.eventImageContainer {
+  flex-shrink: 0;
+}
+
+.eventImage {
+  width: 8rem;
+  height: 8rem;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+.eventContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* .eventCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-color: #d0d8d0;
+} */
 
 /* Chi tiết sự kiện */
 .eventDetails {
@@ -28,33 +63,35 @@
   font-size: 0.875rem;
 }
 
+.eventDetail {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.eventDetail svg {
+  color: #22c55e;
+  flex-shrink: 0;
+}
+
+.badgeNew {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  font-weight: 600;
+}
+
 @media (max-width: 768px) {
+  .eventCardRow {
+    flex-direction: column;
+  }
+
+  .eventImage {
+    width: 100%;
+    height: 12rem;
+  }
+
   .eventDetails {
     grid-template-columns: 1fr;
   }
 }
-
-.detailButton {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid hsl(var(--color-primary));
-  color: hsl(var(--color-primary));
-  background-color: transparent;
-  border-radius: 0.5rem; 
-  font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-}
-
-.detailButton:hover {
-  background-color: hsl(120, 60%, 85%);
-  color: hsl(120, 50%, 20%); 
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-  border-color: hsl(120, 50%, 25%);
-}
-
