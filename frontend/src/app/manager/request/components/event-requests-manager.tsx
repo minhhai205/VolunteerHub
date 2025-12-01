@@ -13,9 +13,10 @@ interface ApiResponse {
   status: number;
   message: string;
   data: {
-    pageNo: number;
+    pageNo: number; // BE trả index 0
     pageSize: number;
     totalPage: number;
+    total: number;
     data: Request[];
   };
 }
@@ -24,14 +25,25 @@ export default function EventRequestsManager() {
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // FE sử dụng page = 1 làm chuẩn
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(4);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+
   const token = getAccessToken();
 
-  // Fetch danh sách yêu cầu từ API
-  const fetchRequests = async () => {
+  // Fetch dữ liệu theo page FE (page FE = 1 → gửi lên BE = 0)
+  const fetchRequests = async (
+    page: number = currentPage - 1, // FE page → BE page index
+    size: number = pageSize
+  ) => {
     try {
       setLoading(true);
+
       const response = await fetchWithAuth(
-        "http://localhost:8080/api/event-request/registration-list",
+        `http://localhost:8080/api/event-request/registration-list?page=${page}&size=${size}`,
         {
           method: "GET",
           headers: {
@@ -44,15 +56,19 @@ export default function EventRequestsManager() {
       if (!response.ok) {
         throw new Error("Không thể tải danh sách yêu cầu");
       }
+
       const result: ApiResponse = await response.json();
-      if (
-        result.data === null ||
-        result.data.data === null ||
-        result.data.data.length === 0
-      ) {
+      if (result.data === null || result.data.data === null) {
         throw new Error("Không thể tải danh sách yêu cầu");
       }
+
       setRequests(result.data.data);
+      setTotalPages(result.data.totalPage);
+      setTotalElements(result.data.total);
+
+      // BE trả page index 0 → FE index = +1
+      setCurrentPage(result.data.pageNo + 1);
+
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Đã xảy ra lỗi");
@@ -62,12 +78,10 @@ export default function EventRequestsManager() {
     }
   };
 
-  // Load dữ liệu khi component mount
   useEffect(() => {
     fetchRequests();
   }, []);
 
-  // Xử lý approve
   const handleApprove = async (id: number) => {
     try {
       const response = await fetch(
@@ -88,7 +102,6 @@ export default function EventRequestsManager() {
       const result = await response.json();
       if (result.status === 200) {
         toastManager.success("Đã duyệt đơn đăng ký");
-        // Cập nhật trạng thái local
         setRequests(
           requests.map((req) =>
             req.id === id ? { ...req, status: "approve" } : req
@@ -105,7 +118,6 @@ export default function EventRequestsManager() {
     }
   };
 
-  // Xử lý reject
   const handleReject = async (id: number) => {
     try {
       const response = await fetch(
@@ -122,10 +134,10 @@ export default function EventRequestsManager() {
       if (!response.ok) {
         throw new Error("Không thể từ chối yêu cầu");
       }
+
       const result = await response.json();
       if (result.status === 200) {
         toastManager.success("Đã từ chối đơn đăng ký");
-        // Cập nhật trạng thái local
         setRequests(
           requests.map((req) =>
             req.id === id ? { ...req, status: "rejected" } : req
@@ -139,6 +151,13 @@ export default function EventRequestsManager() {
     } catch (err) {
       console.error("Error rejecting request:", err);
       alert("Không thể từ chối yêu cầu. Vui lòng thử lại.");
+    }
+  };
+
+  // FE page → BE page index
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      fetchRequests(page - 1, pageSize);
     }
   };
 
@@ -158,7 +177,7 @@ export default function EventRequestsManager() {
         <div style={{ textAlign: "center", padding: "2rem", color: "red" }}>
           Lỗi: {error}
           <button
-            onClick={fetchRequests}
+            onClick={() => fetchRequests()}
             style={{ marginLeft: "1rem", padding: "0.5rem 1rem" }}
           >
             Thử lại
@@ -181,12 +200,77 @@ export default function EventRequestsManager() {
 
   return (
     <div className={styles.container}>
-      <EventRequestHeader totalRequests={requests.length} />
+      <EventRequestHeader totalRequests={totalElements} />
       <EventRequestList
         requests={requests}
         onApprove={handleApprove}
         onReject={handleReject}
       />
+
+      {/* Pagination */}
+      <div className={styles.paginationContainer}>
+        <div className={styles.paginationButtons}>
+          <button
+            onClick={() => handlePageChange(1)}
+            disabled={currentPage === 1}
+            className={styles.pageButton}
+          >
+            ««
+          </button>
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={styles.pageButton}
+          >
+            ‹
+          </button>
+
+          {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+            let pageNum;
+
+            if (totalPages <= 5) {
+              pageNum = i + 1;
+            } else if (currentPage <= 3) {
+              pageNum = i + 1;
+            } else if (currentPage >= totalPages - 2) {
+              pageNum = totalPages - 4 + i;
+            } else {
+              pageNum = currentPage - 2 + i;
+            }
+
+            return (
+              <button
+                key={pageNum}
+                onClick={() => handlePageChange(pageNum)}
+                className={`${styles.pageButton} ${
+                  currentPage === pageNum ? styles.activePage : ""
+                }`}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={styles.pageButton}
+          >
+            ›
+          </button>
+          <button
+            onClick={() => handlePageChange(totalPages)}
+            disabled={currentPage === totalPages}
+            className={styles.pageButton}
+          >
+            »»
+          </button>
+        </div>
+
+        <div className={styles.paginationInfo}>
+          Trang {currentPage} / {totalPages}
+        </div>
+      </div>
     </div>
   );
 }

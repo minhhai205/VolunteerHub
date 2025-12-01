@@ -23,10 +23,8 @@ import project.web.backend.utils.commons.SecurityUtil;
 import project.web.backend.utils.enums.ErrorCode;
 import project.web.backend.utils.enums.EventRequestStatus;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -73,13 +71,28 @@ public class EventRequestService {
         return eventRequestMapper.toResponseDTO(newRequest);
     }
 
-    public List<EventRequestResponseDTO> getAllEventRequest() {
+    public PageResponseDTO<List<EventRequestResponseDTO>> getAllEventRequest(Pageable pageable) {
         log.info("------------ Get all events request --------------");
 
-        List<EventCreateRequest> eventRequests = eventRequestRepository.findAll();
+        Page<EventCreateRequest> eventRequests = eventRequestRepository.findAllPagination(pageable);
 
-        return eventRequests.stream()
-                .map(eventRequestMapper::toResponseDTO).toList();
+        List<Long> eventRequestIds = eventRequests.stream().map(EventCreateRequest::getId).toList();
+
+        List<EventCreateRequest> fetchedEvents = eventRequestRepository.findByIdsWithCategories(eventRequestIds);
+        Map<Long, EventCreateRequest> idEventMap = fetchedEvents.stream()
+                .collect(Collectors.toMap(EventCreateRequest::getId, e -> e));
+
+        List<EventRequestResponseDTO> dtos = eventRequestIds.stream()
+                .map(idEventMap::get)
+                .map(eventRequestMapper::toResponseDTO)
+                .toList();
+
+        return PageResponseDTO.<List<EventRequestResponseDTO>>builder()
+                .totalPage(eventRequests.getTotalPages())
+                .pageNo(pageable.getPageNumber())
+                .pageSize(pageable.getPageSize())
+                .data(dtos)
+                .build();
     }
 
     public List<EventRequestResponseDTO> getAllPendingEventRequest() {
@@ -165,6 +178,7 @@ public class EventRequestService {
                 .totalPage(registrations.getTotalPages())
                 .pageNo(pageable.getPageNumber())
                 .pageSize(pageable.getPageSize())
+                .total(registrations.getTotalElements())
                 .build();
     }
 

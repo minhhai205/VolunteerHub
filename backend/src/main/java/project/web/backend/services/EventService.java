@@ -4,11 +4,13 @@ package project.web.backend.services;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.web.backend.dtos.request.event.EventRequestDTO;
+import project.web.backend.dtos.response.PageResponseDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.entities.*;
 import project.web.backend.exceptions.AppException;
@@ -35,13 +37,20 @@ public class EventService {
     private final EventMemberRepository memberRepository;
     private final EventMemberRepository eventMemberRepository;
 
-    public List<EventResponseDTO> getAllEvents() {
+    public PageResponseDTO<List<EventResponseDTO>> getAllEvents(Pageable pageable, String search) {
         log.info("------------ Get all events --------------");
 
-        List<Event> events = eventRepository.findAllWithCategories();
-        List<EventResponseDTO> eventResponses = events.stream().map(eventMapper::toResponseDTO).toList();
+        Page<Event> events = eventRepository.findAllWithSearch(pageable, search);
+        List<Long> eventsIds = events.stream()
+                .map(Event::getId).toList();
+        List<Event> fetchedEvents = eventRepository.findWithCategoriesByIds(eventsIds);
+        Map<Long, Event> idEventMap = fetchedEvents.stream()
+                .collect(Collectors.toMap(Event::getId, e -> e));
 
-        List<Long> eventsIds = events.stream().map(Event::getId).toList();
+        List<EventResponseDTO> eventResponses = eventsIds.stream()
+                .map(idEventMap::get)
+                .map(eventMapper::toResponseDTO)
+                .toList();
 
         Map<Long, Long> memberCountMap = findCountMemberForEvents(eventsIds);
         Map<Long, Long> postCountMap = findCountPostForEvents(eventsIds);
@@ -51,16 +60,28 @@ public class EventService {
             eventResponse.setCountPosts(postCountMap.get(eventResponse.getId()));
         });
 
-        return eventResponses;
+        return PageResponseDTO.<List<EventResponseDTO>>builder()
+                .pageSize(pageable.getPageSize())
+                .pageNo(pageable.getPageNumber())
+                .totalPage(events.getTotalPages())
+                .data(eventResponses)
+                .build();
     }
 
-    public List<EventResponseDTO> getManagerMyEvent() {
+    public PageResponseDTO<List<EventResponseDTO>> getManagerMyEvent(Pageable pageable, String search) {
         log.info("------------ Get manager events --------------");
-        List<Event> events = eventRepository.findManagerEventWithCategories(
-                SecurityUtil.getCurrentEmail());
-        List<EventResponseDTO> eventResponses = events.stream().map(eventMapper::toResponseDTO).toList();
-
+        Page<Event> events = eventRepository.findManagerEvent(
+                SecurityUtil.getCurrentEmail(), search, pageable);
         List<Long> eventsIds = events.stream().map(Event::getId).toList();
+
+        List<Event> fetchedEvents = eventRepository.findWithCategoriesByIds(eventsIds);
+        Map<Long, Event> idEventMap = fetchedEvents.stream()
+                .collect(Collectors.toMap(Event::getId, e -> e));
+
+        List<EventResponseDTO> eventResponses = eventsIds.stream()
+                .map(idEventMap::get)
+                .map(eventMapper::toResponseDTO)
+                .toList();
 
         Map<Long, Long> memberCountMap = findCountMemberForEvents(eventsIds);
         Map<Long, Long> postCountMap = findCountPostForEvents(eventsIds);
@@ -70,7 +91,12 @@ public class EventService {
             eventResponse.setCountPosts(postCountMap.get(eventResponse.getId()));
         });
 
-        return eventResponses;
+        return PageResponseDTO.<List<EventResponseDTO>>builder()
+                .pageSize(pageable.getPageSize())
+                .pageNo(pageable.getPageNumber())
+                .totalPage(events.getTotalPages())
+                .data(eventResponses)
+                .build();
     }
 
 
