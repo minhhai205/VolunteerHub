@@ -70,6 +70,15 @@ public class EventController {
                 .build();
     }
 
+    @GetMapping("/newest")
+    public ApiSuccessResponse<List<EventResponseDTO>> getNewestPublishedEvents() {
+        return ApiSuccessResponse.<List<EventResponseDTO>>builder()
+                .data(eventService.getNewestPublishedEvents())
+                .status(HttpStatus.OK.value())
+                .message("Get newest events successfully!")
+                .build();
+    }
+
     @GetMapping("/manager/trending")
     public ApiSuccessResponse<List<EventResponseDTO>> getTrendingEventsByManager() {
         return ApiSuccessResponse.<List<EventResponseDTO>>builder()
