@@ -68,7 +68,6 @@ export default function EventsPage() {
   const pageSize = 4;
   const [totalPages, setTotalPages] = useState(0);
 
-
   const getStatusParam = (
     filter: "all" | "upcoming" | "ongoing" | "completed"
   ): string => {
@@ -168,7 +167,7 @@ export default function EventsPage() {
     };
 
     fetchEvents();
-  }, [currentPage, pageSize, searchQuery]);
+  }, [currentPage, pageSize, searchQuery, activeFilter]);
 
   // Cleanup timeout khi component unmount
   useEffect(() => {
