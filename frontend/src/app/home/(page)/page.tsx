@@ -46,10 +46,9 @@ export default function Home() {
     const fetchEvents = async () => {
       try {
         setLoading(true);
-        const response = await fetchWithAuth(
-          "http://localhost:8080/api/event/newest",
-          { method: "GET" }
-        ).then((res) => res.json());
+        const response = await fetch("http://localhost:8080/api/event/newest", {
+          method: "GET",
+        }).then((res) => res.json());
 
         if (response.status === 200) {
           setEvents(response.data?.slice(0, 3) || []);
@@ -71,7 +70,9 @@ export default function Home() {
   const formatDateRange = (startDate: string, endDate: string) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
-    return `${start.toLocaleDateString("vi-VN")} - ${end.toLocaleDateString("vi-VN")}`;
+    return `${start.toLocaleDateString("vi-VN")} - ${end.toLocaleDateString(
+      "vi-VN"
+    )}`;
   };
   return (
     <div className={styles.wrapper}>
