@@ -197,7 +197,7 @@ export default function EventsPage() {
     filter: "all" | "upcoming" | "ongoing" | "completed"
   ) => {
     setActiveFilter(filter);
-    // setCurrentPage(0);
+    setCurrentPage(0);
   };
 
   const handlePageChange = (newPage: number) => {
