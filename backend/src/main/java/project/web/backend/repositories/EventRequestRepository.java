@@ -17,19 +17,29 @@ import java.util.Optional;
 @Repository
 public interface EventRequestRepository extends CrudRepository<EventCreateRequest, Integer> {
 
-        @EntityGraph(attributePaths = {
-                        "categories",
-                        "manager"
-        })
-        Optional<EventCreateRequest> findById(Long requestId);
+    @EntityGraph(attributePaths = {
+            "categories",
+            "manager"
+    })
+    Optional<EventCreateRequest> findById(Long requestId);
 
-        @EntityGraph(attributePaths = {
-                        "categories",
-        })
-        List<EventCreateRequest> findAll();
 
-        @EntityGraph(attributePaths = {
-                        "categories",
-        })
-        List<EventCreateRequest> findByStatusIn(List<EventRequestStatus> statuses);
+    @Query("""
+            SELECT ec FROM EventCreateRequest ec
+            """)
+    Page<EventCreateRequest> findAllPagination(Pageable pageable);
+
+    @EntityGraph(attributePaths = {
+            "categories",
+    })
+    @Query("""
+            SELECT ec FROM EventCreateRequest ec
+            WHERE ec.id IN :ids
+            """)
+    List<EventCreateRequest> findByIdsWithCategories(@Param("ids") List<Long> ids);
+
+    @EntityGraph(attributePaths = {
+            "categories",
+    })
+    List<EventCreateRequest> findByStatusIn(List<EventRequestStatus> statuses);
 }

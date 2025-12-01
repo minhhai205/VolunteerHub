@@ -41,11 +41,15 @@ export function EventStats() {
 
   return (
     <div className={styles.statsGrid}>
-      {stats.map((stat) => {
+      {stats.map((stat, index) => {
         const Icon = stat.icon;
         return (
-          <Card key={stat.title} className={styles.statCard}>
-            <CardContent className="pt-6">
+          <Card
+            key={stat.title}
+            className={styles.statCard}
+            data-stat-index={index}
+          >
+            <CardContent className="pt-2">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">{stat.title}</p>

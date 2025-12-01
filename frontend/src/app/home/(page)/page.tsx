@@ -1,7 +1,13 @@
+"use client";
+
 import { Header } from "@/components/static/Header";
 import { Footer } from "@/components/static/Footer";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 import {
   Card,
   CardContent,
@@ -19,7 +25,55 @@ import {
 } from "lucide-react";
 import styles from "./page.module.css";
 
+interface Event {
+  id: number;
+  name: string;
+  description: string;
+  location: string;
+  startDate: string;
+  endDate: string;
+  countMembers: number;
+  imageUrl: string;
+  categoryNames: string[];
+}
+
 export default function Home() {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("http://localhost:8080/api/event/newest", {
+          method: "GET",
+        }).then((res) => res.json());
+
+        if (response.status === 200) {
+          setEvents(response.data?.slice(0, 3) || []);
+        }
+      } catch (err) {
+        console.error("Fetch events error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  const handleViewEventDetails = (eventId: number) => {
+    router.push(`/event/detail/${eventId}`);
+  };
+
+  const formatDateRange = (startDate: string, endDate: string) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    return `${start.toLocaleDateString("vi-VN")} - ${end.toLocaleDateString(
+      "vi-VN"
+    )}`;
+  };
   return (
     <div className={styles.wrapper}>
       <main className={styles.main}>
@@ -34,10 +88,12 @@ export default function Home() {
               trị ý nghĩa cho cộng đồng.
             </p>
             <div className={styles.heroActions}>
-              <Button size="lg" className={styles.heroPrimaryButton}>
-                Tham gia ngay
-                <ArrowRight className={styles.heroArrowIcon} />
-              </Button>
+              <Link href="/event/list">
+                <Button size="lg" className={styles.heroPrimaryButton}>
+                  Tham gia ngay
+                  <ArrowRight className={styles.heroArrowIcon} />
+                </Button>
+              </Link>
               <Button size="lg" variant="outline">
                 Tìm hiểu thêm
               </Button>
@@ -148,86 +204,48 @@ export default function Home() {
             </div>
 
             <div className={styles.activitiesGrid}>
-              <Card className={styles.activityCard}>
-                <CardHeader>
-                  <div className={styles.activityImage}>
-                    <Image
-                      src="/images/home1.jpg"
-                      alt="Hoạt động từ thiện"
-                      className={styles.activityImageElement}
-                      width={180}
-                      height={38}
-                    />
-                  </div>
-                  <CardTitle className={styles.activityTitle}>
-                    Trao học bổng cho học sinh nghèo
-                  </CardTitle>
-                  <div className={styles.activityDate}>
-                    <Calendar className={styles.activityDateIcon} />
-                    <span>15/03/2024</span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className={styles.activityDescription}>
-                    Trao 50 suất học bổng cho học sinh có hoàn cảnh khó khăn tại
-                    vùng cao
-                  </CardDescription>
-                </CardContent>
-              </Card>
-
-              <Card className={styles.activityCard}>
-                <CardHeader>
-                  <div className={styles.activityImage}>
-                    <Image
-                      src="/images/home2.jpg"
-                      alt="Hoạt động từ thiện"
-                      className={styles.activityImageElement}
-                      width={180}
-                      height={38}
-                    />
-                  </div>
-                  <CardTitle className={styles.activityTitle}>
-                    Chăm sóc người cao tuổi
-                  </CardTitle>
-                  <div className={styles.activityDate}>
-                    <Calendar className={styles.activityDateIcon} />
-                    <span>08/03/2024</span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className={styles.activityDescription}>
-                    Tổ chức hoạt động thăm hỏi và chăm sóc người cao tuổi tại
-                    viện dưỡng lão
-                  </CardDescription>
-                </CardContent>
-              </Card>
-
-              <Card className={styles.activityCard}>
-                <CardHeader>
-                  <div className={styles.activityImage}>
-                    <Image
-                      src="/images/home3.jpg"
-                      alt="Hoạt động từ thiện"
-                      className={styles.activityImageElement}
-                      width={180}
-                      height={38}
-                    />
-                  </div>
-                  <CardTitle className={styles.activityTitle}>
-                    Trồng cây xanh bảo vệ môi trường
-                  </CardTitle>
-                  <div className={styles.activityDate}>
-                    <Calendar className={styles.activityDateIcon} />
-                    <span>01/03/2024</span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className={styles.activityDescription}>
-                    Trồng 200 cây xanh tại khu vực công viên và trường học trong
-                    khu vực
-                  </CardDescription>
-                </CardContent>
-              </Card>
+              {loading ? (
+                <p className="text-muted-foreground">Đang tải...</p>
+              ) : events.length === 0 ? (
+                <p className="text-muted-foreground">Không có sự kiện mới</p>
+              ) : (
+                events.map((event) => (
+                  <Card
+                    key={event.id}
+                    className={styles.activityCard}
+                    onClick={() => handleViewEventDetails(event.id)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <CardHeader>
+                      <div className={styles.activityImage}>
+                        {event.imageUrl && (
+                          <Image
+                            src={event.imageUrl}
+                            alt={event.name}
+                            className={styles.activityImageElement}
+                            width={300}
+                            height={200}
+                          />
+                        )}
+                      </div>
+                      <CardTitle className={styles.activityTitle}>
+                        {event.name}
+                      </CardTitle>
+                      <div className={styles.activityDate}>
+                        <Calendar className={styles.activityDateIcon} />
+                        <span>
+                          {formatDateRange(event.startDate, event.endDate)}
+                        </span>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription className={styles.activityDescription}>
+                        {event.description}
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           </div>
         </section>
@@ -243,9 +261,11 @@ export default function Home() {
               gia cùng chúng tôi!
             </p>
             <div className={styles.ctaActions}>
-              <Button size="lg" className={styles.ctaPrimaryButton}>
-                Đăng ký tình nguyện
-              </Button>
+              <Link href="/event/list">
+                <Button size="lg" className={styles.ctaPrimaryButton}>
+                  Đăng ký tình nguyện
+                </Button>
+              </Link>
               <Button size="lg" variant="outline">
                 Liên hệ với chúng tôi
               </Button>

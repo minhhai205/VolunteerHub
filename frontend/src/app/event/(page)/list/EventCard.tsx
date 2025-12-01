@@ -1,5 +1,6 @@
 import styles from "./list.module.css";
 import { Calendar, Users, MessageSquare, MapPin, Tag } from "lucide-react";
+import Link from "next/link";
 
 interface EventCardProps {
   id: number;
@@ -15,6 +16,7 @@ interface EventCardProps {
 }
 
 export default function EventCard({
+  id,
   name,
   description,
   location,
@@ -37,51 +39,70 @@ export default function EventCard({
     year: "numeric",
   });
 
+  // Giới hạn description nếu quá dài
+  const truncatedDescription =
+    description.length > 120
+      ? description.substring(0, 120) + "..."
+      : description;
+
   return (
-    <div className={styles.eventCard}>
-      {imageUrl && (
-        <img
-          src={imageUrl || "/placeholder.svg"}
-          alt={name}
-          className={styles.eventCardImage}
-        />
-      )}
-
-      <div className={styles.eventCardContent}>
-        <h3 className={styles.eventCardTitle}>{name}</h3>
-        <p className={styles.eventCardDescription}>{description}</p>
-
-        <div className={styles.eventCardInfo}>
-          <div className={styles.eventCardDate}>
-            <Calendar />
-            <span>Ngày bắt đầu: {formattedStartDate}</span>
+    <Link href={`/events/${id}`} className={styles.eventCardLink}>
+      <div className={styles.eventCard}>
+        {imageUrl && (
+          <div className={styles.eventCardImageWrapper}>
+            <img src={imageUrl} alt={name} className={styles.eventCardImage} />
           </div>
-          <div className={styles.eventCardDate}>
-            <Calendar />
-            <span>Ngày kết thúc: {formattedEndDate}</span>
-          </div>
-          <div className={styles.eventCardLocation}>
-            <MapPin />
-            <span>{location}</span>
-          </div>
-        </div>
+        )}
 
-        <div className={styles.eventCardCategories}>
-          <Tag />
-          <span>{categoryNames[0] || "Uncategorized"}</span>
-        </div>
+        <div className={styles.eventCardContent}>
+          <h3 className={styles.eventCardTitle}>{name}</h3>
+          <p className={styles.eventCardDescription}>{truncatedDescription}</p>
 
-        <div className={styles.eventCardStats}>
-          <div className={styles.eventCardStat}>
-            <Users />
-            <span>{countMembers} người tham gia</span>
+          <div className={styles.eventCardInfo}>
+            <div className={styles.eventCardDate}>
+              <Calendar size={16} />
+              <span>{formattedStartDate}</span>
+            </div>
+            <div className={styles.eventCardDate}>
+              <Calendar size={16} />
+              <span>{formattedEndDate}</span>
+            </div>
+            <div className={styles.eventCardLocation}>
+              <MapPin size={16} />
+              <span>{location}</span>
+            </div>
           </div>
-          <div className={styles.eventCardStat}>
-            <MessageSquare />
-            <span>{countPosts} bài viết</span>
+
+          {categoryNames && categoryNames.length > 0 && (
+            <div className={styles.eventCardCategories}>
+              <Tag size={16} />
+              <div className={styles.categoryTags}>
+                {categoryNames.slice(0, 3).map((category, index) => (
+                  <span key={index} className={styles.categoryTag}>
+                    {category}
+                  </span>
+                ))}
+                {categoryNames.length > 3 && (
+                  <span className={styles.categoryTag}>
+                    +{categoryNames.length - 3}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className={styles.eventCardStats}>
+            <div className={styles.eventCardStat}>
+              <Users size={16} />
+              <span>{countMembers}</span>
+            </div>
+            <div className={styles.eventCardStat}>
+              <MessageSquare size={16} />
+              <span>{countPosts}</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

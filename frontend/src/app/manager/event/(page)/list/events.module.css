@@ -313,3 +313,98 @@
   align-items: center;
   flex-wrap: wrap;
 }
+
+/* Thêm/thay thế vào file events.module.css */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+}
+
+.pageButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  color: #4b5563;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pageButton:hover:not(:disabled) {
+  background: #f0fdf4;
+  border-color: #22c55e;
+  color: #16a34a;
+}
+
+.pageButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #f9fafb;
+}
+
+.pageNumbers {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pageNumber {
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0 0.5rem;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  color: #4b5563;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pageNumber:hover:not(:disabled):not(.activePage) {
+  background: #f0fdf4;
+  border-color: #22c55e;
+  color: #16a34a;
+  transform: translateY(-1px);
+}
+
+.pageNumber.activePage {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-color: #16a34a;
+  color: white;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+  font-weight: 600;
+}
+
+.pageNumber.ellipsis {
+  border: none;
+  background: transparent;
+  cursor: default;
+  pointer-events: none;
+  color: #9ca3af;
+}
+
+.pageNumber.ellipsis:hover {
+  background: transparent;
+  border: none;
+  transform: none;
+}
+
+/* Hiệu ứng cho nút Previous/Next khi active */
+.prevButton:hover:not(:disabled),
+.nextButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-color: #16a34a;
+  color: white;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+}

@@ -1,6 +1,7 @@
 package project.web.backend.repositories;
 
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,21 +34,37 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e WHERE e.id = :eventId")
     Optional<Event> findEventByIdWithManager(@Param("eventId") Long eventId);
 
-    @EntityGraph(attributePaths = {
-            "categories"
-    })
-    @Query("SELECT DISTINCT e FROM Event e")
-    List<Event> findAllWithCategories();
+
+    @Query("""
+            SELECT DISTINCT e FROM Event e
+            WHERE
+            e.name LIKE %:search%
+            OR
+            e.description LIKE %:search%
+            """)
+    Page<Event> findAllWithSearch(Pageable pageable, @Param("search") String search);
 
     @EntityGraph(attributePaths = {
             "categories"
     })
     @Query("""
+            SELECT e FROM Event e
+            WHERE e.id IN :ids
+            """)
+    List<Event> findWithCategoriesByIds(@Param("ids") List<Long> ids);
+
+
+    @Query("""
             SELECT DISTINCT e FROM Event e
             INNER JOIN e.manager em
             WHERE em.email=:email
+            AND
+            ( e.name LIKE %:search%
+            OR
+            e.description LIKE %:search% )
+            ORDER BY e.createdAt DESC
             """)
-    List<Event> findManagerEventWithCategories(@Param("email") String email);
+    Page<Event> findManagerEvent(@Param("email") String email, @Param("search") String search, Pageable pageable);
 
 
     @EntityGraph(attributePaths = {
@@ -88,6 +105,12 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findNewestPublishedEventsByManager(@Param("managerId") Long managerId, Pageable pageable);
 
     @Query("""
+                SELECT e FROM Event e
+                ORDER BY e.createdAt DESC
+            """)
+    List<Event> findNewestPublishedEvents(Pageable pageable);
+
+    @Query("""
             SELECT e FROM Event e
             WHERE e.manager.id = :managerId
             AND SIZE(e.members) >= :minMembers
@@ -95,6 +118,16 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             """)
     List<Event> findTopTrendingEventsByManager(
             @Param("managerId") Long managerId,
+            @Param("minMembers") int minMembers,
+            Pageable pageable
+    );
+
+    @Query("""
+            SELECT e FROM Event e
+            WHERE SIZE(e.members) >= :minMembers
+            ORDER BY SIZE(e.members) DESC, e.createdAt DESC
+            """)
+    List<Event> findTopTrendingEvents(
             @Param("minMembers") int minMembers,
             Pageable pageable
     );
@@ -113,10 +146,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Long countByManagerEmail(@Param("email") String email);
 
     @Query("""
-        SELECT COUNT(e.id) FROM Event e
-        WHERE e.manager.email = :email
-          AND SIZE(e.members) >= :minMembers
-    """)
+                SELECT COUNT(e.id) FROM Event e
+                WHERE e.manager.email = :email
+                  AND SIZE(e.members) >= :minMembers
+            """)
     Long countTopTrendingEventsByManagerEmail(
             @Param("email") String email,
             @Param("minMembers") int minMembers
