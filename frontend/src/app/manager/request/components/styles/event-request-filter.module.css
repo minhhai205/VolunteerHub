@@ -1,0 +1,115 @@
+.filterContainer {
+  display: flex;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 0 16px;
+  flex-wrap: wrap;
+}
+
+.filterButton {
+  padding: 10px 20px;
+  border: 2px solid;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #e8f5e9;
+  color: #666;
+}
+
+.filterButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filterButton:active {
+  transform: translateY(0);
+}
+
+.filterButton.active {
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Nút Tất cả */
+.filterAll {
+  border-color: #1976d2;
+  color: #1976d2;
+}
+
+.filterAll:hover {
+  border-color: #1565c0;
+}
+
+.filterAll.active {
+  border-color: #1565c0;
+  color: #1565c0;
+}
+
+/* Nút Chưa duyệt */
+.filterPending {
+  border-color: #f57c00;
+  color: #f57c00;
+}
+
+.filterPending:hover {
+  border-color: #ef6c00;
+}
+
+.filterPending.active {
+  border-color: #ef6c00;
+  color: #ef6c00;
+}
+
+/* Nút Đã duyệt */
+.filterApproved {
+  border-color: #388e3c;
+  color: #388e3c;
+}
+
+.filterApproved:hover {
+  border-color: #2e7d32;
+}
+
+.filterApproved.active {
+  border-color: #2e7d32;
+  color: #2e7d32;
+}
+
+/* Nút Đã từ chối */
+.filterRejected {
+  border-color: #d32f2f;
+  color: #d32f2f;
+}
+
+.filterRejected:hover {
+  border-color: #c62828;
+}
+
+.filterRejected.active {
+  border-color: #c62828;
+  color: #c62828;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .filterContainer {
+    gap: 8px;
+  }
+
+  .filterButton {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .filterContainer {
+    flex-direction: column;
+  }
+
+  .filterButton {
+    width: 100%;
+  }
+}
