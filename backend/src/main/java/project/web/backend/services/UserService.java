@@ -35,14 +35,14 @@ public class UserService {
     private final EventRepository eventRepository;
     private final TokenRepository tokenRepository;
 
-    public PageResponseDTO<List<UserDetailResponseDTO>> getAllUsers(Pageable pageable, String role) {
+    public PageResponseDTO<List<UserDetailResponseDTO>> getAllUsers(Pageable pageable, String role, String search) {
         Page<User> users;
         if (role == null || role.isBlank()) {
-            users = userRepository.getAllUsersAndManagers(pageable);
+            users = userRepository.getAllUsersAndManagers(pageable, search);
         } else {
             // normalize role value (expecting values like "USER", "MANAGER", "ADMIN")
             String normalizedRole = role.trim().toUpperCase();
-            users = userRepository.findAllByRoleName(normalizedRole, pageable);
+            users = userRepository.findAllByRoleName(normalizedRole, pageable, search);
         }
 
         return PageResponseDTO.<List<UserDetailResponseDTO>>builder()

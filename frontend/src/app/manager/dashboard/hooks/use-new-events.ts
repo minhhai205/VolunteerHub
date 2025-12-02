@@ -26,7 +26,7 @@ export function useNewEvents() {
         setLoading(true);
 
         const response = await fetchWithAuth(
-          "http://localhost:8080/api/event/newest",
+          "http://localhost:8080/api/event/manager/newest",
           { method: "GET" }
         ).then((res) => res.json());
 
