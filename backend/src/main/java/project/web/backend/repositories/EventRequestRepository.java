@@ -45,7 +45,7 @@ public interface EventRequestRepository extends CrudRepository<EventCreateReques
     @Query("""
             SELECT ec FROM EventCreateRequest ec
             WHERE ec.status IN :status
-            ORDER BY ec.createdDate DESC
+            ORDER BY ec.createdAt DESC
             """)
     List<EventCreateRequest> findByStatusIn(@Param("status") List<EventRequestStatus> status);
 }

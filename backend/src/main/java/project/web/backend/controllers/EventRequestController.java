@@ -17,6 +17,7 @@ import project.web.backend.dtos.response.event.EventRequestResponseDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.dtos.response.event.RegistrationStatusResponseDTO;
 import project.web.backend.services.EventRequestService;
+import project.web.backend.utils.enums.EventRequestStatus;
 
 import java.util.List;
 
@@ -42,6 +43,7 @@ public class EventRequestController {
     @GetMapping("/request-list")
     public ApiSuccessResponse<PageResponseDTO<List<EventRequestResponseDTO>>> getAllEventRequest(
             Pageable pageable
+
     ) {
         return ApiSuccessResponse.<PageResponseDTO<List<EventRequestResponseDTO>>>builder()
                 .data(eventRequestService.getAllEventRequest(pageable))
@@ -75,9 +77,12 @@ public class EventRequestController {
     @GetMapping("/registration-list")
     @PreAuthorize("hasRole('MANAGER')")
     public ApiSuccessResponse<PageResponseDTO<List<EventRegistrationResponseDTO>>> allRegistrationRequest(
-            Pageable pageable) {
+            Pageable pageable,
+            @RequestParam(required = false, defaultValue = "") String status
+    ) {
+        EventRequestStatus enumStatus = (status.isBlank()) ? null : EventRequestStatus.valueOf(status.toUpperCase());
         return ApiSuccessResponse.<PageResponseDTO<List<EventRegistrationResponseDTO>>>builder()
-                .data(eventRequestService.getAllRegistration(pageable))
+                .data(eventRequestService.getAllRegistration(pageable, enumStatus))
                 .message("Get all registrations successfully")
                 .status(HttpStatus.OK.value())
                 .build();
