@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import EventRequestHeader from "./event-request-header";
 import EventRequestList from "./event-request-list";
 import styles from "./styles/event-requests.module.css";
@@ -32,7 +32,6 @@ export default function EventRequestsManager() {
   const [pageSize, setPageSize] = useState(6);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const token = getAccessToken();
 
@@ -87,11 +86,7 @@ export default function EventRequestsManager() {
   // Scroll to top and show loading skeleton when page changes
   useEffect(() => {
     setDisplayLoading(true);
-    setTimeout(() => {
-      if (containerRef.current) {
-        containerRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 0);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
 
   // Hide loading skeleton after data loads
@@ -185,7 +180,7 @@ export default function EventRequestsManager() {
 
   if (displayLoading) {
     return (
-      <div className={styles.container} ref={containerRef}>
+      <div className={styles.container}>
         <EventRequestHeader totalRequests={0} />
         <div className={styles.skeletonGrid}>
           {Array.from({ length: pageSize }).map((_, i) => (
@@ -222,7 +217,7 @@ export default function EventRequestsManager() {
 
   if (error) {
     return (
-      <div className={styles.container} ref={containerRef}>
+      <div className={styles.container}>
         <div style={{ textAlign: "center", padding: "2rem", color: "red" }}>
           Lỗi: {error}
           <button
@@ -238,7 +233,7 @@ export default function EventRequestsManager() {
 
   if (requests.length === 0) {
     return (
-      <div className={styles.container} ref={containerRef}>
+      <div className={styles.container}>
         <EventRequestHeader totalRequests={0} />
         <div style={{ textAlign: "center", padding: "2rem", color: "#666" }}>
           Hiện chưa có yêu cầu đăng ký nào
@@ -248,7 +243,7 @@ export default function EventRequestsManager() {
   }
 
   return (
-    <div className={styles.container} ref={containerRef}>
+    <div className={styles.container}>
       <EventRequestHeader totalRequests={totalElements} />
       <EventRequestList
         requests={requests}
