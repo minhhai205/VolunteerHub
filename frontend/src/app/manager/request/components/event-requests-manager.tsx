@@ -185,15 +185,28 @@ export default function EventRequestsManager() {
         <div className={styles.skeletonGrid}>
           {Array.from({ length: pageSize }).map((_, i) => (
             <div key={i} className={styles.requestCardSkeleton}>
-              <div className={`${styles.skeleton} ${styles.skeletonAvatar}`}></div>
+              <div
+                className={`${styles.skeleton} ${styles.skeletonAvatar}`}
+              ></div>
               <div className={styles.skeletonContent}>
-                <div className={`${styles.skeleton} ${styles.skeletonTitle}`}></div>
-                <div className={`${styles.skeleton} ${styles.skeletonText}`}></div>
-                <div className={`${styles.skeleton} ${styles.skeletonText}`} style={{ width: "70%" }}></div>
+                <div
+                  className={`${styles.skeleton} ${styles.skeletonTitle}`}
+                ></div>
+                <div
+                  className={`${styles.skeleton} ${styles.skeletonText}`}
+                ></div>
+                <div
+                  className={`${styles.skeleton} ${styles.skeletonText}`}
+                  style={{ width: "70%" }}
+                ></div>
               </div>
               <div className={styles.skeletonActions}>
-                <div className={`${styles.skeleton} ${styles.skeletonButton}`}></div>
-                <div className={`${styles.skeleton} ${styles.skeletonButton}`}></div>
+                <div
+                  className={`${styles.skeleton} ${styles.skeletonButton}`}
+                ></div>
+                <div
+                  className={`${styles.skeleton} ${styles.skeletonButton}`}
+                ></div>
               </div>
             </div>
           ))}
