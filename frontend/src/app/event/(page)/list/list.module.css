@@ -342,3 +342,68 @@
   font-weight: 500;
   color: #6b7280;
 }
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #e5e5e5 25%, #f0f0f0 50%, #e5e5e5 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+.eventCardSkeleton {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.skeletonImage {
+  width: 100%;
+  height: 200px;
+  border-radius: 0.5rem;
+  background: linear-gradient(90deg, #e5e5e5 25%, #f0f0f0 50%, #e5e5e5 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+.skeletonContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.skeletonText {
+  height: 1rem;
+  border-radius: 0.25rem;
+  background: linear-gradient(90deg, #e5e5e5 25%, #f0f0f0 50%, #e5e5e5 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+.skeletonTitle {
+  height: 1.5rem;
+  width: 80%;
+}
+
+.skeletonDescription {
+  height: 3rem;
+  width: 100%;
+}
+
+.skeletonMeta {
+  height: 1rem;
+  width: 60%;
+  margin-top: auto;
+}
