@@ -133,7 +133,7 @@ public class EventService {
      * @return List event
      */
     public List<EventResponseDTO> getNewestPublishedEvents() {
-        log.info("------------ Get new est published events --------------");
+        log.info("------------ Get newest published events --------------");
 
         Pageable pageable = PageRequest.of(0, 6);
         List<Long> eventsIds = eventRepository.findNewestPublishedEvents(pageable)
