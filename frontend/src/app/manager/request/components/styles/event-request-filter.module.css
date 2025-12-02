@@ -14,7 +14,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  background-color: #e8f5e9;
+  background-color: #ffffff;
   color: #666;
 }
 
@@ -30,66 +30,34 @@
 .filterButton.active {
   font-weight: 600;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background-color: #e8f5e9;
 }
 
-/* Nút Tất cả */
-.filterAll {
-  border-color: #1976d2;
-  color: #1976d2;
+/* Tất cả các nút - viền xanh lá nhạt */
+.filterAll,
+.filterPending,
+.filterApproved,
+.filterRejected {
+  border-color: #81c784;
+  color: #81c784;
 }
 
-.filterAll:hover {
-  border-color: #1565c0;
+/* Hover - xanh lá vừa */
+.filterAll:hover,
+.filterPending:hover,
+.filterApproved:hover,
+.filterRejected:hover {
+  border-color: #66bb6a;
+  color: #66bb6a;
 }
 
-.filterAll.active {
-  border-color: #1565c0;
-  color: #1565c0;
-}
-
-/* Nút Chưa duyệt */
-.filterPending {
-  border-color: #f57c00;
-  color: #f57c00;
-}
-
-.filterPending:hover {
-  border-color: #ef6c00;
-}
-
-.filterPending.active {
-  border-color: #ef6c00;
-  color: #ef6c00;
-}
-
-/* Nút Đã duyệt */
-.filterApproved {
+/* Active - xanh lá đậm */
+.filterAll.active,
+.filterPending.active,
+.filterApproved.active,
+.filterRejected.active {
   border-color: #388e3c;
   color: #388e3c;
-}
-
-.filterApproved:hover {
-  border-color: #2e7d32;
-}
-
-.filterApproved.active {
-  border-color: #2e7d32;
-  color: #2e7d32;
-}
-
-/* Nút Đã từ chối */
-.filterRejected {
-  border-color: #d32f2f;
-  color: #d32f2f;
-}
-
-.filterRejected:hover {
-  border-color: #c62828;
-}
-
-.filterRejected.active {
-  border-color: #c62828;
-  color: #c62828;
 }
 
 /* Responsive */
