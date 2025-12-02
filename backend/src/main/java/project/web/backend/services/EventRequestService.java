@@ -168,8 +168,8 @@ public class EventRequestService {
         return eventRequestMapper.toResponseDTO(request);
     }
 
-    public PageResponseDTO<List<EventRegistrationResponseDTO>> getAllRegistration(Pageable pageable) {
-        Page<EventRegistration> registrations = eventRegistrationRepository.getAll(pageable);
+    public PageResponseDTO<List<EventRegistrationResponseDTO>> getAllRegistration(Pageable pageable, EventRequestStatus status) {
+        Page<EventRegistration> registrations = eventRegistrationRepository.getAll(pageable, status);
         List<EventRegistrationResponseDTO> dtos = registrations.stream()
                 .map(eventRequestMapper::toEventRegistrationResponseDTO)
                 .toList();

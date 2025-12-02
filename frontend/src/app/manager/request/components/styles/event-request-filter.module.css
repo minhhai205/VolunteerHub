@@ -1,0 +1,83 @@
+.filterContainer {
+  display: flex;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 0 16px;
+  flex-wrap: wrap;
+}
+
+.filterButton {
+  padding: 10px 20px;
+  border: 2px solid;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #ffffff;
+  color: #666;
+}
+
+.filterButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filterButton:active {
+  transform: translateY(0);
+}
+
+.filterButton.active {
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background-color: #e8f5e9;
+}
+
+/* Tất cả các nút - viền xanh lá nhạt */
+.filterAll,
+.filterPending,
+.filterApproved,
+.filterRejected {
+  border-color: #81c784;
+  color: #81c784;
+}
+
+/* Hover - xanh lá vừa */
+.filterAll:hover,
+.filterPending:hover,
+.filterApproved:hover,
+.filterRejected:hover {
+  border-color: #66bb6a;
+  color: #66bb6a;
+}
+
+/* Active - xanh lá đậm */
+.filterAll.active,
+.filterPending.active,
+.filterApproved.active,
+.filterRejected.active {
+  border-color: #388e3c;
+  color: #388e3c;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .filterContainer {
+    gap: 8px;
+  }
+
+  .filterButton {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .filterContainer {
+    flex-direction: column;
+  }
+
+  .filterButton {
+    width: 100%;
+  }
+}

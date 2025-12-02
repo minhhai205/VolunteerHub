@@ -1,0 +1,64 @@
+.hero {
+  position: relative;
+  min-height: 500px;
+  background: linear-gradient(
+    135deg,
+    rgb(200, 242, 200) 0%,
+    rgb(220, 248, 220) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 60px 20px;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  max-width: 700px;
+}
+
+.heroTitle {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: rgb(34, 95, 34);
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
+}
+
+.heroDescription {
+  font-size: 1.25rem;
+  color: rgb(68, 140, 68);
+  line-height: 1.6;
+}
+
+.heroDecor {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(
+    circle,
+    rgba(86, 180, 86, 0.15) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  top: -50px;
+  right: -100px;
+}
+
+@media (max-width: 768px) {
+  .heroTitle {
+    font-size: 2.5rem;
+  }
+
+  .heroDescription {
+    font-size: 1rem;
+  }
+
+  .heroDecor {
+    width: 250px;
+    height: 250px;
+  }
+}

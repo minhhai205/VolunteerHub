@@ -46,7 +46,7 @@ export default function EventCard({
       : description;
 
   return (
-    <Link href={`/events/${id}`} className={styles.eventCardLink}>
+    <Link href={`/event/detail/${id}`} className={styles.eventCardLink}>
       <div className={styles.eventCard}>
         {imageUrl && (
           <div className={styles.eventCardImageWrapper}>

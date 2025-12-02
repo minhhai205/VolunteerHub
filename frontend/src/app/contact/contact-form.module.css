@@ -1,0 +1,157 @@
+.formSection {
+  padding: 80px 20px;
+  background: linear-gradient(
+    135deg,
+    rgb(235, 245, 235) 0%,
+    rgb(245, 250, 245) 100%
+  );
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: rgb(34, 95, 34);
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.description {
+  font-size: 1.05rem;
+  color: rgb(100, 130, 100);
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.successMessage {
+  background: linear-gradient(135deg, rgb(200, 242, 200), rgb(220, 248, 220));
+  border-left: 5px solid rgb(86, 180, 86);
+  padding: 20px;
+  border-radius: 8px;
+  color: rgb(34, 95, 34);
+  font-weight: 500;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.form {
+  background: white;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 8px 30px rgba(86, 180, 86, 0.12);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-bottom: 25px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgb(34, 95, 34);
+  margin-bottom: 8px;
+}
+
+.input,
+.select {
+  padding: 12px 15px;
+  border: 2px solid rgb(220, 248, 220);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: rgb(34, 95, 34);
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: rgb(86, 180, 86);
+  box-shadow: 0 0 0 3px rgba(86, 180, 86, 0.1);
+}
+
+.input::placeholder {
+  color: rgb(150, 180, 150);
+}
+
+.textarea {
+  padding: 12px 15px;
+  border: 2px solid rgb(220, 248, 220);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: rgb(34, 95, 34);
+  resize: vertical;
+  min-height: 150px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: rgb(86, 180, 86);
+  box-shadow: 0 0 0 3px rgba(86, 180, 86, 0.1);
+}
+
+.textarea::placeholder {
+  color: rgb(150, 180, 150);
+}
+
+.submitButton {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, rgb(86, 180, 86), rgb(56, 140, 56));
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+}
+
+.submitButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(86, 180, 86, 0.3);
+}
+
+.submitButton:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .formSection {
+    padding: 60px 20px;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .form {
+    padding: 25px;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .formGroup {
+    margin-bottom: 20px;
+  }
+}
