@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import project.web.backend.entities.Event;
 import project.web.backend.entities.EventRegistration;
+import project.web.backend.utils.enums.EventRequestStatus;
 
 import java.util.Optional;
 
@@ -17,8 +18,12 @@ public interface EventRegistrationRepository extends JpaRepository<EventRegistra
             SELECT er FROM EventRegistration er
             JOIN FETCH er.user u
             JOIN FETCH er.event e
+            WHERE (:status IS NULL OR er.status = :status)
             """)
-    public Page<EventRegistration> getAll(Pageable pageable);
+    Page<EventRegistration> getAll(
+            Pageable pageable,
+            @Param("status") EventRequestStatus status
+    );
 
     @Query("""
             SELECT er FROM EventRegistration er
