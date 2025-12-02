@@ -94,3 +94,81 @@
     justify-content: center;
   }
 }
+
+/* Skeleton Loading Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #e5e5e5 25%, #f0f0f0 50%, #e5e5e5 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.requestCardSkeleton {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 280px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.skeletonAvatar {
+  width: 100%;
+  height: 80px;
+  border-radius: 0.5rem;
+}
+
+.skeletonContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.skeletonTitle {
+  height: 1.25rem;
+  width: 85%;
+  border-radius: 0.25rem;
+}
+
+.skeletonText {
+  height: 1rem;
+  width: 100%;
+  border-radius: 0.25rem;
+}
+
+.skeletonActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.skeletonButton {
+  height: 2.5rem;
+  flex: 1;
+  border-radius: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .skeletonGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
