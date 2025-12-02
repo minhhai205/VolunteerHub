@@ -1,0 +1,83 @@
+.mapSection {
+  padding: 80px 20px;
+  background: white;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: rgb(34, 95, 34);
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  color: rgb(100, 130, 100);
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.mapContainer {
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 40px;
+  box-shadow: 0 8px 30px rgba(86, 180, 86, 0.12);
+}
+
+.addressCard {
+  background: linear-gradient(
+    135deg,
+    rgb(245, 250, 245) 0%,
+    rgb(235, 245, 235) 100%
+  );
+  border-left: 5px solid rgb(86, 180, 86);
+  padding: 30px;
+  border-radius: 12px;
+  margin-top: 40px;
+}
+
+.addressTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: rgb(34, 95, 34);
+  margin-bottom: 15px;
+}
+
+.addressText {
+  font-size: 1rem;
+  color: rgb(68, 140, 68);
+  line-height: 1.8;
+}
+
+.addressText strong {
+  color: rgb(34, 95, 34);
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .mapSection {
+    padding: 60px 20px;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .addressCard {
+    padding: 25px;
+  }
+
+  .addressTitle {
+    font-size: 1.25rem;
+  }
+
+  .addressText {
+    font-size: 0.95rem;
+  }
+}
