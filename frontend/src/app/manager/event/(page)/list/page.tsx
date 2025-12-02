@@ -87,6 +87,12 @@ export default function EventsPage() {
 
   // Debounce timer ref
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Scroll to top khi currentPage thay đổi
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
+
   useEffect(() => {
     const fetchEvents = async () => {
       setIsLoading(true);

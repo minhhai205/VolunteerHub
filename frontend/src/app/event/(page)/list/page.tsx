@@ -1,7 +1,7 @@
 "use client";
 
 import { Search, Filter, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useEventList } from "../../hooks/useList";
 import styles from "./list.module.css";
 import { Header } from "@/components/static/Header";
@@ -12,6 +12,7 @@ export default function DashboardPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(9);
+  const [displayLoading, setDisplayLoading] = useState(false);
 
   const pageable = {
     page,
@@ -22,6 +23,22 @@ export default function DashboardPage() {
     search,
     pageable
   );
+
+  // Show loading skeleton và scroll to top khi page thay đổi
+  useEffect(() => {
+    setDisplayLoading(true);
+    window.scrollTo(0, 0);
+  }, [page]);
+
+  // Hide loading skeleton khi data load xong
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => {
+        setDisplayLoading(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -76,11 +93,33 @@ export default function DashboardPage() {
           </div>
 
           {/* Trạng thái tải */}
-          {loading && <p>Đang tải danh sách sự kiện...</p>}
+          {displayLoading && (
+            <div className={styles.eventsGrid}>
+              {[...Array(size)].map((_, index) => (
+                <div
+                  key={index}
+                  className={`${styles.eventCardSkeleton} ${styles.skeleton}`}
+                >
+                  <div className={`${styles.skeletonImage}`} />
+                  <div className={styles.skeletonContent}>
+                    <div
+                      className={`${styles.skeletonText} ${styles.skeletonTitle}`}
+                    />
+                    <div
+                      className={`${styles.skeletonText} ${styles.skeletonDescription}`}
+                    />
+                    <div
+                      className={`${styles.skeletonText} ${styles.skeletonMeta}`}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           {error && <p className={styles.error}>{error}</p>}
 
           {/* Hiển thị danh sách */}
-          {!loading && !error && events.length > 0 && (
+          {!displayLoading && !error && events.length > 0 && (
             <>
               <div className={styles.eventsGrid}>
                 {events.map((event) => (
@@ -136,7 +175,7 @@ export default function DashboardPage() {
           )}
 
           {/* Không có sự kiện */}
-          {!loading && !error && events.length === 0 && (
+          {!displayLoading && !error && events.length === 0 && (
             <p>Không có sự kiện nào để hiển thị.</p>
           )}
         </section>

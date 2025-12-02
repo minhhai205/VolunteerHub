@@ -27,11 +27,12 @@ type FilterStatus = "pending" | "approved" | "rejected" | null;
 export default function EventRequestsManager() {
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
+  const [displayLoading, setDisplayLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<FilterStatus>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(4);
+  const [pageSize, setPageSize] = useState(6);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
 
@@ -85,11 +86,28 @@ export default function EventRequestsManager() {
     fetchRequests();
   }, []);
 
+
   const handleFilterChange = (status: FilterStatus) => {
     setFilterStatus(status);
     setCurrentPage(1);
     fetchRequests(0, pageSize, status);
   };
+  // Scroll to top and show loading skeleton when page changes
+  useEffect(() => {
+    setDisplayLoading(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
+
+  // Hide loading skeleton after data loads
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => {
+        setDisplayLoading(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
+
 
   const handleApprove = async (id: number) => {
     try {
@@ -169,11 +187,38 @@ export default function EventRequestsManager() {
     }
   };
 
-  if (loading) {
+  if (displayLoading) {
     return (
       <div className={styles.container}>
-        <div style={{ textAlign: "center", padding: "2rem" }}>
-          Đang tải dữ liệu...
+        <EventRequestHeader totalRequests={0} />
+        <div className={styles.skeletonGrid}>
+          {Array.from({ length: pageSize }).map((_, i) => (
+            <div key={i} className={styles.requestCardSkeleton}>
+              <div
+                className={`${styles.skeleton} ${styles.skeletonAvatar}`}
+              ></div>
+              <div className={styles.skeletonContent}>
+                <div
+                  className={`${styles.skeleton} ${styles.skeletonTitle}`}
+                ></div>
+                <div
+                  className={`${styles.skeleton} ${styles.skeletonText}`}
+                ></div>
+                <div
+                  className={`${styles.skeleton} ${styles.skeletonText}`}
+                  style={{ width: "70%" }}
+                ></div>
+              </div>
+              <div className={styles.skeletonActions}>
+                <div
+                  className={`${styles.skeleton} ${styles.skeletonButton}`}
+                ></div>
+                <div
+                  className={`${styles.skeleton} ${styles.skeletonButton}`}
+                ></div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
