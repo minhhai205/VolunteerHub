@@ -61,7 +61,7 @@ const Navbar = () => {
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent sideOffset={10}>
+          <DropdownMenuContent sideOffset={10} align="end">
             <DropdownMenuLabel>Tên tài khoản</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
