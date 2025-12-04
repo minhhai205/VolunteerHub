@@ -19,7 +19,12 @@ interface UserListResponse {
   };
 }
 
-export function useUserList(page = 1, pageSize = 10, role?: string) {
+export function useUserList(
+  page = 1,
+  pageSize = 10,
+  role?: string,
+  search = ""
+) {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +34,7 @@ export function useUserList(page = 1, pageSize = 10, role?: string) {
     totalPage: 1,
   });
 
-  // refetch whenever page / pageSize / role changes
+  // refetch whenever page / pageSize / role / search changes
   useEffect(() => {
     let mounted = true;
     const fetchUsers = async () => {
@@ -45,6 +50,8 @@ export function useUserList(page = 1, pageSize = 10, role?: string) {
         params.set("page", String(apiPage)); // backend expects 0-based
         params.set("size", String(pageSize));
         if (role) params.set("role", role);
+        if (search.trim()) params.set("search", search.trim());
+
         const url = `http://localhost:8080/api/user/user-list?${params.toString()}`;
 
         const res = await fetchWithAuth(url, {
@@ -80,10 +87,10 @@ export function useUserList(page = 1, pageSize = 10, role?: string) {
     return () => {
       mounted = false;
     };
-  }, [page, pageSize, role]);
+  }, [page, pageSize, role, search]);
 
   const refresh = () => {
-    // callers can change page/role to trigger refetch; provide placeholder refresh if needed
+    // callers can change page/role/search to trigger refetch
     setTimeout(() => {}, 0);
   };
 

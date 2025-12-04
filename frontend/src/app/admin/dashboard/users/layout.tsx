@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useTransition } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Users, UserCog } from "lucide-react";
+import { Search, Users, UserCog, Loader2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import UserDetailDialog from "./components/UserDetailDialog";
 import LockDialog from "./components/LockDialog";
@@ -12,10 +12,14 @@ import { User } from "@/lib/mockData";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { UsersModalProvider, useUsersModal } from "./UserModelContext";
+import { UserSearchProvider, useUserSearch } from "./UserSearchContext";
 import { useLockUser } from "./hooks/useLockUser";
+import { useDebouncedCallback } from "use-debounce";
 
 function UsersInnerLayout({ children }: { children: React.ReactNode }) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const { searchQuery, setSearchQuery, isSearching, setIsSearching } =
+    useUserSearch();
+  const [inputValue, setInputValue] = useState(searchQuery);
   const pathname = usePathname();
   const router = useRouter();
   const {
@@ -26,6 +30,28 @@ function UsersInnerLayout({ children }: { children: React.ReactNode }) {
     closeDetail,
     closeLock,
   } = useUsersModal();
+
+  // Debounce search với loading state
+  const debouncedSetSearch = useDebouncedCallback((value: string) => {
+    // Giả lập delay nhỏ để UI mượt hơn
+    setTimeout(() => {
+      setSearchQuery(value);
+      // Đợi thêm một chút trước khi tắt loading
+      setTimeout(() => {
+        setIsSearching(false);
+      }, 200);
+    }, 100);
+  }, 400);
+
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setInputValue(value);
+      setIsSearching(true);
+      debouncedSetSearch(value);
+    },
+    [debouncedSetSearch, setIsSearching]
+  );
 
   const getStatusBadge = (status: User["status"]) =>
     status === "active" ? (
@@ -38,7 +64,6 @@ function UsersInnerLayout({ children }: { children: React.ReactNode }) {
   const handleConfirmLock = async () => {
     if (!selectedUser) return;
 
-    // optimistic update: broadcast change to UI immediately
     const lock = lockAction === "lock";
     window.dispatchEvent(
       new CustomEvent("user-lock-optimistic", {
@@ -46,24 +71,19 @@ function UsersInnerLayout({ children }: { children: React.ReactNode }) {
       })
     );
 
-    // Gọi API bằng hook mới
     const success = await handleLockToggle(selectedUser.id, lockAction);
 
     if (success) {
-      // Nếu API thành công:
       toast.success(
         lockAction === "lock" ? "Đã khóa tài khoản" : "Đã mở khóa tài khoản"
       );
-      // we could broadcast a committed event if needed
       window.dispatchEvent(
         new CustomEvent("user-lock-committed", {
           detail: { userId: selectedUser.id, lock },
         })
       );
-      closeLock(); // Đóng dialog
-      // refresh(); // Tải lại danh sách user (optional)
+      closeLock();
     } else {
-      // Nếu API thất bại: revert the optimistic change by asking page to re-sync from server state
       window.dispatchEvent(
         new CustomEvent("user-lock-revert", {
           detail: { userId: selectedUser.id },
@@ -86,19 +106,19 @@ function UsersInnerLayout({ children }: { children: React.ReactNode }) {
           </header>
 
           {/* search bar */}
-          <Card>
-            <CardContent>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Tìm kiếm người dùng..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <div className="relative">
+            {isSearching ? (
+              <Loader2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground animate-spin" />
+            ) : (
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            )}
+            <Input
+              placeholder="Tìm kiếm người dùng theo tên hoặc email..."
+              value={inputValue}
+              onChange={handleSearchChange}
+              className="pl-10 transition-all duration-200"
+            />
+          </div>
 
           {/* tabs navigation */}
           <Tabs
@@ -118,15 +138,20 @@ function UsersInnerLayout({ children }: { children: React.ReactNode }) {
             </TabsList>
           </Tabs>
 
-          {/* tab content */}
-          {children}
+          {/* tab content with transition */}
+          <div
+            className={`transition-opacity duration-200 ${
+              isSearching ? "opacity-50" : "opacity-100"
+            }`}
+          >
+            {children}
+          </div>
         </main>
 
         <UserDetailDialog
           open={showDetailDialog}
           onOpenChange={(v) => (v ? null : closeDetail())}
           user={selectedUser}
-          // getRoleBadge={() => {}}
           getStatusBadge={getStatusBadge}
         />
 
@@ -148,8 +173,10 @@ export default function UsersLayout({
   children: React.ReactNode;
 }) {
   return (
-    <UsersModalProvider>
-      <UsersInnerLayout>{children}</UsersInnerLayout>
-    </UsersModalProvider>
+    <UserSearchProvider>
+      <UsersModalProvider>
+        <UsersInnerLayout>{children}</UsersInnerLayout>
+      </UsersModalProvider>
+    </UserSearchProvider>
   );
 }
