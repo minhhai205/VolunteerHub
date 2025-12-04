@@ -68,8 +68,30 @@ export default function EventsPage() {
   const pageSize = 4;
   const [totalPages, setTotalPages] = useState(0);
 
+  const getStatusParam = (
+    filter: "all" | "upcoming" | "ongoing" | "completed"
+  ): string => {
+    switch (filter) {
+      case "all":
+        return "0";
+      case "upcoming":
+        return "1";
+      case "ongoing":
+        return "2";
+      case "completed":
+        return "3";
+      default:
+        return "0";
+    }
+  };
+
   // Debounce timer ref
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Scroll to top khi currentPage thay đổi
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -90,6 +112,7 @@ export default function EventsPage() {
         console.log(params);
 
         params.append("search", searchQuery.trim());
+        params.append("status", getStatusParam(activeFilter));
 
         const response = await fetch(
           `http://localhost:8080/api/event/manager/my-event?${params.toString()}`,
@@ -150,7 +173,7 @@ export default function EventsPage() {
     };
 
     fetchEvents();
-  }, [currentPage, pageSize, searchQuery]);
+  }, [currentPage, pageSize, searchQuery, activeFilter]);
 
   // Cleanup timeout khi component unmount
   useEffect(() => {
@@ -180,7 +203,7 @@ export default function EventsPage() {
     filter: "all" | "upcoming" | "ongoing" | "completed"
   ) => {
     setActiveFilter(filter);
-    // setCurrentPage(0);
+    setCurrentPage(0);
   };
 
   const handlePageChange = (newPage: number) => {

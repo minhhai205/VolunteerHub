@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import EventRequestHeader from "./event-request-header";
 import EventRequestList from "./event-request-list";
 import styles from "./styles/event-requests.module.css";
+import filterStyles from "./styles/event-request-filter.module.css";
 import { Request } from "./event-request-list";
 import { getAccessToken } from "@/lib/token";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
@@ -13,7 +14,7 @@ interface ApiResponse {
   status: number;
   message: string;
   data: {
-    pageNo: number; // BE trả index 0
+    pageNo: number;
     pageSize: number;
     totalPage: number;
     total: number;
@@ -21,37 +22,43 @@ interface ApiResponse {
   };
 }
 
+type FilterStatus = "pending" | "approved" | "rejected" | null;
+
 export default function EventRequestsManager() {
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
+  const [displayLoading, setDisplayLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>(null);
 
-  // FE sử dụng page = 1 làm chuẩn
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(4);
+  const [pageSize, setPageSize] = useState(6);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
 
   const token = getAccessToken();
 
-  // Fetch dữ liệu theo page FE (page FE = 1 → gửi lên BE = 0)
   const fetchRequests = async (
-    page: number = currentPage - 1, // FE page → BE page index
-    size: number = pageSize
+    page: number = currentPage - 1,
+    size: number = pageSize,
+    status: FilterStatus = filterStatus
   ) => {
     try {
       setLoading(true);
 
-      const response = await fetchWithAuth(
-        `http://localhost:8080/api/event-request/registration-list?page=${page}&size=${size}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        }
-      );
+      let url = `http://localhost:8080/api/event-request/registration-list?page=${page}&size=${size}`;
+
+      if (status) {
+        url += `&status=${status}`;
+      }
+
+      const response = await fetchWithAuth(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
 
       if (!response.ok) {
         throw new Error("Không thể tải danh sách yêu cầu");
@@ -65,10 +72,7 @@ export default function EventRequestsManager() {
       setRequests(result.data.data);
       setTotalPages(result.data.totalPage);
       setTotalElements(result.data.total);
-
-      // BE trả page index 0 → FE index = +1
       setCurrentPage(result.data.pageNo + 1);
-
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Đã xảy ra lỗi");
@@ -81,6 +85,29 @@ export default function EventRequestsManager() {
   useEffect(() => {
     fetchRequests();
   }, []);
+
+
+  const handleFilterChange = (status: FilterStatus) => {
+    setFilterStatus(status);
+    setCurrentPage(1);
+    fetchRequests(0, pageSize, status);
+  };
+  // Scroll to top and show loading skeleton when page changes
+  useEffect(() => {
+    setDisplayLoading(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
+
+  // Hide loading skeleton after data loads
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => {
+        setDisplayLoading(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
+
 
   const handleApprove = async (id: number) => {
     try {
@@ -154,18 +181,44 @@ export default function EventRequestsManager() {
     }
   };
 
-  // FE page → BE page index
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
-      fetchRequests(page - 1, pageSize);
+      fetchRequests(page - 1, pageSize, filterStatus);
     }
   };
 
-  if (loading) {
+  if (displayLoading) {
     return (
       <div className={styles.container}>
-        <div style={{ textAlign: "center", padding: "2rem" }}>
-          Đang tải dữ liệu...
+        <EventRequestHeader totalRequests={0} />
+        <div className={styles.skeletonGrid}>
+          {Array.from({ length: pageSize }).map((_, i) => (
+            <div key={i} className={styles.requestCardSkeleton}>
+              <div
+                className={`${styles.skeleton} ${styles.skeletonAvatar}`}
+              ></div>
+              <div className={styles.skeletonContent}>
+                <div
+                  className={`${styles.skeleton} ${styles.skeletonTitle}`}
+                ></div>
+                <div
+                  className={`${styles.skeleton} ${styles.skeletonText}`}
+                ></div>
+                <div
+                  className={`${styles.skeleton} ${styles.skeletonText}`}
+                  style={{ width: "70%" }}
+                ></div>
+              </div>
+              <div className={styles.skeletonActions}>
+                <div
+                  className={`${styles.skeleton} ${styles.skeletonButton}`}
+                ></div>
+                <div
+                  className={`${styles.skeleton} ${styles.skeletonButton}`}
+                ></div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -187,90 +240,124 @@ export default function EventRequestsManager() {
     );
   }
 
-  if (requests.length === 0) {
-    return (
-      <div className={styles.container}>
-        <EventRequestHeader totalRequests={0} />
-        <div style={{ textAlign: "center", padding: "2rem", color: "#666" }}>
-          Hiện chưa có yêu cầu đăng ký nào
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className={styles.container}>
       <EventRequestHeader totalRequests={totalElements} />
-      <EventRequestList
-        requests={requests}
-        onApprove={handleApprove}
-        onReject={handleReject}
-      />
 
-      {/* Pagination */}
-      <div className={styles.paginationContainer}>
-        <div className={styles.paginationButtons}>
-          <button
-            onClick={() => handlePageChange(1)}
-            disabled={currentPage === 1}
-            className={styles.pageButton}
-          >
-            ««
-          </button>
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={styles.pageButton}
-          >
-            ‹
-          </button>
-
-          {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-            let pageNum;
-
-            if (totalPages <= 5) {
-              pageNum = i + 1;
-            } else if (currentPage <= 3) {
-              pageNum = i + 1;
-            } else if (currentPage >= totalPages - 2) {
-              pageNum = totalPages - 4 + i;
-            } else {
-              pageNum = currentPage - 2 + i;
-            }
-
-            return (
-              <button
-                key={pageNum}
-                onClick={() => handlePageChange(pageNum)}
-                className={`${styles.pageButton} ${
-                  currentPage === pageNum ? styles.activePage : ""
-                }`}
-              >
-                {pageNum}
-              </button>
-            );
-          })}
-
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className={styles.pageButton}
-          >
-            ›
-          </button>
-          <button
-            onClick={() => handlePageChange(totalPages)}
-            disabled={currentPage === totalPages}
-            className={styles.pageButton}
-          >
-            »»
-          </button>
-        </div>
-
-        <div className={styles.paginationInfo}>
-          Trang {currentPage} / {totalPages}
-        </div>
+      {/* Filter Buttons */}
+      <div className={filterStyles.filterContainer}>
+        <button
+          onClick={() => handleFilterChange(null)}
+          className={`${filterStyles.filterButton} ${filterStyles.filterAll} ${
+            filterStatus === null ? filterStyles.active : ""
+          }`}
+        >
+          Tất cả
+        </button>
+        <button
+          onClick={() => handleFilterChange("pending")}
+          className={`${filterStyles.filterButton} ${
+            filterStyles.filterPending
+          } ${filterStatus === "pending" ? filterStyles.active : ""}`}
+        >
+          Chưa duyệt
+        </button>
+        <button
+          onClick={() => handleFilterChange("approved")}
+          className={`${filterStyles.filterButton} ${
+            filterStyles.filterApproved
+          } ${filterStatus === "approved" ? filterStyles.active : ""}`}
+        >
+          Đã duyệt
+        </button>
+        <button
+          onClick={() => handleFilterChange("rejected")}
+          className={`${filterStyles.filterButton} ${
+            filterStyles.filterRejected
+          } ${filterStatus === "rejected" ? filterStyles.active : ""}`}
+        >
+          Đã từ chối
+        </button>
       </div>
+
+      {requests.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "2rem", color: "#666" }}>
+          Hiện chưa có yêu cầu đăng ký nào
+        </div>
+      ) : (
+        <>
+          <EventRequestList
+            requests={requests}
+            onApprove={handleApprove}
+            onReject={handleReject}
+          />
+
+          {/* Pagination */}
+          <div className={styles.paginationContainer}>
+            <div className={styles.paginationButtons}>
+              <button
+                onClick={() => handlePageChange(1)}
+                disabled={currentPage === 1}
+                className={styles.pageButton}
+              >
+                ««
+              </button>
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={styles.pageButton}
+              >
+                ‹
+              </button>
+
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                let pageNum;
+
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`${styles.pageButton} ${
+                      currentPage === pageNum ? styles.activePage : ""
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={styles.pageButton}
+              >
+                ›
+              </button>
+              <button
+                onClick={() => handlePageChange(totalPages)}
+                disabled={currentPage === totalPages}
+                className={styles.pageButton}
+              >
+                »»
+              </button>
+            </div>
+
+            <div className={styles.paginationInfo}>
+              Trang {currentPage} / {totalPages}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

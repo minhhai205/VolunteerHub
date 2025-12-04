@@ -66,23 +66,20 @@ export function LoginForm() {
       // Điều hướng theo role (ưu tiên redirect URL nếu có)
       toastManager.success("Đăng nhập thành công !");
 
-      const params = new URLSearchParams(window.location.search);
-      const redirectTo = params.get("redirect");
-
-      if (redirectTo) {
-        router.push(redirectTo);
-      } else {
-        switch (role) {
-          case "ADMIN":
-            router.push("/admin/dashboard");
-            break;
-          case "MANAGER":
-            router.push("/manager/dashboard");
-            break;
-          default:
-            router.push("/home");
-            break;
+      if (role === "USER") {
+        const params = new URLSearchParams(window.location.search);
+        const redirectTo = params.get("redirect");
+        if (redirectTo) {
+          router.push(redirectTo);
+        } else {
+          router.push("/home");
         }
+      } else if (role === "MANAGER") {
+        router.push("/manager/dashboard");
+      } else if (role === "ADMIN") {
+        router.push("/admin/dashboard");
+      } else {
+        throw new Error("Role invalid");
       }
     } catch (err) {
       console.error("Login error:", err);

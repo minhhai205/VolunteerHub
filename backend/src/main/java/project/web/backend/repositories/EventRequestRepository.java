@@ -26,6 +26,7 @@ public interface EventRequestRepository extends CrudRepository<EventCreateReques
 
     @Query("""
             SELECT ec FROM EventCreateRequest ec
+            ORDER BY ec.createdAt DESC
             """)
     Page<EventCreateRequest> findAllPagination(Pageable pageable);
 
@@ -41,5 +42,10 @@ public interface EventRequestRepository extends CrudRepository<EventCreateReques
     @EntityGraph(attributePaths = {
             "categories",
     })
-    List<EventCreateRequest> findByStatusIn(List<EventRequestStatus> statuses);
+    @Query("""
+            SELECT ec FROM EventCreateRequest ec
+            WHERE ec.status IN :status
+            ORDER BY ec.createdAt DESC
+            """)
+    List<EventCreateRequest> findByStatusIn(@Param("status") List<EventRequestStatus> status);
 }

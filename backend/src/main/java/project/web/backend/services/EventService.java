@@ -63,10 +63,10 @@ public class EventService {
                 .build();
     }
 
-    public PageResponseDTO<List<EventResponseDTO>> getManagerMyEvent(Pageable pageable, String search) {
+    public PageResponseDTO<List<EventResponseDTO>> getManagerMyEvent(Pageable pageable, String search, Integer status) {
         log.info("------------ Get manager events --------------");
         Page<Event> events = eventRepository.findManagerEvent(
-                SecurityUtil.getCurrentEmail(), search, pageable);
+                SecurityUtil.getCurrentEmail(), search, status, pageable);
         List<Long> eventsIds = events.stream().map(Event::getId).toList();
 
         List<Event> fetchedEvents = eventRepository.findWithCategoriesByIds(eventsIds);
@@ -133,7 +133,7 @@ public class EventService {
      * @return List event
      */
     public List<EventResponseDTO> getNewestPublishedEvents() {
-        log.info("------------ Get new est published events --------------");
+        log.info("------------ Get newest published events --------------");
 
         Pageable pageable = PageRequest.of(0, 6);
         List<Long> eventsIds = eventRepository.findNewestPublishedEvents(pageable)
