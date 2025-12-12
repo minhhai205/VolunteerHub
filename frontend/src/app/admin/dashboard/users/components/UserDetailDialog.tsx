@@ -8,13 +8,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import type { User } from "@/lib/mockData";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   user: User | null;
-  // getRoleBadge: (role: User["role"]) => React.ReactNode;
   getStatusBadge: (status: User["status"]) => React.ReactNode;
 };
 
@@ -22,9 +23,26 @@ export default function UserDetailDialog({
   open,
   onOpenChange,
   user,
-  // getRoleBadge,
   getStatusBadge,
 }: Props) {
+  const renderRoleBadge = (role: User["role"]) => {
+    if (!role) return null;
+    switch (role.name) {
+      case "ADMIN":
+        return (
+          <Badge className="bg-destructive text-destructive-foreground">
+            Admin
+          </Badge>
+        );
+      case "MANAGER":
+        return (
+          <Badge className="bg-primary text-primary-foreground">Quản lý</Badge>
+        );
+      default:
+        return <Badge>Người dùng</Badge>;
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
@@ -37,9 +55,14 @@ export default function UserDetailDialog({
         {user && (
           <div className="space-y-6">
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-2xl font-semibold text-primary-foreground">
-                {user.fullName}
-              </div>
+              <Avatar className="h-16 w-16 bg-primary text-2xl font-semibold text-primary-foreground">
+                {user.avatar ? (
+                  <AvatarImage src={user.avatar} alt={user.fullName} />
+                ) : (
+                  <AvatarFallback />
+                )}
+              </Avatar>
+
               <div>
                 <h3 className="text-xl font-semibold text-foreground">
                   {user.fullName}
@@ -47,58 +70,33 @@ export default function UserDetailDialog({
                 <p className="text-muted-foreground">{user.email}</p>
               </div>
             </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
                   Vai trò
                 </p>
-                {/* <div className="mt-1">{getRoleBadge(user.role.name)}</div> */}
+                <div className="mt-1">{renderRoleBadge(user.role)}</div>
               </div>
+
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
                   Trạng thái
                 </p>
                 <div className="mt-1">{getStatusBadge(user.status)}</div>
               </div>
+
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
-                  Ngày tham gia
+                  Số điện thoại
                 </p>
-                {/* <p className="text-foreground">
-                  {new Date(user.joinedAt).toLocaleDateString("vi-VN")}
-                </p> */}
-              </div>
-              {/* <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Sự kiện đã tham gia
-                </p>
-                <p className="text-foreground">{user.eventsJoined}</p>
-              </div> */}
-              {user.role.name === "MANAGER" && (
-                <div>
-                  {/* <p className="text-sm font-medium text-muted-foreground">
-                    Sự kiện đã tạo
-                  </p>
-                  <p className="text-foreground">{user.eventsCreated}</p> */}
+                <div className="mt-1 text-foreground">
+                  {user.phoneNumber ?? "Không có dữ liệu"}
                 </div>
-              )}
-            </div>
-            <div className="rounded-lg border border-border p-4">
-              <h4 className="mb-2 font-medium text-foreground">
-                Tóm tắt hoạt động
-              </h4>
-              <div className="space-y-2 text-sm text-muted-foreground">
-                {/* <p>• Tham gia {user.eventsJoined} sự kiện tình nguyện</p>
-                {user.role === "event_manager" && (
-                  <p>• Tạo {user.eventsCreated} sự kiện</p>
-                )}
-                <p> */}
-                • Thành viên từ{" "}
-                {/* {new Date(user.joinedAt).toLocaleDateString("vi-VN")} */}
-                {/* </p> */}
               </div>
+
+              {user.role.name === "MANAGER" && <div />}
             </div>
-            //{" "}
           </div>
         )}
 
