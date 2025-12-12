@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useRef,
+  useState,
+  useEffect,
+} from "react";
 import type { User } from "@/lib/mockData";
 
 type UsersModalContextType = {
@@ -32,22 +38,63 @@ export function UsersModalProvider({
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [lockAction, setLockAction] = useState<"lock" | "unlock">("lock");
 
+  // timeout ref for delayed clearing of selectedUser
+  const clearSelectedTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (clearSelectedTimeoutRef.current) {
+        clearTimeout(clearSelectedTimeoutRef.current);
+        clearSelectedTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
   const openDetail = (user: User) => {
+    // If there is a pending clear timeout, cancel it (we're reopening)
+    if (clearSelectedTimeoutRef.current) {
+      clearTimeout(clearSelectedTimeoutRef.current);
+      clearSelectedTimeoutRef.current = null;
+    }
     setSelectedUser(user);
     setShowDetailDialog(true);
   };
+
   const closeDetail = () => {
+    // Hide the dialog immediately (trigger close animation)
     setShowDetailDialog(false);
-    setSelectedUser(null);
+
+    // Delay clearing selectedUser until after close animation completes
+    // Adjust delay to match your dialog animation duration (250ms is a typical value)
+    if (clearSelectedTimeoutRef.current) {
+      clearTimeout(clearSelectedTimeoutRef.current);
+    }
+    clearSelectedTimeoutRef.current = window.setTimeout(() => {
+      setSelectedUser(null);
+      clearSelectedTimeoutRef.current = null;
+    }, 250);
   };
+
   const openLock = (user: User, action: "lock" | "unlock") => {
+    // same pattern: cancel pending clear so lock dialog can use selectedUser
+    if (clearSelectedTimeoutRef.current) {
+      clearTimeout(clearSelectedTimeoutRef.current);
+      clearSelectedTimeoutRef.current = null;
+    }
     setSelectedUser(user);
     setLockAction(action);
     setShowLockDialog(true);
   };
   const closeLock = () => {
     setShowLockDialog(false);
-    setSelectedUser(null);
+    // delay clearing so other modals/animations can finish if needed
+    if (clearSelectedTimeoutRef.current) {
+      clearTimeout(clearSelectedTimeoutRef.current);
+    }
+    clearSelectedTimeoutRef.current = window.setTimeout(() => {
+      setSelectedUser(null);
+      clearSelectedTimeoutRef.current = null;
+    }, 250);
   };
 
   const openCreate = () => {
