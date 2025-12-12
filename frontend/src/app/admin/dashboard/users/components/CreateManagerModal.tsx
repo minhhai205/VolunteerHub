@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Mail, Lock } from "lucide-react";
+import { User, Mail, Lock, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
@@ -27,6 +27,7 @@ export default function CreateManagerModal({ open, onOpenChange }: Props) {
     email: "",
     password: "",
     confirmPassword: "",
+    phoneNumber: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +53,7 @@ export default function CreateManagerModal({ open, onOpenChange }: Props) {
           fullName: form.fullName,
           email: form.email,
           password: form.password,
+          phoneNumber: form.phoneNumber,
           role: "MANAGER",
         }),
       });
@@ -128,6 +130,26 @@ export default function CreateManagerModal({ open, onOpenChange }: Props) {
                 className="pl-12 h-12"
                 autoComplete="off"
                 placeholder="Email (ví dụ: example@domain.com)"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label
+              htmlFor="phoneNumber"
+              className="mb-2 block text-sm font-medium"
+            >
+              Số điện thoại
+            </Label>
+            <div className="relative">
+              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Input
+                id="phoneNumber"
+                value={form.phoneNumber}
+                onChange={(e) => update("phoneNumber", e.target.value)}
+                className="pl-12 h-12"
+                placeholder="Số điện thoại (ví dụ: 0123456789)"
                 required
               />
             </div>
