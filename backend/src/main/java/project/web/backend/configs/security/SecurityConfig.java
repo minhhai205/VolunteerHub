@@ -35,7 +35,8 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/api/chat/**",
             "/api/event/newest",
-            "/api/event/trending"
+            "/api/event/trending",
+            "/api/event/suggestions"
     };
 
     @Bean
