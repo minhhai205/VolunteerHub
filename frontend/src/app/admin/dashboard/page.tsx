@@ -4,6 +4,7 @@
 import EventStats from "./components/EventStats";
 import NewEventsSection from "./components/NewEventsSection";
 import TrendingEventsSection from "./components/TrendingEventsSection";
+import RecentPostsSection from "./components/recent-posts-section";
 
 export default function DashboardPage() {
   return (
@@ -20,6 +21,7 @@ export default function DashboardPage() {
           <NewEventsSection />
           <TrendingEventsSection />
         </div>
+        <RecentPostsSection />
       </div>
     </main>
   );
