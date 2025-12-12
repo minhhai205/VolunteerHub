@@ -226,7 +226,7 @@ export default function DashboardPage() {
             <Search className={styles.searchIcon} />
             <input
               type="text"
-              placeholder="Tìm kiếm sự kiện theo tên sự kiện hoặc mô tả..."
+              placeholder="Tìm kiếm sự kiện..."
               className={styles.searchInput}
               value={searchInput}
               onChange={handleSearchChange}
