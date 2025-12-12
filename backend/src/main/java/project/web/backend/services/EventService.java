@@ -18,6 +18,7 @@ import project.web.backend.entities.User;
 import project.web.backend.exceptions.AppException;
 import project.web.backend.mappers.EventMapper;
 import project.web.backend.repositories.*;
+import project.web.backend.utils.commons.AppConst;
 import project.web.backend.utils.commons.SecurityUtil;
 import project.web.backend.utils.enums.ErrorCode;
 import project.web.backend.utils.enums.EventRequestStatus;
@@ -161,8 +162,8 @@ public class EventService {
 
         // Tránh phân trang trên memory
         Pageable pageable = PageRequest.of(0, 6);
-        int minMembers = 0;
-        List<Long> eventsIds = eventRepository.findTopTrendingEventsByManager(currentUser.getId(), minMembers, pageable)
+        List<Long> eventsIds = eventRepository.findTopTrendingEventsByManager(
+                        currentUser.getId(), AppConst.numberOfMemberForTrendingEvent, pageable)
                 .stream().map(Event::getId).toList();
 
         List<Event> events = eventRepository.findEventByIdIn(eventsIds);

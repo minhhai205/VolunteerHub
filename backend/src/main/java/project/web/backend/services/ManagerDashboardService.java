@@ -7,6 +7,7 @@ import project.web.backend.dtos.response.dashboard.ManagerDashboardResponseDTO;
 import project.web.backend.repositories.EventMemberRepository;
 import project.web.backend.repositories.EventRepository;
 import project.web.backend.repositories.PostRepository;
+import project.web.backend.utils.commons.AppConst;
 import project.web.backend.utils.commons.SecurityUtil;
 
 import java.time.LocalDateTime;
@@ -36,9 +37,10 @@ public class ManagerDashboardService {
                 () -> eventMemberRepository.countByManagerEmail(email), executor
         );
 
-        // Đếm sô event có ít nhất n thành viên tham gia (ở đây là 1)
+        // Đếm sô event có ít nhất n thành viên tham gia
         CompletableFuture<Long> trendingEventsFuture = CompletableFuture.supplyAsync(
-                () -> eventRepository.countTopTrendingEventsByManagerEmail(email, 1), executor
+                () -> eventRepository.countTopTrendingEventsByManagerEmail(
+                        email, AppConst.numberOfMemberForTrendingEvent), executor
         );
 
         // Đếm số post 7 ngày gần nhất
