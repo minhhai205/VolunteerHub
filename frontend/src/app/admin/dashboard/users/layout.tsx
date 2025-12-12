@@ -4,7 +4,7 @@ import { useState, useCallback, useTransition } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Users, UserCog, Loader2 } from "lucide-react";
+import { Search, Users, UserCog, Loader2, Plus } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import UserDetailDialog from "./components/UserDetailDialog";
 import LockDialog from "./components/LockDialog";
@@ -15,6 +15,8 @@ import { UsersModalProvider, useUsersModal } from "./UserModelContext";
 import { UserSearchProvider, useUserSearch } from "./UserSearchContext";
 import { useLockUser } from "./hooks/useLockUser";
 import { useDebouncedCallback } from "use-debounce";
+import { Button } from "@/components/ui/button";
+import CreateManagerModal from "./components/CreateManagerModal";
 
 function UsersInnerLayout({ children }: { children: React.ReactNode }) {
   const { searchQuery, setSearchQuery, isSearching, setIsSearching } =
@@ -27,8 +29,11 @@ function UsersInnerLayout({ children }: { children: React.ReactNode }) {
     lockAction,
     showDetailDialog,
     showLockDialog,
+    showCreateDialog,
     closeDetail,
     closeLock,
+    openCreate,
+    closeCreate,
   } = useUsersModal();
 
   // Debounce search với loading state
@@ -138,6 +143,13 @@ function UsersInnerLayout({ children }: { children: React.ReactNode }) {
             </TabsList>
           </Tabs>
 
+          {/* button to create manager */}
+          {pathname.includes("managers") && (
+            <Button size="sm" onClick={openCreate}>
+              <Plus className="mr-2 h-4 w-4" /> Tạo quản lý
+            </Button>
+          )}
+
           {/* tab content with transition */}
           <div
             className={`transition-opacity duration-200 ${
@@ -161,6 +173,11 @@ function UsersInnerLayout({ children }: { children: React.ReactNode }) {
           user={selectedUser}
           lockAction={lockAction}
           onConfirm={handleConfirmLock}
+        />
+
+        <CreateManagerModal
+          open={showCreateDialog}
+          onOpenChange={(v) => (v ? null : closeCreate())}
         />
       </div>
     </div>

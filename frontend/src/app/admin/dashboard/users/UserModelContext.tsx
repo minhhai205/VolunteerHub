@@ -6,12 +6,15 @@ import type { User } from "@/lib/mockData";
 type UsersModalContextType = {
   openDetail: (user: User) => void;
   openLock: (user: User, action: "lock" | "unlock") => void;
+  openCreate: () => void;
   closeDetail: () => void;
   closeLock: () => void;
+  closeCreate: () => void;
   selectedUser: User | null;
   lockAction: "lock" | "unlock";
   showDetailDialog: boolean;
   showLockDialog: boolean;
+  showCreateDialog: boolean;
 };
 
 const UsersModalContext = createContext<UsersModalContextType | undefined>(
@@ -26,6 +29,7 @@ export function UsersModalProvider({
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
   const [showLockDialog, setShowLockDialog] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [lockAction, setLockAction] = useState<"lock" | "unlock">("lock");
 
   const openDetail = (user: User) => {
@@ -46,17 +50,27 @@ export function UsersModalProvider({
     setSelectedUser(null);
   };
 
+  const openCreate = () => {
+    setShowCreateDialog(true);
+  };
+  const closeCreate = () => {
+    setShowCreateDialog(false);
+  };
+
   return (
     <UsersModalContext.Provider
       value={{
         openDetail,
         openLock,
+        openCreate,
         closeDetail,
         closeLock,
+        closeCreate,
         selectedUser,
         lockAction,
         showDetailDialog,
         showLockDialog,
+        showCreateDialog,
       }}
     >
       {children}
