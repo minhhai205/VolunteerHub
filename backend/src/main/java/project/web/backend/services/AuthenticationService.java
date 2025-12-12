@@ -111,7 +111,7 @@ public class AuthenticationService {
                 .email(email)
                 .build();
         Token refresh = Token.builder()
-                .jti(jwtService.extractJti(refreshToken))
+                .jti(jwtService.extractJti(newRefreshToken))
                 .email(email)
                 .build();
         tokenRepository.saveAll(List.of(access, refresh));
