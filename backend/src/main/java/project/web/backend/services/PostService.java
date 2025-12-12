@@ -4,6 +4,8 @@ package project.web.backend.services;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,7 +102,6 @@ public class PostService {
     }
 
     public PageResponseDTO<List<PostResponseDTO>> getPosts(Pageable pageable, Long eventId) {
-
         Page<Post> posts = postRepository.findAllPostsWithNoFetch(pageable, eventId);
 
         List<Long> postIds = posts.stream()
@@ -151,7 +152,7 @@ public class PostService {
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXISTED));
 
         Optional<Like> likeExisted = likeRepository.findByUserIdAndPostId(currentUser.getId(), postId);
-        if(likeExisted.isPresent()){
+        if (likeExisted.isPresent()) {
             likeRepository.delete(likeExisted.get());
             return "success";
         }
@@ -163,5 +164,36 @@ public class PostService {
         likeRepository.save(like);
 
         return "success";
+    }
+
+
+    public List<PostResponseDTO> getTrendingPosts() {
+        Page<Post> posts = postRepository.findTrendingPosts(PageRequest.of(0, 5));
+        return fromPagesToOrderedDTO(posts);
+    }
+
+    public List<PostResponseDTO> getNewestPosts() {
+        Page<Post> posts = postRepository.findNewestPosts(PageRequest.of(0, 5));
+        return fromPagesToOrderedDTO(posts);
+    }
+
+
+    private List<PostResponseDTO> fromPagesToOrderedDTO(Page<Post> posts) {
+        List<Long> postIds = posts.stream()
+                .map(Post::getId).toList();
+        List<Post> orderedPosts = getOrderedPosts(postIds, posts);
+        List<PostResponseDTO> dtos = orderedPosts.stream().map(postMapper::toDTO).toList();
+
+        Map<Long, Long> postIdsCommentCountMap = postRepository.findAllPostsWithCommentCountByIds(postIds)
+                .stream().collect(Collectors.toMap(ar -> (Long) ar[0], ar -> (Long) ar[1]));
+
+        Map<Long, Long> postIdsLikeCountMap = postRepository.findAllPostsWithLikeCountByIds(postIds)
+                .stream().collect(Collectors.toMap(ar -> (Long) ar[0], ar -> (Long) ar[1]));
+
+        dtos.forEach(dto -> {
+            dto.setLikesCount(postIdsLikeCountMap.get(dto.getId()));
+            dto.setCommentsCount(postIdsCommentCountMap.get(dto.getId()));
+        });
+        return dtos;
     }
 }

@@ -24,6 +24,23 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("""
             SELECT p FROM Post p
+            LEFT JOIN p.comments c
+            LEFT JOIN p.likes l
+            GROUP BY p.id
+            ORDER BY COUNT(c.id)+COUNT(l.id) DESC,  p.createdAt DESC
+            """)
+    Page<Post> findTrendingPosts(Pageable pageable);
+
+
+    @Query("""
+            SELECT p FROM Post p
+            ORDER BY p.createdAt DESC
+            """)
+    Page<Post> findNewestPosts(Pageable pageable);
+
+
+    @Query("""
+            SELECT p FROM Post p
             JOIN FETCH p.user u
             JOIN FETCH p.event e
             LEFT JOIN FETCH p.medias m
@@ -59,11 +76,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findByIdWithCreatedUserAndPostMedia(@Param("id") Long id);
 
     @Query("""
-        SELECT COUNT(p.id)
-        FROM Post p
-        WHERE p.event.manager.email = :email
-          AND p.createdAt >= :daysAgo
-    """)
+                SELECT COUNT(p.id)
+                FROM Post p
+                WHERE p.event.manager.email = :email
+                  AND p.createdAt >= :daysAgo
+            """)
     Long countRecentPostsByManager(
             @Param("email") String email,
             @Param("daysAgo") LocalDateTime daysAgo

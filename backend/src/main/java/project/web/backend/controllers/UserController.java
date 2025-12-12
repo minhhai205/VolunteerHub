@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.web.backend.dtos.request.user.LockRequestDTO;
 import project.web.backend.dtos.request.user.UpdateInformationRequestDTO;
+import project.web.backend.dtos.request.user.UserCreationRequestDTO;
 import project.web.backend.dtos.response.ApiSuccessResponse;
 import project.web.backend.dtos.response.PageResponseDTO;
 import project.web.backend.dtos.response.user.InformationUserResponseDTO;
@@ -97,6 +98,19 @@ public class UserController {
                 .data(userService.workingInformation(email))
                 .status(HttpStatus.OK.value())
                 .message("Get working time statistics successfully!")
+                .build();
+    }
+
+
+    @PostMapping("/create")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiSuccessResponse<UserDetailResponseDTO> createUser(
+            @RequestBody @Valid UserCreationRequestDTO dto
+    ) {
+        return ApiSuccessResponse.<UserDetailResponseDTO>builder()
+                .data(userService.create(dto))
+                .status(HttpStatus.OK.value())
+                .message("Created user successfully")
                 .build();
     }
 }
