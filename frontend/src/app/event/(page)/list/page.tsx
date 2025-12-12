@@ -31,11 +31,11 @@ export default function DashboardPage() {
     pageable
   );
 
-  // Show loading skeleton và scroll to top khi page thay đổi
+  // Show loading skeleton và scroll to top khi page hoặc search thay đổi
   useEffect(() => {
     setDisplayLoading(true);
     window.scrollTo(0, 0);
-  }, [page]);
+  }, [page, search]);
 
   // Hide loading skeleton khi data load xong
   useEffect(() => {
