@@ -17,6 +17,7 @@ import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.services.EventService;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/event")
@@ -35,6 +36,15 @@ public class EventController {
                 .data(eventService.getAllEvents(pageable, search))
                 .status(HttpStatus.OK.value())
                 .message("Get all events successfully!")
+                .build();
+    }
+
+    @GetMapping("/suggestions")
+    public ApiSuccessResponse<Set<String>> getSuggestions(@RequestParam String search) {
+        return ApiSuccessResponse.<Set<String>>builder()
+                .data(eventService.getSuggestions(search))
+                .status(HttpStatus.OK.value())
+                .message("Get suggestions successfully!")
                 .build();
     }
 

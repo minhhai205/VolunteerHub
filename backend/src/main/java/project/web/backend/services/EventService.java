@@ -64,6 +64,14 @@ public class EventService {
                 .build();
     }
 
+    public Set<String> getSuggestions(String search) {
+        log.info("------------ Get event suggestions --------------");
+
+        Page<Event> events = eventRepository.findAllWithSearch(PageRequest.of(0, 9), search);
+
+        return events.stream().map(Event::getName).collect(Collectors.toSet());
+    }
+
     public PageResponseDTO<List<EventResponseDTO>> getManagerMyEvent(Pageable pageable, String search, Integer status) {
         log.info("------------ Get manager events --------------");
         Page<Event> events = eventRepository.findManagerEvent(
