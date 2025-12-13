@@ -57,4 +57,14 @@ public interface EventRequestRepository extends CrudRepository<EventCreateReques
             ORDER BY ec.createdAt DESC
             """)
     List<EventCreateRequest> findByStatusIn(@Param("status") List<EventRequestStatus> status);
+
+    @Query("""
+                SELECT
+                    COUNT(ec),
+                    SUM(CASE WHEN ec.status = 'PENDING' THEN 1 ELSE 0 END),
+                    SUM(CASE WHEN ec.status = 'APPROVED' THEN 1 ELSE 0 END),
+                    SUM(CASE WHEN ec.status = 'REJECTED' THEN 1 ELSE 0 END)
+                FROM EventCreateRequest ec
+            """)
+    List<Object[]> countStatistics();
 }
