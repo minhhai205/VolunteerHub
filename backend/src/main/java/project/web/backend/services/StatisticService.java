@@ -3,7 +3,8 @@ package project.web.backend.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import project.web.backend.dtos.response.dashboard.ManagerDashboardResponseDTO;
+import project.web.backend.dtos.response.statistic.AdminStatisticsResponseDTO;
+import project.web.backend.dtos.response.statistic.ManagerStatisticsResponseDTO;
 import project.web.backend.repositories.EventMemberRepository;
 import project.web.backend.repositories.EventRepository;
 import project.web.backend.repositories.PostRepository;
@@ -19,13 +20,13 @@ import java.util.concurrent.Executors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ManagerDashboardService {
+public class StatisticService {
     private final EventRepository eventRepository;
     private final EventMemberRepository eventMemberRepository;
     private final PostRepository postRepository;
     private final ExecutorService executor = Executors.newFixedThreadPool(4);
 
-    public ManagerDashboardResponseDTO getManagerDashboardStatistics() throws ExecutionException, InterruptedException {
+    public ManagerStatisticsResponseDTO getManagerDashboardStatistics() throws ExecutionException, InterruptedException {
         log.info("----------------- Get manager dashboard statistics ------------------");
         String email = SecurityUtil.getCurrentEmail();
 
@@ -57,7 +58,45 @@ public class ManagerDashboardService {
         ).join();
 
 
-        return ManagerDashboardResponseDTO.builder()
+        return ManagerStatisticsResponseDTO.builder()
+                .totalEvents(totalEventsFuture.get())
+                .totalVolunteers(totalVolunteersFuture.get())
+                .trendingEvents(Math.min(trendingEventsFuture.get(), 10))
+                .totalNewDiscussionPosts(totalNewDiscussionPostsFuture.get())
+                .build();
+    }
+
+    public AdminStatisticsResponseDTO getAdminDashboardStatistics() throws ExecutionException, InterruptedException {
+        log.info("--------------- Get admin dashboard statistics ---------------");
+
+        CompletableFuture<Long> totalEventsFuture = CompletableFuture.supplyAsync(
+                eventRepository::countAll, executor
+        );
+
+        CompletableFuture<Long> totalVolunteersFuture = CompletableFuture.supplyAsync(
+                eventMemberRepository::countAll, executor
+        );
+
+        // Đếm sô event có ít nhất n thành viên tham gia
+        CompletableFuture<Long> trendingEventsFuture = CompletableFuture.supplyAsync(
+                () -> eventRepository.countTopTrending(AppConst.numberOfMemberForTrendingEvent), executor
+        );
+
+        // Đếm số post 7 ngày gần nhất
+        LocalDateTime daysAgo = LocalDateTime.now().minusDays(7);
+        CompletableFuture<Long> totalNewDiscussionPostsFuture = CompletableFuture.supplyAsync(
+                () -> postRepository.countRecentPosts(daysAgo), executor
+        );
+
+        CompletableFuture.allOf(
+                totalEventsFuture,
+                totalVolunteersFuture,
+                trendingEventsFuture,
+                totalNewDiscussionPostsFuture
+        ).join();
+
+
+        return AdminStatisticsResponseDTO.builder()
                 .totalEvents(totalEventsFuture.get())
                 .totalVolunteers(totalVolunteersFuture.get())
                 .trendingEvents(Math.min(trendingEventsFuture.get(), 10))

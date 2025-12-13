@@ -1,4 +1,4 @@
-package project.web.backend.dtos.response.dashboard;
+package project.web.backend.dtos.response.statistic;
 
 import lombok.*;
 
@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ManagerDashboardResponseDTO implements Serializable {
+public class ManagerStatisticsResponseDTO implements Serializable {
     private Long totalEvents;           // Tổng số sự kiện mà manager đã tạo
     private Long totalVolunteers;       // Tổng số tình nguyện viên tham gia sự kiện của manager
     private Long trendingEvents;        // Số sự kiện đang trending
