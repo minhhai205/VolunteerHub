@@ -8,7 +8,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import project.web.backend.entities.EventCreateRequest;
-import project.web.backend.entities.EventRegistration;
 import project.web.backend.utils.enums.EventRequestStatus;
 
 import java.util.List;
@@ -25,10 +24,20 @@ public interface EventRequestRepository extends CrudRepository<EventCreateReques
 
 
     @Query("""
-            SELECT ec FROM EventCreateRequest ec
-            ORDER BY ec.createdAt DESC
+                SELECT ec FROM EventCreateRequest ec
+                WHERE
+                    (:search IS NULL OR :search = ''
+                        OR ec.name LIKE %:search%
+                        OR ec.description LIKE %:search%)
+                AND
+                    (:status IS NULL OR ec.status = :status)
+                ORDER BY ec.createdAt DESC
             """)
-    Page<EventCreateRequest> findAllPagination(Pageable pageable);
+    Page<EventCreateRequest> findAllPagination(
+            Pageable pageable,
+            @Param("search") String search,
+            @Param("status") EventRequestStatus status
+    );
 
     @EntityGraph(attributePaths = {
             "categories",
