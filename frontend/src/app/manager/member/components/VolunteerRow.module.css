@@ -1,0 +1,96 @@
+.row {
+  position: relative;
+}
+
+.checkboxCell {
+  padding: 1.25rem 1.25rem;
+  width: 48px;
+}
+
+.row td {
+  padding: 1.25rem 1.25rem;
+  font-size: 0.875rem;
+  color: #374151;
+  vertical-align: middle;
+}
+
+.volunteerInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.avatarFallback {
+  background-color: #dcfce7;
+  color: #15803d;
+  font-weight: 600;
+}
+
+.volunteerName {
+  font-weight: 500;
+  color: #111827;
+}
+
+.volunteerEmail {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.eventName {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.date {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.hours {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.completeButton {
+  color: #16a34a;
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.completeButton:hover {
+  color: #15803d;
+  background-color: #f0fdf4;
+}
+
+.absentButton {
+  color: #dc2626;
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.absentButton:hover {
+  color: #b91c1c;
+  background-color: #fef2f2;
+}
+
+.pendingButton {
+  color: #ea580c;
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.pendingButton:hover {
+  color: #c2410c;
+  background-color: #fff7ed;
+}
