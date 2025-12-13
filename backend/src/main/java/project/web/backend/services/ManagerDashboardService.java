@@ -60,7 +60,7 @@ public class ManagerDashboardService {
         return ManagerDashboardResponseDTO.builder()
                 .totalEvents(totalEventsFuture.get())
                 .totalVolunteers(totalVolunteersFuture.get())
-                .trendingEvents(trendingEventsFuture.get())
+                .trendingEvents(Math.min(trendingEventsFuture.get(), 10))
                 .totalNewDiscussionPosts(totalNewDiscussionPostsFuture.get())
                 .build();
     }

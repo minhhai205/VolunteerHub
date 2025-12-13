@@ -124,7 +124,7 @@ public class EventService {
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXIST));
 
         // Tránh phân trang trên memory
-        Pageable pageable = PageRequest.of(0, 4);
+        Pageable pageable = PageRequest.of(0, 6);
         List<Long> eventsIds = eventRepository.findNewestPublishedEventsByManager(currentUser.getId(), pageable)
                 .stream().map(Event::getId).toList();
 
@@ -169,7 +169,7 @@ public class EventService {
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXIST));
 
         // Tránh phân trang trên memory
-        Pageable pageable = PageRequest.of(0, 6);
+        Pageable pageable = PageRequest.of(0, 10);
         List<Long> eventsIds = eventRepository.findTopTrendingEventsByManager(
                         currentUser.getId(), AppConst.numberOfMemberForTrendingEvent, pageable)
                 .stream().map(Event::getId).toList();
@@ -191,7 +191,7 @@ public class EventService {
         log.info("------------ Get trending events --------------");
 
         // Tránh phân trang trên memory
-        Pageable pageable = PageRequest.of(0, 6);
+        Pageable pageable = PageRequest.of(0, 10);
         int minMembers = 0;
         List<Long> eventsIds = eventRepository.findTopTrendingEvents(minMembers, pageable)
                 .stream().map(Event::getId).toList();
