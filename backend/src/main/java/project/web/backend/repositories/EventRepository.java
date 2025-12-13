@@ -59,7 +59,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             SELECT DISTINCT e FROM Event e
             INNER JOIN e.manager em
             WHERE em.email = :email
-              AND (e.name LIKE %:search% OR e.description LIKE %:search%)
+              AND (:search = '' OR e.name LIKE %:search% OR e.description LIKE %:search%)
               AND (
                    CASE
                            WHEN :status = 0 THEN true
