@@ -11,12 +11,18 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.web.backend.dtos.request.event.EventRequestDTO;
+import project.web.backend.dtos.request.user.EventMemberFilterRequestDTO;
+import project.web.backend.dtos.request.user.WorkRatingRequestDTO;
+import project.web.backend.dtos.response.ApiResponse;
 import project.web.backend.dtos.response.ApiSuccessResponse;
 import project.web.backend.dtos.response.PageResponseDTO;
+import project.web.backend.dtos.response.event.EventNameResponseDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
+import project.web.backend.dtos.response.user.EventMemberResponseDTO;
 import project.web.backend.services.EventService;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/event")
@@ -38,11 +44,20 @@ public class EventController {
                 .build();
     }
 
+    @GetMapping("/suggestions")
+    public ApiSuccessResponse<Set<String>> getSuggestions(@RequestParam String search) {
+        return ApiSuccessResponse.<Set<String>>builder()
+                .data(eventService.getSuggestions(search))
+                .status(HttpStatus.OK.value())
+                .message("Get suggestions successfully!")
+                .build();
+    }
+
     @GetMapping("/manager/my-event")
     @PreAuthorize("hasRole('MANAGER')")
     public ApiSuccessResponse<PageResponseDTO<List<EventResponseDTO>>> getManagerMyEvent(
             Pageable pageable,
-            @RequestParam String search,
+            @RequestParam(required = false, defaultValue = "") String search,
             @RequestParam(required = false, defaultValue = "0") Integer status
     ) {
         return ApiSuccessResponse.<PageResponseDTO<List<EventResponseDTO>>>builder()
@@ -51,6 +66,18 @@ public class EventController {
                 .message("Get all events successfully!")
                 .build();
     }
+
+
+    @GetMapping("/manager/my-event-name")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ApiSuccessResponse<List<EventNameResponseDTO>> getManagerMyEventName() {
+        return ApiSuccessResponse.<List<EventNameResponseDTO>>builder()
+                .data(eventService.getManagerMyEventName())
+                .status(HttpStatus.OK.value())
+                .message("Get all events successfully!")
+                .build();
+    }
+
 
     @GetMapping("/my-event")
     @PreAuthorize("hasRole('USER')")
@@ -148,6 +175,32 @@ public class EventController {
         return ApiSuccessResponse.<String>builder()
                 .data(eventService.leaveMyEvent(eventId))
                 .message("Leaved!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @GetMapping("/event-members")
+    @PreAuthorize("hasAnyRole({'MANAGER'})")
+    public ApiSuccessResponse<PageResponseDTO<List<EventMemberResponseDTO>>> getEventMembers(
+            Pageable pageable,
+            @ModelAttribute @Valid EventMemberFilterRequestDTO dto
+    ) {
+        return ApiSuccessResponse.<PageResponseDTO<List<EventMemberResponseDTO>>>builder()
+                .data(eventService.getEventMembers(dto, pageable))
+                .message("Get event members")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+
+    @PatchMapping("/work-rating")
+    @PreAuthorize("hasAnyRole({'MANAGER'})")
+    public ApiSuccessResponse<String> workRating(
+            @RequestBody @Valid WorkRatingRequestDTO dto
+    ) {
+        return ApiSuccessResponse.<String>builder()
+                .data(eventService.rating(dto))
+                .message("Rated members")
                 .status(HttpStatus.OK.value())
                 .build();
     }

@@ -1,7 +1,5 @@
 package project.web.backend.services;
 
-import com.sun.jdi.request.EventRequest;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -71,10 +69,10 @@ public class EventRequestService {
         return eventRequestMapper.toResponseDTO(newRequest);
     }
 
-    public PageResponseDTO<List<EventRequestResponseDTO>> getAllEventRequest(Pageable pageable) {
+    public PageResponseDTO<List<EventRequestResponseDTO>> getAllEventRequest(Pageable pageable, String search, EventRequestStatus status) {
         log.info("------------ Get all events request --------------");
 
-        Page<EventCreateRequest> eventRequests = eventRequestRepository.findAllPagination(pageable);
+        Page<EventCreateRequest> eventRequests = eventRequestRepository.findAllPagination(pageable, search, status);
 
         List<Long> eventRequestIds = eventRequests.stream().map(EventCreateRequest::getId).toList();
 
@@ -168,8 +166,9 @@ public class EventRequestService {
         return eventRequestMapper.toResponseDTO(request);
     }
 
-    public PageResponseDTO<List<EventRegistrationResponseDTO>> getAllRegistration(Pageable pageable, EventRequestStatus status) {
-        Page<EventRegistration> registrations = eventRegistrationRepository.getAll(pageable, status);
+    public PageResponseDTO<List<EventRegistrationResponseDTO>> getAllRegistration(Pageable pageable, EventRequestStatus status, Long search) {
+        String managerEmail = SecurityUtil.getCurrentEmail();
+        Page<EventRegistration> registrations = eventRegistrationRepository.getAll(pageable, status, managerEmail, search);
         List<EventRegistrationResponseDTO> dtos = registrations.stream()
                 .map(eventRequestMapper::toEventRegistrationResponseDTO)
                 .toList();

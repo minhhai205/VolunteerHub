@@ -9,19 +9,26 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.web.backend.dtos.request.event.EventRequestDTO;
+import project.web.backend.dtos.request.user.EventMemberFilterRequestDTO;
+import project.web.backend.dtos.request.user.PersonalRatingDTO;
+import project.web.backend.dtos.request.user.WorkRatingRequestDTO;
 import project.web.backend.dtos.response.PageResponseDTO;
+import project.web.backend.dtos.response.event.EventNameResponseDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
-import project.web.backend.entities.Category;
-import project.web.backend.entities.Event;
-import project.web.backend.entities.EventRegistration;
-import project.web.backend.entities.User;
+import project.web.backend.dtos.response.user.EventMemberResponseDTO;
+import project.web.backend.entities.*;
 import project.web.backend.exceptions.AppException;
 import project.web.backend.mappers.EventMapper;
 import project.web.backend.repositories.*;
+import project.web.backend.utils.commons.AppConst;
 import project.web.backend.utils.commons.SecurityUtil;
 import project.web.backend.utils.enums.ErrorCode;
 import project.web.backend.utils.enums.EventRequestStatus;
+import project.web.backend.utils.enums.WorkStatus;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,6 +70,14 @@ public class EventService {
                 .build();
     }
 
+    public Set<String> getSuggestions(String search) {
+        log.info("------------ Get event suggestions --------------");
+
+        Page<Event> events = eventRepository.findAllWithSearch(PageRequest.of(0, 9), search);
+
+        return events.stream().map(Event::getName).collect(Collectors.toSet());
+    }
+
     public PageResponseDTO<List<EventResponseDTO>> getManagerMyEvent(Pageable pageable, String search, Integer status) {
         log.info("------------ Get manager events --------------");
         Page<Event> events = eventRepository.findManagerEvent(
@@ -86,6 +101,18 @@ public class EventService {
                 .totalPage(events.getTotalPages())
                 .data(eventResponses)
                 .build();
+    }
+
+
+    public List<EventNameResponseDTO> getManagerMyEventName() {
+        return eventRepository
+                .findManagerEventTungTungTungSahurr(SecurityUtil.getCurrentEmail())
+                .stream()
+                .map(e -> EventNameResponseDTO.builder()
+                        .id(e.getId())
+                        .name(e.getName())
+                        .build())
+                .toList();
     }
 
 
@@ -115,7 +142,7 @@ public class EventService {
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXIST));
 
         // Tránh phân trang trên memory
-        Pageable pageable = PageRequest.of(0, 4);
+        Pageable pageable = PageRequest.of(0, 6);
         List<Long> eventsIds = eventRepository.findNewestPublishedEventsByManager(currentUser.getId(), pageable)
                 .stream().map(Event::getId).toList();
 
@@ -160,9 +187,9 @@ public class EventService {
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXIST));
 
         // Tránh phân trang trên memory
-        Pageable pageable = PageRequest.of(0, 6);
-        int minMembers = 0;
-        List<Long> eventsIds = eventRepository.findTopTrendingEventsByManager(currentUser.getId(), minMembers, pageable)
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Long> eventsIds = eventRepository.findTopTrendingEventsByManager(
+                        currentUser.getId(), AppConst.numberOfMemberForTrendingEvent, pageable)
                 .stream().map(Event::getId).toList();
 
         List<Event> events = eventRepository.findEventByIdIn(eventsIds);
@@ -182,7 +209,7 @@ public class EventService {
         log.info("------------ Get trending events --------------");
 
         // Tránh phân trang trên memory
-        Pageable pageable = PageRequest.of(0, 6);
+        Pageable pageable = PageRequest.of(0, 10);
         int minMembers = 0;
         List<Long> eventsIds = eventRepository.findTopTrendingEvents(minMembers, pageable)
                 .stream().map(Event::getId).toList();
@@ -300,5 +327,56 @@ public class EventService {
             eventResponse.setCountMembers(memberCountMap.get(eventResponse.getId()));
             eventResponse.setCountPosts(postCountMap.get(eventResponse.getId()));
         });
+    }
+
+
+    public PageResponseDTO<List<EventMemberResponseDTO>> getEventMembers(EventMemberFilterRequestDTO dto, Pageable pageable) {
+        String search = dto.getSearch();
+        WorkStatus status = dto.getStatus();
+        Long eventId = dto.getEventId();
+
+        Page<EventMember> eventMembers = eventMemberRepository.findByFilter(search, status, eventId, pageable);
+        List<EventMemberResponseDTO> dtos = eventMembers.stream()
+                .map(em -> {
+                    Long workingHour = Duration.between(
+                            em.getCreatedAt().toInstant(),
+                            Instant.now()
+                    ).toHours();
+
+                    return EventMemberResponseDTO.builder()
+                            .email(em.getUser().getEmail())
+                            .id(em.getId())
+                            .eventName(em.getEvent().getName())
+                            .memberName(em.getUser().getFullName())
+                            .workingHour(workingHour)
+                            .registrationDate(em.getCreatedAt())
+                            .status(em.getStatus())
+                            .build();
+                })
+                .toList();
+
+        return PageResponseDTO.<List<EventMemberResponseDTO>>builder()
+                .data(dtos)
+                .pageNo(pageable.getPageNumber())
+                .pageSize(pageable.getPageSize())
+                .totalPage(eventMembers.getTotalPages())
+                .build();
+    }
+
+    public String rating(WorkRatingRequestDTO dto) {
+        List<PersonalRatingDTO> personalRatingDTOS = dto.getDtos();
+        Map<Long, Boolean> idRateMap = personalRatingDTOS.stream().collect(Collectors.toMap(
+                PersonalRatingDTO::getId, PersonalRatingDTO::getIsCompleted));
+        List<EventMember> eventMembers = eventMemberRepository.findAllById(idRateMap.keySet())
+                .stream()
+                .peek(em -> {
+                    if (idRateMap.get(em.getId())) {
+                        em.setStatus(WorkStatus.COMPLETED);
+                    } else {
+                        em.setStatus(WorkStatus.ABSENT);
+                    }
+                }).toList();
+        eventMemberRepository.saveAll(eventMembers);
+        return "Done";
     }
 }

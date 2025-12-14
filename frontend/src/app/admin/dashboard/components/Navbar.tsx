@@ -33,7 +33,7 @@ const Navbar = () => {
       <div className="flex items-center gap-4">
         {/* THEME MENU */}
         <NotificationsDropdown />
-        <DropdownMenu>
+        {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon">
               <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
@@ -52,7 +52,7 @@ const Navbar = () => {
               System
             </DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
         {/* USER MENU */}
         <DropdownMenu>
           <DropdownMenuTrigger>
@@ -61,17 +61,17 @@ const Navbar = () => {
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent sideOffset={10}>
+          <DropdownMenuContent sideOffset={10} align="end">
             <DropdownMenuLabel>Tên tài khoản</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <User className="h-[1.2rem] w-[1.2rem] mr-2" />
               Hồ sơ
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            {/* <DropdownMenuItem>
               <Settings className="h-[1.2rem] w-[1.2rem] mr-2" />
               Cài đặt
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
             <DropdownMenuItem variant="destructive" onClick={logout}>
               <LogOut className="h-[1.2rem] w-[1.2rem] mr-2" />
               Đăng xuất

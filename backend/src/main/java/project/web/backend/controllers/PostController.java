@@ -67,13 +67,33 @@ public class PostController {
 
     @PostMapping("/reaction/{postId}")
     @PreAuthorize("hasRole('USER') OR hasRole('MANAGER')")
-    public ApiSuccessResponse<String>  handlePostReaction(
+    public ApiSuccessResponse<String> handlePostReaction(
             @PathVariable @Min(value = 1, message = "Post id must be greater than 0") long postId
     ) {
         return ApiSuccessResponse.<String>builder()
                 .data(postService.handlePostReaction(postId))
                 .status(HttpStatus.OK.value())
                 .message("Reaction post successfully")
+                .build();
+    }
+
+
+    @GetMapping("/trending-posts")
+    public ApiSuccessResponse<List<PostResponseDTO>> getPostsTrending() {
+        return ApiSuccessResponse.<List<PostResponseDTO>>builder()
+                .data(postService.getTrendingPosts())
+                .status(HttpStatus.OK.value())
+                .message("Get all posts trending successfully")
+                .build();
+    }
+
+
+    @GetMapping("/newest-posts")
+    public ApiSuccessResponse<List<PostResponseDTO>> getPostsNewest() {
+        return ApiSuccessResponse.<List<PostResponseDTO>>builder()
+                .data(postService.getNewestPosts())
+                .status(HttpStatus.OK.value())
+                .message("Get all newest posts successfully")
                 .build();
     }
 }

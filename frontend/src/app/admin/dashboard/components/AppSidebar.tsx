@@ -47,20 +47,15 @@ const items = [
     url: "/admin/dashboard/users",
     icon: User,
   },
-  {
-    title: "Cài đặt",
-    url: "#",
-    icon: Settings,
-  },
 ];
 
 const AppSidebar = () => {
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="text-xl">
       <SidebarHeader className="py-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild className="text-xl">
               <Link href="/admin/dashboard">
                 <Image
                   src="/UET.svg.png"
@@ -79,10 +74,10 @@ const AppSidebar = () => {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-2">
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className="text-lg">
                     <Link href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
@@ -102,7 +97,7 @@ const AppSidebar = () => {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
+                <SidebarMenuButton className="text-lg">
                   <User2 /> Tên tài khoản <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>

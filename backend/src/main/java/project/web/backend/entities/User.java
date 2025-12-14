@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import project.web.backend.utils.annotations.PhoneNumber;
 import project.web.backend.utils.enums.UserStatus;
 
@@ -38,7 +39,7 @@ public class User extends AbstractEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private UserStatus status;
+    private UserStatus status = UserStatus.ACTIVE;
 
     @Column(name = "phone_number")
     @PhoneNumber(message = "Phone number is invalid")

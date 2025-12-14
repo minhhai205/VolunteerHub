@@ -24,12 +24,19 @@ interface ApiResponse {
 
 type FilterStatus = "pending" | "approved" | "rejected" | null;
 
+interface Event {
+  id: number;
+  name: string;
+}
+
 export default function EventRequestsManager() {
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [displayLoading, setDisplayLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<FilterStatus>(null);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
@@ -38,10 +45,38 @@ export default function EventRequestsManager() {
 
   const token = getAccessToken();
 
+  // Fetch events list
+  const fetchEvents = async () => {
+    try {
+      const response = await fetchWithAuth(
+        "http://localhost:8080/api/event/manager/my-event-name",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Không thể tải danh sách sự kiện");
+      }
+
+      const result = await response.json();
+      if (result.data) {
+        setEvents(result.data);
+      }
+    } catch (err) {
+      console.error("Error fetching events:", err);
+    }
+  };
+
   const fetchRequests = async (
     page: number = currentPage - 1,
     size: number = pageSize,
-    status: FilterStatus = filterStatus
+    status: FilterStatus = filterStatus,
+    eventId: number | null = selectedEventId
   ) => {
     try {
       setLoading(true);
@@ -50,6 +85,10 @@ export default function EventRequestsManager() {
 
       if (status) {
         url += `&status=${status}`;
+      }
+
+      if (eventId !== null) {
+        url += `&eventId=${eventId}`;
       }
 
       const response = await fetchWithAuth(url, {
@@ -83,15 +122,22 @@ export default function EventRequestsManager() {
   };
 
   useEffect(() => {
+    fetchEvents();
     fetchRequests();
   }, []);
-
 
   const handleFilterChange = (status: FilterStatus) => {
     setFilterStatus(status);
     setCurrentPage(1);
-    fetchRequests(0, pageSize, status);
+    fetchRequests(0, pageSize, status, selectedEventId);
   };
+
+  const handleEventChange = (eventId: number | null) => {
+    setSelectedEventId(eventId);
+    setCurrentPage(1);
+    fetchRequests(0, pageSize, filterStatus, eventId);
+  };
+
   // Scroll to top and show loading skeleton when page changes
   useEffect(() => {
     setDisplayLoading(true);
@@ -107,7 +153,6 @@ export default function EventRequestsManager() {
       return () => clearTimeout(timer);
     }
   }, [loading]);
-
 
   const handleApprove = async (id: number) => {
     try {
@@ -183,7 +228,7 @@ export default function EventRequestsManager() {
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
-      fetchRequests(page - 1, pageSize, filterStatus);
+      fetchRequests(page - 1, pageSize, filterStatus, selectedEventId);
     }
   };
 
@@ -243,6 +288,24 @@ export default function EventRequestsManager() {
   return (
     <div className={styles.container}>
       <EventRequestHeader totalRequests={totalElements} />
+
+      {/* Event Search/Filter */}
+      <div className={filterStyles.filterContainer}>
+        <select
+          value={selectedEventId ?? ""}
+          onChange={(e) =>
+            handleEventChange(e.target.value ? Number(e.target.value) : null)
+          }
+          className={filterStyles.eventSelect}
+        >
+          <option value="">Tất cả sự kiện</option>
+          {events.map((event) => (
+            <option key={event.id} value={event.id}>
+              {event.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* Filter Buttons */}
       <div className={filterStyles.filterContainer}>

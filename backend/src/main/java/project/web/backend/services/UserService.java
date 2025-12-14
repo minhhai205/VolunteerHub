@@ -3,19 +3,23 @@ package project.web.backend.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.web.backend.dtos.request.user.LockRequestDTO;
 import project.web.backend.dtos.request.user.UpdateInformationRequestDTO;
+import project.web.backend.dtos.request.user.UserCreationRequestDTO;
 import project.web.backend.dtos.response.PageResponseDTO;
 import project.web.backend.dtos.response.user.InformationUserResponseDTO;
 import project.web.backend.dtos.response.user.UserDetailResponseDTO;
 import project.web.backend.dtos.response.user.UserResponseDTO;
 import project.web.backend.dtos.response.user.WorkingInformationResponseDTO;
+import project.web.backend.entities.Role;
 import project.web.backend.entities.User;
 import project.web.backend.exceptions.AppException;
 import project.web.backend.mappers.UserMapper;
 import project.web.backend.repositories.EventRepository;
+import project.web.backend.repositories.RoleRepository;
 import project.web.backend.repositories.TokenRepository;
 import project.web.backend.repositories.UserRepository;
 import project.web.backend.utils.commons.SecurityUtil;
@@ -34,6 +38,8 @@ public class UserService {
     private final UserMapper userMapper;
     private final EventRepository eventRepository;
     private final TokenRepository tokenRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public PageResponseDTO<List<UserDetailResponseDTO>> getAllUsers(Pageable pageable, String role, String search) {
         Page<User> users;
@@ -108,5 +114,31 @@ public class UserService {
                 .completedProject(completedProject)
                 .numberOfProject(joinedProject)
                 .build();
+    }
+
+
+    public UserDetailResponseDTO create(UserCreationRequestDTO dto) {
+        // cản không cho tạo user account(giả định thôi, sau sửa logic xóa thỏai mái)
+        if (!dto.getRoleName().equalsIgnoreCase("MANAGER")) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
+
+        Role role = roleRepository.findByName(dto.getRoleName().toUpperCase())
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
+        var emailChecker = userRepository.findByEmail(dto.getEmail());
+        if (emailChecker.isPresent()) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+        User newUser = User.builder()
+                .email(dto.getEmail())
+                .password(passwordEncoder.encode(dto.getPassword()))
+                .fullName(dto.getFullName())
+                .role(role)
+                .phoneNumber(dto.getPhoneNumber())
+                .status(UserStatus.ACTIVE)
+                .build();
+
+        userRepository.save(newUser);
+        return userMapper.toDetailDTO(newUser);
     }
 }

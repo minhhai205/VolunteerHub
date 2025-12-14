@@ -1,7 +1,7 @@
 "use client";
 
 import { Search, Filter, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useEventList } from "../../hooks/useList";
 import styles from "./list.module.css";
 import { Header } from "@/components/static/Header";
@@ -9,10 +9,17 @@ import EventCard from "./EventCard";
 import { Footer } from "@/components/static/Footer";
 
 export default function DashboardPage() {
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState(""); // Giá trị input
+  const [search, setSearch] = useState(""); // Giá trị dùng để tìm kiếm (gửi API)
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+  const [isKeyboardNavigation, setIsKeyboardNavigation] = useState(false);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(9);
   const [displayLoading, setDisplayLoading] = useState(false);
+  const suggestTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const searchBoxRef = useRef<HTMLDivElement>(null);
 
   const pageable = {
     page,
@@ -24,11 +31,11 @@ export default function DashboardPage() {
     pageable
   );
 
-  // Show loading skeleton và scroll to top khi page thay đổi
+  // Show loading skeleton và scroll to top khi page hoặc search thay đổi
   useEffect(() => {
     setDisplayLoading(true);
     window.scrollTo(0, 0);
-  }, [page]);
+  }, [page, search]);
 
   // Hide loading skeleton khi data load xong
   useEffect(() => {
@@ -40,9 +47,157 @@ export default function DashboardPage() {
     }
   }, [loading]);
 
+  // Fetch suggestions từ API event
+  const fetchSuggestions = async (query: string) => {
+    if (!query.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    try {
+      const params = new URLSearchParams({
+        search: query,
+      });
+
+      const response = await fetch(
+        `http://localhost:8080/api/event/suggestions?${params.toString()}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        // Response trả về Set<String> - chuyển thành Array
+        const eventNames = Array.isArray(result.data) ? result.data : [];
+        setSuggestions(eventNames);
+      } else {
+        setSuggestions([]);
+      }
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+      setSuggestions([]);
+    }
+  };
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-    setPage(0); // Reset về trang đầu khi tìm kiếm
+    const value = e.target.value;
+    setSearchInput(value);
+    setSelectedSuggestionIndex(-1); // Reset selection khi gõ
+    setIsKeyboardNavigation(false); // Reset keyboard navigation flag
+
+    // Clear previous timeout
+    if (suggestTimeoutRef.current) {
+      clearTimeout(suggestTimeoutRef.current);
+    }
+
+    // Hiển thị suggestions nếu có text
+    if (value.trim()) {
+      setShowSuggestions(true);
+      // Debounce API call - 300ms
+      suggestTimeoutRef.current = setTimeout(() => {
+        fetchSuggestions(value);
+      }, 300);
+    } else {
+      setShowSuggestions(false);
+      setSuggestions([]);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (suggestTimeoutRef.current) {
+        clearTimeout(suggestTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Handle click outside to hide suggestions
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchBoxRef.current &&
+        !searchBoxRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleSearchSubmit = (query: string) => {
+    setSearch(query);
+    setSearchInput(query);
+    setShowSuggestions(false);
+    setSuggestions([]);
+    setSelectedSuggestionIndex(-1);
+    setIsKeyboardNavigation(false);
+    setPage(0);
+  };
+
+  const handleSearchFocus = () => {
+    // Hiển thị suggestions khi click vào input nếu đã có suggestions
+    if (searchInput.trim() && suggestions.length > 0) {
+      setShowSuggestions(true);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions) {
+      if (e.key === "Enter") {
+        handleSearchSubmit(searchInput);
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setIsKeyboardNavigation(true);
+        setSelectedSuggestionIndex((prev) => {
+          const newIndex = prev < suggestions.length - 1 ? prev + 1 : prev;
+          if (newIndex >= 0) {
+            setSearchInput(suggestions[newIndex]);
+          }
+          return newIndex;
+        });
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setIsKeyboardNavigation(true);
+        setSelectedSuggestionIndex((prev) => {
+          const newIndex = prev > 0 ? prev - 1 : -1;
+          if (newIndex >= 0) {
+            setSearchInput(suggestions[newIndex]);
+          } else {
+            setSearchInput("");
+          }
+          return newIndex;
+        });
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (selectedSuggestionIndex >= 0) {
+          handleSearchSubmit(suggestions[selectedSuggestionIndex]);
+        } else {
+          handleSearchSubmit(searchInput);
+        }
+        break;
+      case "Escape":
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+        setIsKeyboardNavigation(false);
+        break;
+      default:
+        break;
+    }
   };
 
   const handlePageChange = (newPage: number) => {
@@ -67,15 +222,49 @@ export default function DashboardPage() {
 
         {/* Thanh tìm kiếm và lọc */}
         <div className={styles.filterBar}>
-          <div className={styles.searchBox}>
+          <div className={styles.searchBox} ref={searchBoxRef}>
             <Search className={styles.searchIcon} />
             <input
               type="text"
-              placeholder="Tìm kiếm sự kiện theo tên sự kiện hoặc mô tả..."
+              placeholder="Tìm kiếm sự kiện..."
               className={styles.searchInput}
-              value={search}
+              value={searchInput}
               onChange={handleSearchChange}
+              onKeyDown={handleKeyDown}
+              onFocus={handleSearchFocus}
             />
+            {/* Suggest Box */}
+            {showSuggestions && suggestions.length > 0 && (
+              <div className={styles.suggestBox}>
+                {suggestions.map((suggestion, index) => (
+                  <div
+                    key={index}
+                    className={`${styles.suggestItem} ${
+                      index === selectedSuggestionIndex && isKeyboardNavigation
+                        ? styles.suggestItemActive
+                        : index === selectedSuggestionIndex &&
+                          !isKeyboardNavigation
+                        ? styles.suggestItemHover
+                        : ""
+                    }`}
+                    onClick={() => {
+                      handleSearchSubmit(suggestion);
+                      setIsKeyboardNavigation(false);
+                    }}
+                    onMouseEnter={() => {
+                      setIsKeyboardNavigation(false);
+                      setSelectedSuggestionIndex(index);
+                    }}
+                    onMouseLeave={() => {
+                      setSelectedSuggestionIndex(-1);
+                    }}
+                  >
+                    <Search size={16} />
+                    <span>{suggestion}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           {/* <button className={styles.filterButton}>
             <Filter />
