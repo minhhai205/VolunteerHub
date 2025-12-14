@@ -32,7 +32,6 @@ interface Event {
 export default function EventRequestsManager() {
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
-  const [displayLoading, setDisplayLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<FilterStatus>(null);
   const [events, setEvents] = useState<Event[]>([]);
@@ -138,21 +137,15 @@ export default function EventRequestsManager() {
     fetchRequests(0, pageSize, filterStatus, eventId);
   };
 
-  // Scroll to top and show loading skeleton when page changes
+  // Fetch data when currentPage changes
   useEffect(() => {
-    setDisplayLoading(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    fetchRequests(currentPage - 1, pageSize, filterStatus, selectedEventId);
   }, [currentPage]);
 
-  // Hide loading skeleton after data loads
+  // Scroll to top when page changes
   useEffect(() => {
-    if (!loading) {
-      const timer = setTimeout(() => {
-        setDisplayLoading(false);
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [loading]);
+    window.scrollTo({ top: 0 });
+  }, [currentPage]);
 
   const handleApprove = async (id: number) => {
     try {
@@ -228,46 +221,9 @@ export default function EventRequestsManager() {
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
-      fetchRequests(page - 1, pageSize, filterStatus, selectedEventId);
+      setCurrentPage(page);
     }
   };
-
-  if (displayLoading) {
-    return (
-      <div className={styles.container}>
-        <EventRequestHeader totalRequests={0} />
-        <div className={styles.skeletonGrid}>
-          {Array.from({ length: pageSize }).map((_, i) => (
-            <div key={i} className={styles.requestCardSkeleton}>
-              <div
-                className={`${styles.skeleton} ${styles.skeletonAvatar}`}
-              ></div>
-              <div className={styles.skeletonContent}>
-                <div
-                  className={`${styles.skeleton} ${styles.skeletonTitle}`}
-                ></div>
-                <div
-                  className={`${styles.skeleton} ${styles.skeletonText}`}
-                ></div>
-                <div
-                  className={`${styles.skeleton} ${styles.skeletonText}`}
-                  style={{ width: "70%" }}
-                ></div>
-              </div>
-              <div className={styles.skeletonActions}>
-                <div
-                  className={`${styles.skeleton} ${styles.skeletonButton}`}
-                ></div>
-                <div
-                  className={`${styles.skeleton} ${styles.skeletonButton}`}
-                ></div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -352,6 +308,7 @@ export default function EventRequestsManager() {
             requests={requests}
             onApprove={handleApprove}
             onReject={handleReject}
+            isLoading={loading}
           />
 
           {/* Pagination */}
