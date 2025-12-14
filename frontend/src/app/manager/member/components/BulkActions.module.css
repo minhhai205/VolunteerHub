@@ -1,0 +1,21 @@
+.bulkActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.selectedText {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.actionButton {
+  gap: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .bulkActions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,32 @@
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #f0f9f0;
+  min-height: 100vh;
+}
+
+.backgroundContainer {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f0f9f0;
+}
+
+.filterHeader {
+  display: flex;
+  justify-content: center; /* Updated from space-between */
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .filterHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

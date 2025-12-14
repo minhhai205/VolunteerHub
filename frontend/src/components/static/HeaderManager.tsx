@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Heart, Menu, LogOut, User, Settings } from "lucide-react";
+import { Heart, Menu, LogOut, User, Settings, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import styles from "./Header.module.css";
@@ -12,6 +12,7 @@ export function Header() {
   const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showManagementMenu, setShowManagementMenu] = useState(false);
   const [user, setUser] = useState({
     name: "",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=user",
@@ -128,14 +129,53 @@ export function Header() {
           >
             Sự kiện
           </Link>
-          <Link
-            href="/manager/request"
-            className={`${styles.navLink} ${
-              isActive("/manager/request") ? styles.navLinkActive : ""
-            }`}
-          >
-            Quản lý đăng ký
-          </Link>
+
+          {/* Dropdown Menu cho Quản lý */}
+          <div className={styles.dropdownWrapper}>
+            <button
+              className={`${styles.navLink} ${styles.navLinkDropdown} ${
+                isActive(["/manager/request", "/manager/member"])
+                  ? styles.navLinkActive
+                  : ""
+              }`}
+              onClick={() => setShowManagementMenu(!showManagementMenu)}
+              onMouseEnter={() => setShowManagementMenu(true)}
+            >
+              Quản lý
+              <ChevronDown size={16} className={styles.chevronIcon} />
+            </button>
+
+            {showManagementMenu && (
+              <div
+                className={styles.managementDropdown}
+                onMouseLeave={() => setShowManagementMenu(false)}
+              >
+                <Link
+                  href="/manager/request"
+                  className={`${styles.managementItem} ${
+                    isActive("/manager/request")
+                      ? styles.managementItemActive
+                      : ""
+                  }`}
+                  onClick={() => setShowManagementMenu(false)}
+                >
+                  Quản lý đăng ký
+                </Link>
+                <Link
+                  href="/manager/member"
+                  className={`${styles.managementItem} ${
+                    isActive("/manager/member")
+                      ? styles.managementItemActive
+                      : ""
+                  }`}
+                  onClick={() => setShowManagementMenu(false)}
+                >
+                  Quản lý đánh giá
+                </Link>
+              </div>
+            )}
+          </div>
+
           <Link
             href="/contact"
             className={`${styles.navLink} ${

@@ -9,12 +9,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.web.backend.dtos.request.event.EventRequestDTO;
+import project.web.backend.dtos.request.user.EventMemberFilterRequestDTO;
+import project.web.backend.dtos.request.user.PersonalRatingDTO;
+import project.web.backend.dtos.request.user.WorkRatingRequestDTO;
 import project.web.backend.dtos.response.PageResponseDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
-import project.web.backend.entities.Category;
-import project.web.backend.entities.Event;
-import project.web.backend.entities.EventRegistration;
-import project.web.backend.entities.User;
+import project.web.backend.dtos.response.user.EventMemberResponseDTO;
+import project.web.backend.entities.*;
 import project.web.backend.exceptions.AppException;
 import project.web.backend.mappers.EventMapper;
 import project.web.backend.repositories.*;
@@ -22,7 +23,11 @@ import project.web.backend.utils.commons.AppConst;
 import project.web.backend.utils.commons.SecurityUtil;
 import project.web.backend.utils.enums.ErrorCode;
 import project.web.backend.utils.enums.EventRequestStatus;
+import project.web.backend.utils.enums.WorkStatus;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -309,5 +314,56 @@ public class EventService {
             eventResponse.setCountMembers(memberCountMap.get(eventResponse.getId()));
             eventResponse.setCountPosts(postCountMap.get(eventResponse.getId()));
         });
+    }
+
+
+    public PageResponseDTO<List<EventMemberResponseDTO>> getEventMembers(EventMemberFilterRequestDTO dto, Pageable pageable) {
+        String search = dto.getSearch();
+        WorkStatus status = dto.getStatus();
+        Long eventId = dto.getEventId();
+
+        Page<EventMember> eventMembers = eventMemberRepository.findByFilter(search, status, eventId, pageable);
+        List<EventMemberResponseDTO> dtos = eventMembers.stream()
+                .map(em -> {
+                    Long workingHour = Duration.between(
+                            em.getCreatedAt().toInstant(),
+                            Instant.now()
+                    ).toHours();
+
+                    return EventMemberResponseDTO.builder()
+                            .email(em.getUser().getEmail())
+                            .id(em.getId())
+                            .eventName(em.getEvent().getName())
+                            .memberName(em.getUser().getFullName())
+                            .workingHour(workingHour)
+                            .registrationDate(em.getCreatedAt())
+                            .status(em.getStatus())
+                            .build();
+                })
+                .toList();
+
+        return PageResponseDTO.<List<EventMemberResponseDTO>>builder()
+                .data(dtos)
+                .pageNo(pageable.getPageNumber())
+                .pageSize(pageable.getPageSize())
+                .totalPage(eventMembers.getTotalPages())
+                .build();
+    }
+
+    public String rating(WorkRatingRequestDTO dto) {
+        List<PersonalRatingDTO> personalRatingDTOS = dto.getDtos();
+        Map<Long, Boolean> idRateMap = personalRatingDTOS.stream().collect(Collectors.toMap(
+                PersonalRatingDTO::getId, PersonalRatingDTO::getIsCompleted));
+        List<EventMember> eventMembers = eventMemberRepository.findAllById(idRateMap.keySet())
+                .stream()
+                .peek(em -> {
+                    if (idRateMap.get(em.getId())) {
+                        em.setStatus(WorkStatus.COMPLETED);
+                    } else {
+                        em.setStatus(WorkStatus.ABSENT);
+                    }
+                }).toList();
+        eventMemberRepository.saveAll(eventMembers);
+        return "Done";
     }
 }
