@@ -185,7 +185,7 @@ export function Header() {
                   }`}
                   onClick={() => setShowManagementMenu(false)}
                 >
-                  Quản lý yêu cầu tạo sự kiện
+                  Yêu cầu tạo sự kiện
                 </Link>
               </div>
             )}
