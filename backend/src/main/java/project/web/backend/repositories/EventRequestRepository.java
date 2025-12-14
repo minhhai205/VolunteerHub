@@ -8,6 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import project.web.backend.entities.EventCreateRequest;
+import project.web.backend.entities.EventRegistration;
 import project.web.backend.utils.enums.EventRequestStatus;
 
 import java.util.List;
@@ -67,4 +68,17 @@ public interface EventRequestRepository extends CrudRepository<EventCreateReques
                 FROM EventCreateRequest ec
             """)
     List<Object[]> countStatistics();
+
+
+    @Query("""
+            SELECT er FROM EventCreateRequest er
+            JOIN er.manager u
+            WHERE
+                u.email=:email
+                    AND
+                (:status IS NULL OR er.status=:status)
+            """)
+    Page<EventCreateRequest> findByStatusAndManagerEmail(@Param("email") String email,
+                                                         @Param("status") EventRequestStatus status,
+                                                         Pageable pageable);
 }

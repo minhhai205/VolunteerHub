@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public enum EventRequestStatus {
     @JsonProperty("pending")
     PENDING,
-    @JsonProperty("approve")
+    @JsonProperty("approved")
     APPROVED,
     @JsonProperty("rejected")
     REJECTED,
