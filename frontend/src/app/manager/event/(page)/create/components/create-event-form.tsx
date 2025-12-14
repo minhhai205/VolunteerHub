@@ -19,6 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import styles from "./create-event-form.module.css";
 import { uploadToCloudinary } from "@/lib/upload";
 import { getAccessToken } from "@/lib/token";
+import { toastManager } from "@/components/static/toast/toast";
 
 export function CreateEventForm() {
   const [formData, setFormData] = useState({
@@ -86,16 +87,28 @@ export function CreateEventForm() {
       return;
     }
 
+    // --- 2. DATE VALIDATION ---
+    const startDateTime = new Date(
+      `${formData.startDate}T${formData.startTime}`
+    );
+    const endDateTime = new Date(`${formData.endDate}T${formData.endTime}`);
+
+    if (endDateTime < startDateTime) {
+      toastManager.error("Ngày kết thúc không được trước ngày bắt đầu.");
+      return;
+    }
+
+    if (startDateTime > endDateTime) {
+      toastManager.error("Ngày bắt đầu không được sau ngày kết thúc.");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const imageUrl = await uploadToCloudinary(formData.image);
-      const startDateISO = new Date(
-        `${formData.startDate}T${formData.startTime}`
-      ).toISOString();
-      const endDateISO = new Date(
-        `${formData.endDate}T${formData.endTime}`
-      ).toISOString();
+      const startDateISO = startDateTime.toISOString();
+      const endDateISO = endDateTime.toISOString();
 
       const apiPayload = {
         name: formData.name,
@@ -127,6 +140,10 @@ export function CreateEventForm() {
           errorData?.message || `Lỗi từ server: ${response.statusText}`
         );
       }
+
+      // --- SUCCESS TOAST ---
+      toastManager.success("Đã tạo sự kiện thành công");
+
       setFormData({
         name: "",
         description: "",
