@@ -45,7 +45,7 @@ public class JwtService {
         long ttl = 0;
         String secretKey;
         if (type.equals(TokenType.ACCESS)) {
-            ttl = accessTTL * 10 * 1000L;
+            ttl = accessTTL * 60 * 1000L;
             secretKey = accessKey;
         } else if (type.equals(TokenType.REFRESH)) {
             ttl = refreshTTL * 30 * 24 * 60 * 60 * 1000L;

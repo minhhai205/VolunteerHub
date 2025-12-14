@@ -31,6 +31,7 @@ export default function VolunteerRow({
         <Checkbox
           checked={isSelected}
           onCheckedChange={() => onSelect(volunteer.id)}
+          disabled={!isPending}
         />
       </td>
       <td>

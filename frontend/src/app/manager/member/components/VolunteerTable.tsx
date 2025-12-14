@@ -33,6 +33,8 @@ export default function VolunteerTable({
   onUpdateStatus,
   isLoading = false,
 }: VolunteerTableProps) {
+  const allPending = volunteers.length > 0 && volunteers.every(v => v.status.toLowerCase() === "pending");
+  
   return (
     <div className={styles.tableContainer}>
       <table className={styles.table}>
@@ -42,7 +44,8 @@ export default function VolunteerTable({
               <Checkbox
                 checked={
                   volunteers.length > 0 &&
-                  selectedVolunteers.length === volunteers.length
+                  volunteers.filter(v => v.status.toLowerCase() === "pending").length > 0 &&
+                  volunteers.filter(v => v.status.toLowerCase() === "pending").every(v => selectedVolunteers.includes(v.id))
                 }
                 onCheckedChange={onSelectAll}
               />
@@ -52,30 +55,32 @@ export default function VolunteerTable({
             <th>Ngày đăng ký</th>
             <th>Giờ tham gia</th>
             <th>Trạng thái</th>
-            <th className="text-right">Hành động</th>
+            <th>Hành động</th>
           </tr>
         </thead>
-        <tbody>
-          {volunteers.map((volunteer) => (
-            <VolunteerRow
-              key={volunteer.id}
-              volunteer={volunteer}
-              isSelected={selectedVolunteers.includes(volunteer.id)}
-              onSelect={onSelectVolunteer}
-              onUpdateStatus={onUpdateStatus}
-              isLoading={isLoading}
-            />
-          ))}
+        <tbody className={isLoading ? styles.loadingRows : ""}>
+          {volunteers.length === 0 && !isLoading ? (
+            <tr>
+              <td colSpan={7} className={styles.emptyRow}>
+                <p className={styles.emptyText}>
+                  Không tìm thấy tình nguyện viên nào
+                </p>
+              </td>
+            </tr>
+          ) : (
+            volunteers.map((volunteer) => (
+              <VolunteerRow
+                key={volunteer.id}
+                volunteer={volunteer}
+                isSelected={selectedVolunteers.includes(volunteer.id)}
+                onSelect={onSelectVolunteer}
+                onUpdateStatus={onUpdateStatus}
+                isLoading={isLoading}
+              />
+            ))
+          )}
         </tbody>
       </table>
-
-      {volunteers.length === 0 && (
-        <div className={styles.emptyState}>
-          <p className={styles.emptyText}>
-            Không tìm thấy tình nguyện viên nào
-          </p>
-        </div>
-      )}
     </div>
   );
 }
