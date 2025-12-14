@@ -6,6 +6,12 @@
   min-height: 100vh;
 }
 
+.backgroundContainer {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f0f9f0;
+}
+
 .filterHeader {
   display: flex;
   justify-content: center; /* Updated from space-between */

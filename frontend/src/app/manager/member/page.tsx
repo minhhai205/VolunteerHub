@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import CompletionHeader from "./components/CompletionHeader";
 import FilterBar from "./components/FilterBar";
 import BulkActions from "./components/BulkActions";
@@ -17,6 +18,13 @@ import styles from "./completion.module.css";
 import { Header } from "@/components/static/HeaderManager";
 import { Footer } from "@/components/static/Footer";
 import { getAccessToken } from "@/lib/token";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 
 interface EventMemberResponse {
   status: number;
@@ -70,6 +78,8 @@ export interface EventMemberFilterDTO {
   search?: string;
   eventId?: number;
   status?: string;
+  page?: number;
+  size?: number;
 }
 
 interface WorkRatingDTO {
@@ -91,10 +101,18 @@ export default function CompletionPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedVolunteers, setSelectedVolunteers] = useState<number[]>([]);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+
   const dto: EventMemberFilterDTO = {
     search: searchQuery || undefined,
     eventId: selectedEvent !== "all" ? Number(selectedEvent) : undefined,
     status: statusFilter !== "all" ? statusFilter.toUpperCase() : undefined,
+    page: currentPage - 1, // Backend starts from 0
+    size: pageSize,
   };
 
   function buildQueryParams(dto: Record<string, any>): URLSearchParams {
@@ -117,7 +135,7 @@ export default function CompletionPage() {
 
       const requestBody: WorkRatingRequest = { dtos };
 
-      const response = await fetch(url, {
+      const response = await fetchWithAuth(url, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -149,7 +167,7 @@ export default function CompletionPage() {
       const token = getAccessToken();
       const url = `http://localhost:8080/api/event/manager/my-event`;
 
-      const response = await fetch(url, {
+      const response = await fetchWithAuth(url, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -216,6 +234,8 @@ export default function CompletionPage() {
         }));
 
         setVolunteers(transformedData);
+        setTotalPages(result.data.totalPage);
+        setTotalItems(result.data.total);
       } else {
         throw new Error(result.message || "Không thể tải dữ liệu");
       }
@@ -234,12 +254,17 @@ export default function CompletionPage() {
   }, []);
 
   useEffect(() => {
-    fetchEventMembers();
+    setCurrentPage(1); // Reset to page 1 when filters change
   }, [selectedEvent, statusFilter]);
+
+  useEffect(() => {
+    fetchEventMembers();
+  }, [currentPage, pageSize, selectedEvent, statusFilter]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (searchQuery !== undefined) {
+        setCurrentPage(1); // Reset to page 1 when searching
         fetchEventMembers();
       }
     }, 500);
@@ -267,19 +292,15 @@ export default function CompletionPage() {
     try {
       setLoading(true);
 
-      // Map status string to boolean isCompleted for API
       const isCompleted = status.toUpperCase() === "COMPLETED";
 
-      // Prepare DTOs for bulk update
       const dtos: WorkRatingDTO[] = selectedVolunteers.map((id) => ({
         id,
         isCompleted,
       }));
 
-      // Call API
       await updateWorkRating(dtos);
 
-      // Update local state
       setVolunteers(
         volunteers.map((v) =>
           selectedVolunteers.includes(v.id) ? { ...v, status } : v
@@ -302,10 +323,8 @@ export default function CompletionPage() {
     try {
       setLoading(true);
 
-      // Map status string to boolean isCompleted for API
       const isCompleted = status.toUpperCase() === "COMPLETED";
 
-      // Prepare DTO for single update
       const dtos: WorkRatingDTO[] = [
         {
           id,
@@ -313,10 +332,8 @@ export default function CompletionPage() {
         },
       ];
 
-      // Call API
       await updateWorkRating(dtos);
 
-      // Update local state
       setVolunteers(
         volunteers.map((v) => (v.id === id ? { ...v, status } : v))
       );
@@ -330,64 +347,184 @@ export default function CompletionPage() {
     }
   };
 
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      setSelectedVolunteers([]); // Clear selections when changing page
+    }
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+    setSelectedVolunteers([]); // Clear selections
+  };
+
   return (
     <>
       <Header></Header>
-      <div className={styles.container}>
-        <CompletionHeader
-          title="Đánh Dấu Hoàn Thành"
-          subtitle="Cập nhật trạng thái tham gia của tình nguyện viên sau sự kiện"
-        />
+      <div className={styles.backgroundContainer}>
+        <div className={styles.container}>
+          <CompletionHeader
+            title="Đánh Dấu Hoàn Thành"
+            subtitle="Cập nhật trạng thái tham gia của tình nguyện viên sau sự kiện"
+          />
 
-        <div className="flex justify-center">
-          <Card className="w-full">
-            <CardHeader>
-              <div className={styles.filterHeader}>
-                <CardTitle>Danh sách tình nguyện viên</CardTitle>
-                <BulkActions
-                  selectedCount={selectedVolunteers.length}
-                  onMarkCompleted={() => handleBulkUpdate("COMPLETED")}
-                  onMarkAbsent={() => handleBulkUpdate("ABSENT")}
-                />
-              </div>
-              <CardDescription>
-                Quản lý trạng thái tham gia của tình nguyện viên
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <FilterBar
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                selectedEvent={selectedEvent}
-                onEventChange={setSelectedEvent}
-                statusFilter={statusFilter}
-                onStatusChange={setStatusFilter}
-                events={events}
-              />
-
-              {error && (
-                <div className="text-center py-8 text-red-500">{error}</div>
-              )}
-
-              {!error && (
-                <>
-                  {loading && (
-                    <div className="text-center py-8 text-gray-500">
-                      Đang tải dữ liệu...
-                    </div>
-                  )}
-                  <VolunteerTable
-                    volunteers={volunteers}
-                    selectedVolunteers={selectedVolunteers}
-                    onSelectAll={handleSelectAll}
-                    onSelectVolunteer={handleSelectVolunteer}
-                    onUpdateStatus={handleUpdateStatus}
-                    isLoading={loading}
+          <div className="flex justify-center">
+            <Card className="w-full">
+              <CardHeader>
+                <div className={styles.filterHeader}>
+                  <CardTitle>Danh sách tình nguyện viên</CardTitle>
+                  <BulkActions
+                    selectedCount={selectedVolunteers.length}
+                    onMarkCompleted={() => handleBulkUpdate("COMPLETED")}
+                    onMarkAbsent={() => handleBulkUpdate("ABSENT")}
                   />
-                </>
-              )}
-            </CardContent>
-          </Card>
+                </div>
+                <CardDescription>
+                  Quản lý trạng thái tham gia của tình nguyện viên
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <FilterBar
+                  searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
+                  selectedEvent={selectedEvent}
+                  onEventChange={setSelectedEvent}
+                  statusFilter={statusFilter}
+                  onStatusChange={setStatusFilter}
+                  events={events}
+                />
+
+                {error && (
+                  <div className="text-center py-8 text-red-500">{error}</div>
+                )}
+
+                {!error && (
+                  <>
+                    {loading && (
+                      <div className="text-center py-8 text-gray-500">
+                        Đang tải dữ liệu...
+                      </div>
+                    )}
+                    <VolunteerTable
+                      volunteers={volunteers}
+                      selectedVolunteers={selectedVolunteers}
+                      onSelectAll={handleSelectAll}
+                      onSelectVolunteer={handleSelectVolunteer}
+                      onUpdateStatus={handleUpdateStatus}
+                      isLoading={loading}
+                    />
+
+                    {/* Pagination Controls */}
+                    {volunteers.length > 0 && (
+                      <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t pt-4">
+                        {/* Page size selector */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600">
+                            Hiển thị:
+                          </span>
+                          <select
+                            value={pageSize}
+                            onChange={(e) =>
+                              handlePageSizeChange(Number(e.target.value))
+                            }
+                            className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                          >
+                            <option value={5}>5</option>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                          </select>
+                          <span className="text-sm text-gray-600">/ trang</span>
+                        </div>
+
+                        {/* Page navigation */}
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePageChange(1)}
+                            disabled={currentPage === 1}
+                            className="hover:bg-green-50 hover:border-green-300 disabled:opacity-50"
+                          >
+                            <ChevronsLeft className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className="hover:bg-green-50 hover:border-green-300 disabled:opacity-50"
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                          </Button>
+
+                          <div className="flex items-center gap-1 px-2">
+                            {/* Show page numbers */}
+                            {Array.from(
+                              { length: Math.min(5, totalPages) },
+                              (_, i) => {
+                                let pageNum;
+                                if (totalPages <= 5) {
+                                  pageNum = i + 1;
+                                } else if (currentPage <= 3) {
+                                  pageNum = i + 1;
+                                } else if (currentPage >= totalPages - 2) {
+                                  pageNum = totalPages - 4 + i;
+                                } else {
+                                  pageNum = currentPage - 2 + i;
+                                }
+
+                                return (
+                                  <Button
+                                    key={pageNum}
+                                    variant={
+                                      currentPage === pageNum
+                                        ? "default"
+                                        : "outline"
+                                    }
+                                    size="sm"
+                                    onClick={() => handlePageChange(pageNum)}
+                                    className={
+                                      currentPage === pageNum
+                                        ? "bg-green-500 hover:bg-green-600 text-white"
+                                        : "hover:bg-green-50 hover:border-green-300"
+                                    }
+                                  >
+                                    {pageNum}
+                                  </Button>
+                                );
+                              }
+                            )}
+                          </div>
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className="hover:bg-green-50 hover:border-green-300 disabled:opacity-50"
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePageChange(totalPages)}
+                            disabled={currentPage === totalPages}
+                            className="hover:bg-green-50 hover:border-green-300 disabled:opacity-50"
+                          >
+                            <ChevronsRight className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
       <Footer></Footer>

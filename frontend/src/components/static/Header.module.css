@@ -226,8 +226,8 @@
   min-width: 220px;
   background: white;
   border-radius: 0.75rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
-              0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
   padding: 0.5rem;
   z-index: 50;
   animation: slideDownFade 0.2s ease-out;
@@ -296,12 +296,12 @@
   .userName {
     display: none;
   }
-  
+
   .userAvatar {
     width: 36px;
     height: 36px;
   }
-  
+
   .userInfoWrapper {
     gap: 0.5rem;
   }
@@ -321,7 +321,7 @@
 }
 
 .navLinkActive::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -8px;
   left: 0;
@@ -338,7 +338,7 @@
 }
 
 .navLink::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -8px;
   left: 0;
@@ -351,4 +351,82 @@
 
 .navLink:hover::after {
   background-color: rgba(220, 38, 38, 0.3);
+}
+
+/* Thêm vào file Header.module.css */
+
+/* Dropdown wrapper cho menu Quản lý */
+.dropdownWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Nav link có dropdown */
+.navLinkDropdown {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+/* Icon chevron */
+.chevronIcon {
+  transition: transform 0.2s ease;
+}
+
+.navLinkDropdown:hover .chevronIcon {
+  transform: rotate(180deg);
+}
+
+/* Management dropdown menu */
+.managementDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  padding: 8px;
+  z-index: 1000;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Management dropdown items */
+.managementItem {
+  display: block;
+  padding: 10px 16px;
+  color: #374151;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.managementItem:hover {
+  background: #f3f4f6;
+  color: #dc2626;
+}
+
+.managementItemActive {
+  background: #fee2e2;
+  color: #dc2626;
+  font-weight: 500;
 }

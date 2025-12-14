@@ -5,6 +5,7 @@
 .checkboxCell {
   padding: 1.25rem 1.25rem;
   width: 48px;
+  text-align: center;
 }
 
 .row td {
@@ -12,6 +13,10 @@
   font-size: 0.875rem;
   color: #374151;
   vertical-align: middle;
+}
+
+.row td:nth-child(n + 3) {
+  text-align: center;
 }
 
 .volunteerInfo {
@@ -58,7 +63,7 @@
 
 .actionButtons {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 0.5rem;
 }
 

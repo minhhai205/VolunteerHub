@@ -67,7 +67,7 @@ export default function VolunteerRow({
       </td>
       <td>
         <div className={styles.actionButtons}>
-          {volunteer.status !== "completed" && (
+          {
             <Button
               size="sm"
               variant="ghost"
@@ -78,8 +78,8 @@ export default function VolunteerRow({
             >
               <CheckCircle2 className="w-4 h-4" />
             </Button>
-          )}
-          {volunteer.status !== "absent" && (
+          }
+          {
             <Button
               size="sm"
               variant="ghost"
@@ -90,19 +90,7 @@ export default function VolunteerRow({
             >
               <XCircle className="w-4 h-4" />
             </Button>
-          )}
-          {volunteer.status !== "pending" && (
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => onUpdateStatus(volunteer.id, "pending")}
-              className={styles.pendingButton}
-              title="Đặt về chờ xác nhận"
-              disabled={isLoading || isPending}
-            >
-              <Clock className="w-4 h-4" />
-            </Button>
-          )}
+          }
         </div>
       </td>
     </tr>
