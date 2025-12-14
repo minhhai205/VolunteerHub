@@ -134,7 +134,11 @@ export function Header() {
           <div className={styles.dropdownWrapper}>
             <button
               className={`${styles.navLink} ${styles.navLinkDropdown} ${
-                isActive(["/manager/request", "/manager/member"])
+                isActive([
+                  "/manager/request",
+                  "/manager/member",
+                  "/manager/create-request",
+                ])
                   ? styles.navLinkActive
                   : ""
               }`}
@@ -171,6 +175,17 @@ export function Header() {
                   onClick={() => setShowManagementMenu(false)}
                 >
                   Quản lý đánh giá
+                </Link>
+                <Link
+                  href="/manager/create-request"
+                  className={`${styles.managementItem} ${
+                    isActive("/manager/create-request")
+                      ? styles.managementItemActive
+                      : ""
+                  }`}
+                  onClick={() => setShowManagementMenu(false)}
+                >
+                  Quản lý yêu cầu tạo sự kiện
                 </Link>
               </div>
             )}
