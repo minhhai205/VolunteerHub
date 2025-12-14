@@ -20,7 +20,7 @@ export function useEventStats() {
       try {
         setLoading(true);
         const response = await fetchWithAuth(
-          "http://localhost:8080/api/dashboard/statistics"
+          "http://localhost:8080/api/dashboard/manager/statistics"
         ).then((res) => res.json());
 
         if (!response.status) throw new Error("Failed to fetch stats");

@@ -14,7 +14,6 @@ import project.web.backend.dtos.response.ApiSuccessResponse;
 import project.web.backend.dtos.response.PageResponseDTO;
 import project.web.backend.dtos.response.event.EventRegistrationResponseDTO;
 import project.web.backend.dtos.response.event.EventRequestResponseDTO;
-import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.dtos.response.event.RegistrationStatusResponseDTO;
 import project.web.backend.services.EventRequestService;
 import project.web.backend.utils.enums.EventRequestStatus;
@@ -42,11 +41,13 @@ public class EventRequestController {
 
     @GetMapping("/request-list")
     public ApiSuccessResponse<PageResponseDTO<List<EventRequestResponseDTO>>> getAllEventRequest(
-            Pageable pageable
-
+            Pageable pageable,
+            @RequestParam(required = false, defaultValue = "") String search,
+            @RequestParam(required = false, defaultValue = "") String status
     ) {
+        EventRequestStatus enumStatus = (status.isBlank()) ? null : EventRequestStatus.valueOf(status.toUpperCase());
         return ApiSuccessResponse.<PageResponseDTO<List<EventRequestResponseDTO>>>builder()
-                .data(eventRequestService.getAllEventRequest(pageable))
+                .data(eventRequestService.getAllEventRequest(pageable, search, enumStatus))
                 .status(HttpStatus.OK.value())
                 .message("Get all event request successfully!")
                 .build();

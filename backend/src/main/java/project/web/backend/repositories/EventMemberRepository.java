@@ -10,9 +10,9 @@ import org.springframework.stereotype.Repository;
 import org.w3c.dom.stylesheets.LinkStyle;
 import project.web.backend.entities.EventMember;
 import project.web.backend.utils.enums.WorkStatus;
-
 import java.util.List;
 import java.util.Optional;
+
 
 @Repository
 public interface EventMemberRepository extends JpaRepository<EventMember, Long> {
@@ -47,4 +47,6 @@ public interface EventMemberRepository extends JpaRepository<EventMember, Long> 
             Pageable pageable
     );
     
+    @Query("SELECT COUNT(em.id) FROM EventMember em")
+    Long countAll();
 }

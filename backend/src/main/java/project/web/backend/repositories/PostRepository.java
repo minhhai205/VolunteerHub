@@ -85,4 +85,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("email") String email,
             @Param("daysAgo") LocalDateTime daysAgo
     );
+
+    @Query("""
+                SELECT COUNT(p.id)
+                FROM Post p
+                WHERE  p.createdAt >= :daysAgo
+            """)
+    Long countRecentPosts(
+            @Param("daysAgo") LocalDateTime daysAgo
+    );
 }
