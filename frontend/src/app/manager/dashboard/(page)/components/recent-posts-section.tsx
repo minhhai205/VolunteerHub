@@ -69,7 +69,7 @@ export function RecentPostsSection() {
                   </div>
                   <div className="flex items-center gap-1 text-muted-foreground">
                     <MessageCircle className="w-4 h-4" />
-                    <span className="text-xs">{post.comments.length}</span>
+                    <span className="text-xs">{post.commentsCount}</span>
                   </div>
                 </div>
               </div>
