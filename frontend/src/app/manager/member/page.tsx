@@ -338,6 +338,7 @@ export default function CompletionPage() {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
       setSelectedVolunteers([]); // Clear selections when changing page
+      window.scrollTo({ top: 0 }); // Scroll to top
     }
   };
 
@@ -345,6 +346,7 @@ export default function CompletionPage() {
     setPageSize(newSize);
     setCurrentPage(1); // Reset to first page when changing page size
     setSelectedVolunteers([]); // Clear selections
+    window.scrollTo({ top: 0 }); // Scroll to top
   };
 
   return (
