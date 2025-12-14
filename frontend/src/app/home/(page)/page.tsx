@@ -353,9 +353,11 @@ export default function Home() {
                   Đăng ký tình nguyện
                 </Button>
               </Link>
-              <Button size="lg" variant="outline">
-                Liên hệ với chúng tôi
-              </Button>
+              <Link href="/contact">
+                <Button size="lg" variant="outline">
+                  Liên hệ với chúng tôi
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
