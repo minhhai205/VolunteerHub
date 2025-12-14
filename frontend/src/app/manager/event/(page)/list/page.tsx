@@ -6,6 +6,7 @@ import { Header } from "@/components/static/HeaderManager";
 import { Footer } from "@/components/static/Footer";
 import { getAccessToken } from "@/lib/token";
 import { Search } from "lucide-react";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface Event {
   id: string;
@@ -156,7 +157,7 @@ export default function EventsPage() {
         params.append("search", searchQuery.trim());
         params.append("status", getStatusParam(activeFilter));
 
-        const response = await fetch(
+        const response = await fetchWithAuth(
           `http://localhost:8080/api/event/manager/my-event?${params.toString()}`,
           {
             method: "GET",

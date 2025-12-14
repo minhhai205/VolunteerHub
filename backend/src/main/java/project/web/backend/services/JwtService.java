@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import project.web.backend.entities.Token;
 import project.web.backend.entities.User;
 import project.web.backend.exceptions.AuthException;
@@ -27,13 +26,13 @@ import java.util.function.Function;
 @Slf4j
 @RequiredArgsConstructor
 public class JwtService {
+    private final TokenRepository tokenRepository;
     @Value("${security.jwt.access.timeout}")
     private long accessTTL;
     @Value("${security.jwt.refresh.timeout}")
     private long refreshTTL;
     @Value("${security.jwt.reset.timeout}")
     private long resetTTL;
-
     @Value("${security.jwt.access.secretKey}")
     private String accessKey;
     @Value("${security.jwt.refresh.secretKey}")
@@ -41,14 +40,12 @@ public class JwtService {
     @Value("${security.jwt.reset.secretKey}")
     private String resetKey;
 
-    private final TokenRepository tokenRepository;
-
     public String generateToken(User user, TokenType type) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
         long ttl = 0;
         String secretKey;
         if (type.equals(TokenType.ACCESS)) {
-            ttl = accessTTL * 60 * 1000L;
+            ttl = accessTTL * 10 * 1000L;
             secretKey = accessKey;
         } else if (type.equals(TokenType.REFRESH)) {
             ttl = refreshTTL * 30 * 24 * 60 * 60 * 1000L;
