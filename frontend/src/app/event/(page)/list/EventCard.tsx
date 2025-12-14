@@ -13,6 +13,7 @@ interface EventCardProps {
   countMembers: number;
   countPosts: number;
   imageUrl?: string;
+  status?: string;
 }
 
 export default function EventCard({
@@ -26,7 +27,24 @@ export default function EventCard({
   countMembers,
   countPosts,
   imageUrl,
+  status,
 }: EventCardProps) {
+  const getEventStatus = (): { label: string; className: string } => {
+    const now = new Date();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (now < start) {
+      return { label: "Sắp diễn ra", className: styles.statusUpcoming };
+    } else if (now >= start && now <= end) {
+      return { label: "Đang diễn ra", className: styles.statusOngoing };
+    } else {
+      return { label: "Đã kết thúc", className: styles.statusEnded };
+    }
+  };
+
+  const eventStatus = getEventStatus();
+
   const formattedStartDate = new Date(startDate).toLocaleDateString("vi-VN", {
     day: "2-digit",
     month: "2-digit",
@@ -51,6 +69,13 @@ export default function EventCard({
         {imageUrl && (
           <div className={styles.eventCardImageWrapper}>
             <img src={imageUrl} alt={name} className={styles.eventCardImage} />
+            <div
+              className={`${styles.statusBadgeCorner} ${eventStatus.className}`}
+            >
+              <span className={styles.statusBadgeText}>
+                {eventStatus.label}
+              </span>
+            </div>
           </div>
         )}
 
@@ -80,6 +105,10 @@ export default function EventCard({
                 {categoryNames.slice(0, 3).map((category, index) => (
                   <span key={index} className={styles.categoryTag}>
                     {category}
+                    {index <
+                      (categoryNames.length > 3
+                        ? 2
+                        : categoryNames.length - 1) && ", "}
                   </span>
                 ))}
                 {categoryNames.length > 3 && (

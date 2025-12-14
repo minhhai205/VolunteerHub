@@ -12,6 +12,7 @@ export interface EventCardData {
   countMembers: number;
   countPosts: number;
   imageUrl: string;
+  status?: string;
 }
 
 export interface Pageable {

@@ -328,6 +328,7 @@ export default function DashboardPage() {
                         ? event.imageUrl
                         : "https://pbs.twimg.com/media/GSHywsIaUAA0ero?format=jpg&name=4096x4096"
                     }
+                    status={event.status}
                   />
                 ))}
               </div>
