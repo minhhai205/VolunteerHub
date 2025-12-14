@@ -16,6 +16,7 @@ import project.web.backend.dtos.request.user.WorkRatingRequestDTO;
 import project.web.backend.dtos.response.ApiResponse;
 import project.web.backend.dtos.response.ApiSuccessResponse;
 import project.web.backend.dtos.response.PageResponseDTO;
+import project.web.backend.dtos.response.event.EventNameResponseDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.dtos.response.user.EventMemberResponseDTO;
 import project.web.backend.services.EventService;
@@ -65,6 +66,18 @@ public class EventController {
                 .message("Get all events successfully!")
                 .build();
     }
+
+
+    @GetMapping("/manager/my-event-name")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ApiSuccessResponse<List<EventNameResponseDTO>> getManagerMyEventName() {
+        return ApiSuccessResponse.<List<EventNameResponseDTO>>builder()
+                .data(eventService.getManagerMyEventName())
+                .status(HttpStatus.OK.value())
+                .message("Get all events successfully!")
+                .build();
+    }
+
 
     @GetMapping("/my-event")
     @PreAuthorize("hasRole('USER')")

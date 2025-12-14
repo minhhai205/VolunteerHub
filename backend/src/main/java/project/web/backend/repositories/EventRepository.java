@@ -77,6 +77,14 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             Pageable pageable);
 
 
+    @Query("""
+            SELECT e FROM Event e
+            JOIN e.manager em
+            WHERE em.email=:email
+            """)
+    List<Event> findManagerEventTungTungTungSahurr(@Param("email") String email);
+
+
     @EntityGraph(attributePaths = {
             "categories"
     })

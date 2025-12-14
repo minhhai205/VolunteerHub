@@ -13,6 +13,7 @@ import project.web.backend.dtos.request.user.EventMemberFilterRequestDTO;
 import project.web.backend.dtos.request.user.PersonalRatingDTO;
 import project.web.backend.dtos.request.user.WorkRatingRequestDTO;
 import project.web.backend.dtos.response.PageResponseDTO;
+import project.web.backend.dtos.response.event.EventNameResponseDTO;
 import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.dtos.response.user.EventMemberResponseDTO;
 import project.web.backend.entities.*;
@@ -100,6 +101,18 @@ public class EventService {
                 .totalPage(events.getTotalPages())
                 .data(eventResponses)
                 .build();
+    }
+
+
+    public List<EventNameResponseDTO> getManagerMyEventName() {
+        return eventRepository
+                .findManagerEventTungTungTungSahurr(SecurityUtil.getCurrentEmail())
+                .stream()
+                .map(e -> EventNameResponseDTO.builder()
+                        .id(e.getId())
+                        .name(e.getName())
+                        .build())
+                .toList();
     }
 
 
