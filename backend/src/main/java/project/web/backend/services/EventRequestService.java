@@ -166,9 +166,9 @@ public class EventRequestService {
         return eventRequestMapper.toResponseDTO(request);
     }
 
-    public PageResponseDTO<List<EventRegistrationResponseDTO>> getAllRegistration(Pageable pageable, EventRequestStatus status) {
+    public PageResponseDTO<List<EventRegistrationResponseDTO>> getAllRegistration(Pageable pageable, EventRequestStatus status, Long search) {
         String managerEmail = SecurityUtil.getCurrentEmail();
-        Page<EventRegistration> registrations = eventRegistrationRepository.getAll(pageable, status, managerEmail);
+        Page<EventRegistration> registrations = eventRegistrationRepository.getAll(pageable, status, managerEmail, search);
         List<EventRegistrationResponseDTO> dtos = registrations.stream()
                 .map(eventRequestMapper::toEventRegistrationResponseDTO)
                 .toList();

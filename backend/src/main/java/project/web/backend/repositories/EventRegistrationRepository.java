@@ -20,11 +20,13 @@ public interface EventRegistrationRepository extends JpaRepository<EventRegistra
             JOIN e.manager m
             WHERE (:status IS NULL OR er.status = :status)
             AND m.email=:email
+            AND (:eventId IS NULL OR e.id = :eventId)
             """)
     Page<EventRegistration> getAll(
             Pageable pageable,
             @Param("status") EventRequestStatus status,
-            @Param("email") String managerEmail
+            @Param("email") String managerEmail,
+            @Param("eventId") Long eventId
     );
 
     @Query("""

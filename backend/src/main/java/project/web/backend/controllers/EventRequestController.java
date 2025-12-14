@@ -79,11 +79,12 @@ public class EventRequestController {
     @PreAuthorize("hasRole('MANAGER')")
     public ApiSuccessResponse<PageResponseDTO<List<EventRegistrationResponseDTO>>> allRegistrationRequest(
             Pageable pageable,
-            @RequestParam(required = false, defaultValue = "") String status
+            @RequestParam(required = false, defaultValue = "") String status,
+            @RequestParam(required = false) Long eventId
     ) {
         EventRequestStatus enumStatus = (status.isBlank()) ? null : EventRequestStatus.valueOf(status.toUpperCase());
         return ApiSuccessResponse.<PageResponseDTO<List<EventRegistrationResponseDTO>>>builder()
-                .data(eventRequestService.getAllRegistration(pageable, enumStatus))
+                .data(eventRequestService.getAllRegistration(pageable, enumStatus, eventId))
                 .message("Get all registrations successfully")
                 .status(HttpStatus.OK.value())
                 .build();
