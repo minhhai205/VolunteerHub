@@ -492,7 +492,7 @@ export default function EventsPage() {
           <div>
             <h1 className={styles.title}>Quản lý sự kiện tình nguyện</h1>
             <p className={styles.subtitle}>
-              Theo dõi và quản lý các hoạt động tình nguyện của UET
+              Theo dõi và quản lý các hoạt động tình nguyện do bạn quản lý
             </p>
           </div>
           <button
