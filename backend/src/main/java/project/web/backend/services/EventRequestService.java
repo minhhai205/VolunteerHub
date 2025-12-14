@@ -9,11 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 import project.web.backend.dtos.request.event.EventRequestDTO;
 import project.web.backend.dtos.request.notification.NotificationPayload;
 import project.web.backend.dtos.response.PageResponseDTO;
+import project.web.backend.dtos.response.event.EventCreationResponseDTO;
 import project.web.backend.dtos.response.event.EventRegistrationResponseDTO;
 import project.web.backend.dtos.response.event.EventRequestResponseDTO;
 import project.web.backend.dtos.response.event.RegistrationStatusResponseDTO;
 import project.web.backend.entities.*;
 import project.web.backend.exceptions.AppException;
+import project.web.backend.mappers.EventCreationMapper;
 import project.web.backend.mappers.EventMapper;
 import project.web.backend.mappers.EventRequestMapper;
 import project.web.backend.repositories.*;
@@ -37,6 +39,7 @@ public class EventRequestService {
     private final EventMapper eventMapper;
     private final PushNotificationService pushNotificationService;
     private final EventMemberRepository eventMemberRepository;
+    private final EventCreationMapper eventCreationMapper;
 
     public EventRequestResponseDTO createEventRequest(EventRequestDTO eventRequestDTO) {
         log.info("------------ Create new event request --------------");
@@ -265,4 +268,20 @@ public class EventRequestService {
     }
 
 
+    public PageResponseDTO<List<EventCreationResponseDTO>> createRequest(EventRequestStatus status, Pageable pageable) {
+        String managerEmail = SecurityUtil.getCurrentEmail();
+
+        Page<EventCreateRequest> requests = eventRequestRepository.findByStatusAndManagerEmail(managerEmail, status, pageable);
+        List<EventCreationResponseDTO> dtos = requests.stream()
+                .map(eventCreationMapper::toDTO)
+                .toList();
+
+        return PageResponseDTO.<List<EventCreationResponseDTO>>builder()
+                .pageNo(pageable.getPageNumber())
+                .totalPage(requests.getTotalPages())
+                .pageSize(pageable.getPageSize())
+                .data(dtos)
+                .total(requests.getTotalElements())
+                .build();
+    }
 }
