@@ -164,14 +164,10 @@ export default function CompletionPage() {
   // Fetch events from API
   const fetchEvents = async () => {
     try {
-      const token = getAccessToken();
       const url = `http://localhost:8080/api/event/manager/my-event`;
 
       const response = await fetchWithAuth(url, {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       if (!response.ok) {
@@ -201,15 +197,11 @@ export default function CompletionPage() {
     setError(null);
 
     try {
-      const token = getAccessToken();
       const params = buildQueryParams(dto);
       const url = `http://localhost:8080/api/event/event-members?${params.toString()}`;
 
-      const response = await fetch(url, {
+      const response = await fetchWithAuth(url, {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       if (!response.ok) {
@@ -259,24 +251,23 @@ export default function CompletionPage() {
 
   useEffect(() => {
     fetchEventMembers();
-  }, [currentPage, pageSize, selectedEvent, statusFilter]);
+  }, [currentPage, pageSize, selectedEvent, statusFilter, searchQuery]);
 
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchQuery !== undefined) {
-        setCurrentPage(1); // Reset to page 1 when searching
-        fetchEventMembers();
-      }
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery]);
+  const handleSearchSubmit = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1); // Reset to page 1 when searching
+  };
 
   const handleSelectAll = () => {
-    if (selectedVolunteers.length === volunteers.length) {
+    // Chỉ select những volunteer có status pending
+    const pendingVolunteers = volunteers
+      .filter((v) => v.status.toLowerCase() === "pending")
+      .map((v) => v.id);
+
+    if (selectedVolunteers.length === pendingVolunteers.length) {
       setSelectedVolunteers([]);
     } else {
-      setSelectedVolunteers(volunteers.map((v) => v.id));
+      setSelectedVolunteers(pendingVolunteers);
     }
   };
 
@@ -301,11 +292,8 @@ export default function CompletionPage() {
 
       await updateWorkRating(dtos);
 
-      setVolunteers(
-        volunteers.map((v) =>
-          selectedVolunteers.includes(v.id) ? { ...v, status } : v
-        )
-      );
+      // Fetch lại data từ backend
+      await fetchEventMembers();
       setSelectedVolunteers([]);
     } catch (err) {
       console.error("Error in bulk update:", err);
@@ -334,9 +322,8 @@ export default function CompletionPage() {
 
       await updateWorkRating(dtos);
 
-      setVolunteers(
-        volunteers.map((v) => (v.id === id ? { ...v, status } : v))
-      );
+      // Fetch lại data từ backend
+      await fetchEventMembers();
     } catch (err) {
       console.error("Error in single update:", err);
       setError(
@@ -375,11 +362,6 @@ export default function CompletionPage() {
               <CardHeader>
                 <div className={styles.filterHeader}>
                   <CardTitle>Danh sách tình nguyện viên</CardTitle>
-                  <BulkActions
-                    selectedCount={selectedVolunteers.length}
-                    onMarkCompleted={() => handleBulkUpdate("COMPLETED")}
-                    onMarkAbsent={() => handleBulkUpdate("ABSENT")}
-                  />
                 </div>
                 <CardDescription>
                   Quản lý trạng thái tham gia của tình nguyện viên
@@ -389,11 +371,19 @@ export default function CompletionPage() {
                 <FilterBar
                   searchQuery={searchQuery}
                   onSearchChange={setSearchQuery}
+                  onSearchSubmit={handleSearchSubmit}
                   selectedEvent={selectedEvent}
                   onEventChange={setSelectedEvent}
                   statusFilter={statusFilter}
                   onStatusChange={setStatusFilter}
                   events={events}
+                />
+
+                <BulkActions
+                  selectedCount={selectedVolunteers.length}
+                  onMarkCompleted={() => handleBulkUpdate("COMPLETED")}
+                  onMarkAbsent={() => handleBulkUpdate("ABSENT")}
+                  className="mt-6 mb-6"
                 />
 
                 {error && (
@@ -402,11 +392,6 @@ export default function CompletionPage() {
 
                 {!error && (
                   <>
-                    {loading && (
-                      <div className="text-center py-8 text-gray-500">
-                        Đang tải dữ liệu...
-                      </div>
-                    )}
                     <VolunteerTable
                       volunteers={volunteers}
                       selectedVolunteers={selectedVolunteers}
