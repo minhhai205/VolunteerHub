@@ -21,6 +21,11 @@ export interface Pageable {
   sort?: string[];
 }
 
+export interface FilterParams {
+  category?: string;
+  status?: string;
+}
+
 export interface PageResponse<T> {
   data: T[];
   totalPage: number;
@@ -28,7 +33,11 @@ export interface PageResponse<T> {
   pageSize: number;
 }
 
-export function useEventList(search: string = "", pageable: Pageable) {
+export function useEventList(
+  search: string = "",
+  pageable: Pageable,
+  filters?: FilterParams
+) {
   const [events, setEvents] = useState<EventCardData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,6 +62,14 @@ export function useEventList(search: string = "", pageable: Pageable) {
 
         // Thêm search nếu có
         params.append("search", search.trim());
+
+        // Thêm filters nếu có
+        if (filters?.category) {
+          params.append("category", filters.category);
+        }
+        if (filters?.status) {
+          params.append("status", filters.status);
+        }
         const url = `http://localhost:8080/api/event/event-list?${params.toString()}`;
 
         const response = await fetchWithAuth(url, {
@@ -93,7 +110,14 @@ export function useEventList(search: string = "", pageable: Pageable) {
     };
 
     fetchEvents();
-  }, [search, pageable.page, pageable.size, pageable.sort]);
+  }, [
+    search,
+    pageable.page,
+    pageable.size,
+    pageable.sort,
+    filters?.category,
+    filters?.status,
+  ]);
 
   return {
     events,

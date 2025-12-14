@@ -86,11 +86,11 @@ export default function EventCard({
           <div className={styles.eventCardInfo}>
             <div className={styles.eventCardDate}>
               <Calendar size={16} />
-              <span>{formattedStartDate}</span>
+              <span>Ngày bắt đầu: {formattedStartDate}</span>
             </div>
             <div className={styles.eventCardDate}>
               <Calendar size={16} />
-              <span>{formattedEndDate}</span>
+              <span>Ngày kết thúc: {formattedEndDate}</span>
             </div>
             <div className={styles.eventCardLocation}>
               <MapPin size={16} />
