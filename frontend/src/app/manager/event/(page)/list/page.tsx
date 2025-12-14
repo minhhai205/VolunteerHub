@@ -133,7 +133,7 @@ export default function EventsPage() {
 
   // Scroll to top khi currentPage thay đổi
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0 });
   }, [currentPage]);
 
   useEffect(() => {
@@ -345,8 +345,8 @@ export default function EventsPage() {
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 0 && newPage < totalPages) {
-      // Scroll to top with smooth animation
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      // Scroll to top
+      window.scrollTo({ top: 0 });
       // Change page
       setCurrentPage(newPage);
     }
