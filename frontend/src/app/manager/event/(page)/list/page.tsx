@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./events.module.css";
 import { Header } from "@/components/static/HeaderManager";
 import { Footer } from "@/components/static/Footer";
@@ -57,6 +58,7 @@ const getEventStatus = (
 };
 
 export default function EventsPage() {
+  const router = useRouter();
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -417,11 +419,44 @@ export default function EventsPage() {
       <Header />
 
       <main className={styles.main}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Quản lý sự kiện tình nguyện</h1>
-          <p className={styles.subtitle}>
-            Theo dõi và quản lý các hoạt động tình nguyện của UET
-          </p>
+        <div
+          className={styles.header}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "2rem",
+          }}
+        >
+          <div>
+            <h1 className={styles.title}>Quản lý sự kiện tình nguyện</h1>
+            <p className={styles.subtitle}>
+              Theo dõi và quản lý các hoạt động tình nguyện của UET
+            </p>
+          </div>
+          <button
+            onClick={() => router.push("/manager/event/create")}
+            style={{
+              padding: "0.75rem 1.5rem",
+              backgroundColor: "#16a34a",
+              color: "white",
+              border: "none",
+              borderRadius: "0.5rem",
+              fontSize: "1rem",
+              fontWeight: "600",
+              cursor: "pointer",
+              transition: "background-color 0.2s",
+              whiteSpace: "nowrap",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#15803d";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#16a34a";
+            }}
+          >
+            + Tạo sự kiện mới
+          </button>
         </div>
 
         <div className={styles.controls}>
