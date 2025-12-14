@@ -81,3 +81,34 @@
     width: 100%;
   }
 }
+
+/* Thêm vào file event-request-filter.module.css */
+
+.eventSelect {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #a8d5ba;
+  border-radius: 12px;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.eventSelect:hover {
+  border-color: #7ec699;
+  box-shadow: 0 2px 8px rgba(168, 213, 186, 0.2);
+}
+
+.eventSelect:focus {
+  outline: none;
+  border-color: #6bb889;
+  box-shadow: 0 0 0 3px rgba(168, 213, 186, 0.15);
+}
+
+.eventSelect option {
+  padding: 0.5rem;
+}
