@@ -289,8 +289,43 @@ export default function EventRequestsManager() {
     <div className={styles.container}>
       <EventRequestHeader totalRequests={totalElements} />
 
-      {/* Event Search/Filter */}
-      <div className={filterStyles.filterContainer}>
+      {/* Filter Buttons and Event Search */}
+      <div className={filterStyles.filterWrapper}>
+        <div className={filterStyles.filterContainer}>
+          <button
+            onClick={() => handleFilterChange(null)}
+            className={`${filterStyles.filterButton} ${
+              filterStyles.filterAll
+            } ${filterStatus === null ? filterStyles.active : ""}`}
+          >
+            Tất cả
+          </button>
+          <button
+            onClick={() => handleFilterChange("pending")}
+            className={`${filterStyles.filterButton} ${
+              filterStyles.filterPending
+            } ${filterStatus === "pending" ? filterStyles.active : ""}`}
+          >
+            Chưa duyệt
+          </button>
+          <button
+            onClick={() => handleFilterChange("approved")}
+            className={`${filterStyles.filterButton} ${
+              filterStyles.filterApproved
+            } ${filterStatus === "approved" ? filterStyles.active : ""}`}
+          >
+            Đã duyệt
+          </button>
+          <button
+            onClick={() => handleFilterChange("rejected")}
+            className={`${filterStyles.filterButton} ${
+              filterStyles.filterRejected
+            } ${filterStatus === "rejected" ? filterStyles.active : ""}`}
+          >
+            Đã từ chối
+          </button>
+        </div>
+
         <select
           value={selectedEventId ?? ""}
           onChange={(e) =>
@@ -305,42 +340,6 @@ export default function EventRequestsManager() {
             </option>
           ))}
         </select>
-      </div>
-
-      {/* Filter Buttons */}
-      <div className={filterStyles.filterContainer}>
-        <button
-          onClick={() => handleFilterChange(null)}
-          className={`${filterStyles.filterButton} ${filterStyles.filterAll} ${
-            filterStatus === null ? filterStyles.active : ""
-          }`}
-        >
-          Tất cả
-        </button>
-        <button
-          onClick={() => handleFilterChange("pending")}
-          className={`${filterStyles.filterButton} ${
-            filterStyles.filterPending
-          } ${filterStatus === "pending" ? filterStyles.active : ""}`}
-        >
-          Chưa duyệt
-        </button>
-        <button
-          onClick={() => handleFilterChange("approved")}
-          className={`${filterStyles.filterButton} ${
-            filterStyles.filterApproved
-          } ${filterStatus === "approved" ? filterStyles.active : ""}`}
-        >
-          Đã duyệt
-        </button>
-        <button
-          onClick={() => handleFilterChange("rejected")}
-          className={`${filterStyles.filterButton} ${
-            filterStyles.filterRejected
-          } ${filterStatus === "rejected" ? filterStyles.active : ""}`}
-        >
-          Đã từ chối
-        </button>
       </div>
 
       {requests.length === 0 ? (
