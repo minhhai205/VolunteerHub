@@ -10,10 +10,8 @@ export default function EventRequestHeader({
   return (
     <div className={styles.header}>
       <div className={styles.headerContent}>
-        <h1 className={styles.title}>Quản lí đơn đăng ký sự kiện</h1>
-        <p className={styles.subtitle}>
-          Quản lí và xử lí các đơn đăng ký từ tình nguyện viên
-        </p>
+        <h1 className={styles.title}>Yêu cầu của tôi</h1>
+        <p className={styles.subtitle}>Trạng thái các yêu cầu tôi đã gửi</p>
       </div>
       <div className={styles.stats}>
         <div className={styles.statItem}>
