@@ -11,6 +11,7 @@ import {
 } from "../../../../hooks/useDetail";
 import styles from "./post-item.module.css";
 import { toastManager } from "@/components/static/toast/toast";
+import { getName } from "@/lib/getDataFromToken";
 
 interface PostItemProps {
   post: Post;
@@ -43,6 +44,7 @@ export default function PostItem({ post, onUpdate }: PostItemProps) {
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [commentContent, setCommentContent] = useState("");
   const [isCommentLoading, setIsCommentLoading] = useState(false);
+  const [currentUserName, setCurrentUserName] = useState<string>("Người dùng");
 
   // Comment pagination states
   const [comments, setComments] = useState<Comment[]>(post.comments || []);
@@ -63,6 +65,12 @@ export default function PostItem({ post, onUpdate }: PostItemProps) {
       loadInitialComments();
     }
   }, [showComments]);
+
+  // Get current user name từ token
+  useEffect(() => {
+    const userName = getName() || "Người dùng";
+    setCurrentUserName(userName);
+  }, []);
 
   const loadInitialComments = async () => {
     setLoadingComments(true);
@@ -179,11 +187,12 @@ export default function PostItem({ post, onUpdate }: PostItemProps) {
       <div className={styles.header}>
         <div className={styles.userInfo}>
           <div className={styles.avatar}>
-            {post.user?.fullName?.charAt(0).toUpperCase() || "U"}
+            {post.user?.fullName?.charAt(0).toUpperCase() ||
+              currentUserName.charAt(0).toUpperCase()}
           </div>
           <div>
             <p className={styles.userName}>
-              {post.user?.fullName || "Người dùng"}
+              {post.user?.fullName || currentUserName}
             </p>
             <p className={styles.timestamp}>{formatDate(post.createdAt)}</p>
           </div>

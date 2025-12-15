@@ -65,7 +65,7 @@ export function useEventList(
 
         // Thêm filters nếu có
         if (filters?.category) {
-          params.append("category", filters.category);
+          params.append("categoryId", filters.category);
         }
         if (filters?.status) {
           params.append("status", filters.status);

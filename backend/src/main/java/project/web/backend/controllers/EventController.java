@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import project.web.backend.dtos.request.event.EventRequestDTO;
 import project.web.backend.dtos.request.user.EventMemberFilterRequestDTO;
 import project.web.backend.dtos.request.user.WorkRatingRequestDTO;
-import project.web.backend.dtos.response.ApiResponse;
 import project.web.backend.dtos.response.ApiSuccessResponse;
 import project.web.backend.dtos.response.PageResponseDTO;
 import project.web.backend.dtos.response.event.EventNameResponseDTO;
@@ -35,10 +34,12 @@ public class EventController {
     @GetMapping("/event-list")
     public ApiSuccessResponse<PageResponseDTO<List<EventResponseDTO>>> getAllEvents(
             Pageable pageable,
-            @RequestParam String search
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) Integer status
     ) {
         return ApiSuccessResponse.<PageResponseDTO<List<EventResponseDTO>>>builder()
-                .data(eventService.getAllEvents(pageable, search))
+                .data(eventService.getAllEvents(pageable, search, categoryId, status))
                 .status(HttpStatus.OK.value())
                 .message("Get all events successfully!")
                 .build();
