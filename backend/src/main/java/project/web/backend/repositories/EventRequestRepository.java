@@ -77,6 +77,7 @@ public interface EventRequestRepository extends CrudRepository<EventCreateReques
                 u.email=:email
                     AND
                 (:status IS NULL OR er.status=:status)
+            ORDER BY er.createdAt DESC
             """)
     Page<EventCreateRequest> findByStatusAndManagerEmail(@Param("email") String email,
                                                          @Param("status") EventRequestStatus status,
