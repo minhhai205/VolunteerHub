@@ -19,13 +19,12 @@ export function useEventStats() {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        const response = await fetchWithAuth(
-          "http://localhost:8080/api/dashboard/statistics"
-        ).then((res) => res.json());
-
-        if (!response.status) throw new Error("Failed to fetch stats");
-        setData(response.data);
-
+        const res = await fetchWithAuth(
+          "http://localhost:8080/api/dashboard/admin/statistics"
+        );
+        if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+        const body = await res.json();
+        setData(body?.data ?? null);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
