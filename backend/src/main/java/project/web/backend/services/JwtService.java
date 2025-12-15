@@ -61,6 +61,7 @@ public class JwtService {
                 .expirationTime(new Date(System.currentTimeMillis() + ttl))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", (user.getRole() != null) ? "ROLE_" + user.getRole().getName() : "")
+                .claim("name", user.getFullName())
                 .build();
         Payload payload = new Payload(claimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(header, payload);
@@ -99,6 +100,10 @@ public class JwtService {
 
     public Date extractExpiration(String token) {
         return extractFieldFromPayload(token, JWTClaimsSet::getExpirationTime);
+    }
+
+    public String extractFullName(String token) {
+        return extractFieldFromPayload(token, e -> e.getClaim("name").toString());
     }
 
     public String extractEmail(String token) {
