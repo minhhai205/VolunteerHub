@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import type { Event } from "../../../../hooks/useDetail";
 import {
   isUserRole,
+  isManagerRole,
   isEventEnded,
   fetchRegistrationStatus,
   registerForEvent,
@@ -12,6 +13,7 @@ import {
   leaveEvent,
 } from "../../../../hooks/useDetail";
 import { Calendar, MapPin, Users, Clock } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import styles from "./event-header.module.css";
 import { toastManager } from "@/components/static/toast/toast";
 
@@ -30,6 +32,7 @@ export default function EventHeader({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const userRole = isUserRole();
+  const isManager = isManagerRole();
   const eventEnded = isEventEnded(event.endDate);
 
   // Fetch registration status khi component mount
@@ -47,6 +50,24 @@ export default function EventHeader({
 
     loadRegistrationStatus();
   }, [event.id, userRole, eventEnded]);
+
+  // Calculate event progress based on dates
+  const calculateEventProgress = (): number => {
+    if (!event.startDate || !event.endDate) return 0;
+
+    const now = new Date();
+    const start = new Date(event.startDate);
+    const end = new Date(event.endDate);
+
+    if (now < start) return 0;
+    if (now > end) return 100;
+
+    const totalDuration = end.getTime() - start.getTime();
+    const elapsed = now.getTime() - start.getTime();
+    const progress = Math.round((elapsed / totalDuration) * 100);
+
+    return Math.min(100, Math.max(0, progress));
+  };
 
   // Format date
   const formatDate = (dateString: string) => {
@@ -88,9 +109,9 @@ export default function EventHeader({
       await registerForEvent(event.id.toString());
       setRegistrationStatus("PENDING");
       onStatusChange?.();
-      toastManager.success("Đăng kí thành công!")
+      toastManager.success("Đăng kí thành công!");
     } catch (err: any) {
-      toastManager.error("Đăng kí thất bại!")
+      toastManager.error("Đăng kí thất bại!");
       setError(err.message || "Đăng ký thất bại");
     } finally {
       setIsLoading(false);
@@ -106,9 +127,9 @@ export default function EventHeader({
       await cancelRegistration(event.id.toString());
       setRegistrationStatus("NOT_REGISTERED");
       onStatusChange?.();
-      toastManager.success("Hủy đăng kí thành công!")
+      toastManager.success("Hủy đăng kí thành công!");
     } catch (err: any) {
-      toastManager.error("Hủy đăng kí thất bại!")
+      toastManager.error("Hủy đăng kí thất bại!");
       setError(err.message || "Hủy đăng ký thất bại");
     } finally {
       setIsLoading(false);
@@ -124,9 +145,9 @@ export default function EventHeader({
       await leaveEvent(event.id.toString());
       setRegistrationStatus("NOT_REGISTERED");
       onStatusChange?.();
-      toastManager.success("Hủy tham gia thành công!")
+      toastManager.success("Hủy tham gia thành công!");
     } catch (err: any) {
-      toastManager.error("Hủy tham gia thất bại!")
+      toastManager.error("Hủy tham gia thất bại!");
       setError(err.message || "Hủy tham gia thất bại");
     } finally {
       setIsLoading(false);
@@ -135,6 +156,18 @@ export default function EventHeader({
 
   // Render button dựa trên trạng thái
   const renderActionButton = () => {
+    // Nếu là MANAGER, hiển thị progress bar
+    if (isManager) {
+      const progress = calculateEventProgress();
+      return (
+        <div className={styles.managerSection}>
+          <div className={styles.progressLabel}>Tiến độ sự kiện</div>
+          <Progress value={progress} className={styles.progressBar} />
+          <div className={styles.progressText}>{progress}% hoàn thành</div>
+        </div>
+      );
+    }
+
     // Nếu không phải USER role
     if (!userRole) {
       return (
@@ -190,7 +223,10 @@ export default function EventHeader({
 
       case "REJECTED":
         return (
-          <button className={`${styles.registerBtn} ${styles.disabled}`} disabled>
+          <button
+            className={`${styles.registerBtn} ${styles.disabled}`}
+            disabled
+          >
             Đăng ký bị từ chối
           </button>
         );
@@ -271,20 +307,22 @@ export default function EventHeader({
 
           <div className={styles.headerRight}>
             <div className={styles.registerCard}>
-              <div className={styles.cardContent}>
-                <div className={styles.priceTag}>
-                  <span className={styles.priceLabel}>
-                    {registrationStatus === "APPROVED"
-                      ? "Đã tham gia"
-                      : registrationStatus === "PENDING"
-                      ? "Chờ duyệt"
-                      : "Đăng kí tham gia"}
-                  </span>
-                  <Clock className={styles.clockIcon} />
+              {!isManager && (
+                <div className={styles.cardContent}>
+                  <div className={styles.priceTag}>
+                    <span className={styles.priceLabel}>
+                      {registrationStatus === "APPROVED"
+                        ? "Đã tham gia"
+                        : registrationStatus === "PENDING"
+                        ? "Chờ duyệt"
+                        : "Đăng kí tham gia"}
+                    </span>
+                    <Clock className={styles.clockIcon} />
+                  </div>
+                  <p className={styles.registerText}>{getStatusText()}</p>
+                  {error && <p className={styles.errorText}>{error}</p>}
                 </div>
-                <p className={styles.registerText}>{getStatusText()}</p>
-                {error && <p className={styles.errorText}>{error}</p>}
-              </div>
+              )}
               {renderActionButton()}
             </div>
           </div>

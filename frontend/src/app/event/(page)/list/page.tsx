@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Filter, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useEventList } from "../../hooks/useList";
 import styles from "./list.module.css";
@@ -18,6 +18,9 @@ export default function DashboardPage() {
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(9);
   const [displayLoading, setDisplayLoading] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
   const suggestTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const searchBoxRef = useRef<HTMLDivElement>(null);
 
@@ -26,9 +29,15 @@ export default function DashboardPage() {
     size,
   };
 
+  const filters = {
+    category: selectedCategory || undefined,
+    status: selectedStatus || undefined,
+  };
+
   const { events, loading, error, totalPages, totalElements } = useEventList(
     search,
-    pageable
+    pageable,
+    filters
   );
 
   // Show loading skeleton và scroll to top khi page hoặc search thay đổi
@@ -206,6 +215,12 @@ export default function DashboardPage() {
     }
   };
 
+  const handleResetFilters = () => {
+    setSelectedCategory("");
+    setSelectedStatus("");
+    setPage(0);
+  };
+
   return (
     <div className={styles.pageContainer}>
       <Header />
@@ -266,10 +281,48 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
-          {/* <button className={styles.filterButton}>
-            <Filter />
-            <span>Lọc</span>
-          </button> */}
+
+          {/* Category Filter */}
+          <select
+            className={styles.barFilterSelect}
+            value={selectedCategory}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+              setPage(0);
+            }}
+          >
+            <option value="">Danh mục</option>
+            <option value="EDUCATION">Giáo dục</option>
+            <option value="ENVIRONMENT">Môi trường</option>
+            <option value="HEALTH">Sức khỏe</option>
+            <option value="COMMUNITY">Cộng đồng</option>
+            <option value="ELDERLY_CARE">Chăm sóc người cao tuổi</option>
+            <option value="CHILD_DEVELOPMENT">Phát triển trẻ em</option>
+          </select>
+
+          {/* Status Filter */}
+          <select
+            className={styles.barFilterSelect}
+            value={selectedStatus}
+            onChange={(e) => {
+              setSelectedStatus(e.target.value);
+              setPage(0);
+            }}
+          >
+            <option value="">Trạng thái</option>
+            <option value="UPCOMING">Sắp diễn ra</option>
+            <option value="ONGOING">Đang diễn ra</option>
+            <option value="COMPLETED">Đã kết thúc</option>
+          </select>
+
+          {/* Filter Toggle Button */}
+          <button
+            className={styles.filterButton}
+            onClick={() => setShowFilters(!showFilters)}
+            title="Xóa bộ lọc"
+          >
+            <X size={18} />
+          </button>
         </div>
 
         {/* Danh sách sự kiện */}
@@ -328,6 +381,7 @@ export default function DashboardPage() {
                         ? event.imageUrl
                         : "https://pbs.twimg.com/media/GSHywsIaUAA0ero?format=jpg&name=4096x4096"
                     }
+                    status={event.status}
                   />
                 ))}
               </div>
@@ -362,8 +416,6 @@ export default function DashboardPage() {
               }
             </>
           )}
-
-          {/* Không có sự kiện */}
           {!displayLoading && !error && events.length === 0 && (
             <p>Không có sự kiện nào để hiển thị.</p>
           )}

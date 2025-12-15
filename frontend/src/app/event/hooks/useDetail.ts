@@ -52,6 +52,7 @@ export interface Event {
   countPosts?: number;
   posts?: Post[];
   registrationStatus?: "NOT_REGISTERED" | "PENDING" | "APPROVED" | "REJECTED";
+  progress?: number;
 }
 
 export interface PaginatedPostResponse {
@@ -80,6 +81,14 @@ export interface PaginatedCommentResponse {
 export function isUserRole(): boolean {
   const role = getUserRole();
   return role === "USER";
+}
+
+/**
+ * Kiểm tra xem user có phải là MANAGER role không
+ */
+export function isManagerRole(): boolean {
+  const role = getUserRole();
+  return role === "MANAGER";
 }
 
 /**
@@ -132,7 +141,7 @@ export async function fetchRegistrationStatus(
 
     const response = await res.json();
 
-    console.log(response)
+    console.log(response);
 
     if (response.status !== 200) {
       return "NOT_REGISTERED";

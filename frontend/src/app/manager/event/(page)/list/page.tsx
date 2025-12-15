@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./events.module.css";
 import { Header } from "@/components/static/HeaderManager";
 import { Footer } from "@/components/static/Footer";
 import { getAccessToken } from "@/lib/token";
-import { Search } from "lucide-react";
+import { Search, Edit, Trash2, Eye } from "lucide-react";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import { toastManager } from "@/components/static/toast/toast";
 
 interface Event {
   id: string;
@@ -56,6 +59,7 @@ const getEventStatus = (
 };
 
 export default function EventsPage() {
+  const router = useRouter();
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +72,18 @@ export default function EventsPage() {
   const [activeFilter, setActiveFilter] = useState<
     "all" | "upcoming" | "ongoing" | "completed"
   >("all");
+
+  // Delete confirmation states
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    show: boolean;
+    eventId: string | null;
+    eventName: string | null;
+  }>({
+    show: false,
+    eventId: null,
+    eventName: null,
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(0);
@@ -132,7 +148,7 @@ export default function EventsPage() {
 
   // Scroll to top khi currentPage thay đổi
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0 });
   }, [currentPage]);
 
   useEffect(() => {
@@ -156,7 +172,7 @@ export default function EventsPage() {
         params.append("search", searchQuery.trim());
         params.append("status", getStatusParam(activeFilter));
 
-        const response = await fetch(
+        const response = await fetchWithAuth(
           `http://localhost:8080/api/event/manager/my-event?${params.toString()}`,
           {
             method: "GET",
@@ -344,11 +360,59 @@ export default function EventsPage() {
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 0 && newPage < totalPages) {
-      // Scroll to top with smooth animation
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      // Scroll to top
+      window.scrollTo({ top: 0 });
       // Change page
       setCurrentPage(newPage);
     }
+  };
+
+  const handleDeleteClick = (eventId: string, eventName: string) => {
+    setDeleteConfirm({
+      show: true,
+      eventId,
+      eventName,
+    });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirm.eventId) return;
+
+    setIsDeleting(true);
+    try {
+      const token = getAccessToken();
+      const response = await fetch(
+        `http://localhost:8080/api/event-request/${deleteConfirm.eventId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Không thể xóa sự kiện");
+      }
+
+      toastManager.success("Đã xóa sự kiện thành công");
+      setDeleteConfirm({ show: false, eventId: null, eventName: null });
+
+      // Refresh the event list
+      setAllEvents((prev) =>
+        prev.filter((event) => event.id !== deleteConfirm.eventId)
+      );
+    } catch (err) {
+      console.error("Error deleting event:", err);
+      toastManager.error("Không thể xóa sự kiện. Vui lòng thử lại.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirm({ show: false, eventId: null, eventName: null });
   };
 
   const getStatusText = (startDateStr: string, endDateStr: string) => {
@@ -416,11 +480,44 @@ export default function EventsPage() {
       <Header />
 
       <main className={styles.main}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Quản lý sự kiện tình nguyện</h1>
-          <p className={styles.subtitle}>
-            Theo dõi và quản lý các hoạt động tình nguyện của UET
-          </p>
+        <div
+          className={styles.header}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "2rem",
+          }}
+        >
+          <div>
+            <h1 className={styles.title}>Quản lý sự kiện tình nguyện</h1>
+            <p className={styles.subtitle}>
+              Theo dõi và quản lý các hoạt động tình nguyện do bạn quản lý
+            </p>
+          </div>
+          <button
+            onClick={() => router.push("/manager/event/create")}
+            style={{
+              padding: "0.75rem 1.5rem",
+              backgroundColor: "#16a34a",
+              color: "white",
+              border: "none",
+              borderRadius: "0.5rem",
+              fontSize: "1rem",
+              fontWeight: "600",
+              cursor: "pointer",
+              transition: "background-color 0.2s",
+              whiteSpace: "nowrap",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#15803d";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#16a34a";
+            }}
+          >
+            + Tạo sự kiện mới
+          </button>
         </div>
 
         <div className={styles.controls}>
@@ -673,76 +770,95 @@ export default function EventsPage() {
                               {event.participants} người
                             </span>
                           </div>
-                          <button
-                            className={styles.detailButton}
-                            onClick={() =>
-                              (window.location.href = `http://localhost:3000/event/detail/${event.id}`)
-                            }
-                          >
-                            Xem chi tiết
-                          </button>
+                          <div className={styles.actionButtons}>
+                            <button
+                              className={styles.iconButton}
+                              title="Xem chi tiết"
+                              onClick={() =>
+                                (window.location.href = `http://localhost:3000/event/detail/${event.id}`)
+                              }
+                            >
+                              <Eye size={18} />
+                            </button>
+                            <button
+                              className={styles.iconButton}
+                              title="Chỉnh sửa"
+                              onClick={() =>
+                                router.push(`/manager/event/update/${event.id}`)
+                              }
+                            >
+                              <Edit size={18} />
+                            </button>
+                            <button
+                              className={`${styles.iconButton} ${styles.deleteButton}`}
+                              title="Xóa"
+                              onClick={() =>
+                                handleDeleteClick(event.id, event.title)
+                              }
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                {
-                  <div className={styles.pagination}>
-                    <button
-                      className={styles.pageButton}
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 0}
+                <div className={styles.pagination}>
+                  <button
+                    className={styles.pageButton}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 0}
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
                     >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <polyline points="15 18 9 12 15 6" />
-                      </svg>
-                      Trước
-                    </button>
+                      <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                    Trước
+                  </button>
 
-                    <div className={styles.pageNumbers}>
-                      {getPageNumbers().map((page, index) => (
-                        <button
-                          key={index}
-                          className={`${styles.pageNumber} ${
-                            page === currentPage ? styles.activePage : ""
-                          } ${page === "..." ? styles.ellipsis : ""}`}
-                          onClick={() =>
-                            typeof page === "number" && handlePageChange(page)
-                          }
-                          disabled={page === "..."}
-                        >
-                          {typeof page === "number" ? page + 1 : page}
-                        </button>
-                      ))}
-                    </div>
-
-                    <button
-                      className={styles.pageButton}
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages - 1}
-                    >
-                      Sau
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
+                  <div className={styles.pageNumbers}>
+                    {getPageNumbers().map((page, index) => (
+                      <button
+                        key={index}
+                        className={`${styles.pageNumber} ${
+                          page === currentPage ? styles.activePage : ""
+                        } ${page === "..." ? styles.ellipsis : ""}`}
+                        onClick={() =>
+                          typeof page === "number" && handlePageChange(page)
+                        }
+                        disabled={page === "..."}
                       >
-                        <polyline points="9 18 15 12 9 6" />
-                      </svg>
-                    </button>
+                        {typeof page === "number" ? page + 1 : page}
+                      </button>
+                    ))}
                   </div>
-                }
+
+                  <button
+                    className={styles.pageButton}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages - 1}
+                  >
+                    Sau
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </button>
+                </div>
               </>
             ) : (
               <div className={styles.emptyState}>
@@ -768,6 +884,37 @@ export default function EventsPage() {
           </>
         )}
       </main>
+
+      {/* Delete Confirmation Dialog */}
+      {deleteConfirm.show && (
+        <div className={styles.dialogOverlay}>
+          <div className={styles.dialogContent}>
+            <h2 className={styles.dialogTitle}>Xác nhận xóa sự kiện</h2>
+            <p className={styles.dialogMessage}>
+              Bạn có chắc chắn muốn xóa sự kiện &quot;
+              <strong>{deleteConfirm.eventName}</strong>&quot;? Hành động này
+              không thể hoàn tác.
+            </p>
+            <div className={styles.dialogActions}>
+              <button
+                className={styles.cancelButton}
+                onClick={handleDeleteCancel}
+                disabled={isDeleting}
+              >
+                Hủy
+              </button>
+              <button
+                className={styles.confirmDeleteButton}
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Đang xóa..." : "Xóa"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );

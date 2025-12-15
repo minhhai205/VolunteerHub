@@ -41,7 +41,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             e.name LIKE %:search%
             OR
             e.description LIKE %:search%
-            ORDER BY e.createdAt DESC
+            ORDER BY e.startDate DESC, e.endDate DESC
             """)
     Page<Event> findAllWithSearch(Pageable pageable, @Param("search") String search);
 
@@ -51,6 +51,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("""
             SELECT e FROM Event e
             WHERE e.id IN :ids
+            ORDER BY e.startDate DESC, e.endDate DESC
             """)
     List<Event> findWithCategoriesByIds(@Param("ids") List<Long> ids);
 

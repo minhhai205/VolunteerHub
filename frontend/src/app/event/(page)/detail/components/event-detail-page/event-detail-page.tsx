@@ -14,7 +14,8 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<string | null>(null);
-  const [HeaderComponent, setHeaderComponent] = useState<React.ComponentType | null>(null);
+  const [HeaderComponent, setHeaderComponent] =
+    useState<React.ComponentType | null>(null);
 
   const params = useParams();
   const eventId = params.eventId as string;
@@ -37,13 +38,17 @@ export default function EventDetailPage() {
 
   // Load user role and select header
   useEffect(() => {
-    const role = getUserRole()
+    const role = getUserRole();
     setRole(role);
 
     if (role === "MANAGER") {
-      import("@/components/static/HeaderManager").then((mod) => setHeaderComponent(() => mod.Header));
+      import("@/components/static/HeaderManager").then((mod) =>
+        setHeaderComponent(() => mod.Header)
+      );
     } else {
-      import("@/components/static/Header").then((mod) => setHeaderComponent(() => mod.Header));
+      import("@/components/static/Header").then((mod) =>
+        setHeaderComponent(() => mod.Header)
+      );
     }
   }, []);
 
@@ -66,6 +71,19 @@ export default function EventDetailPage() {
     );
   }
 
+  // Get event status based on dates
+  const getEventStatus = () => {
+    if (!event.startDate || !event.endDate) return "Sắp diễn ra";
+
+    const now = new Date();
+    const start = new Date(event.startDate);
+    const end = new Date(event.endDate);
+
+    if (now < start) return "Sắp diễn ra";
+    if (now > end) return "Đã kết thúc";
+    return "Đang diễn ra";
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <HeaderComponent />
@@ -85,13 +103,19 @@ export default function EventDetailPage() {
               <h3 className="font-bold text-primary mb-4">Chi tiết sự kiện</h3>
               <div className="space-y-4 text-sm">
                 <div>
-                  <p className="text-muted-foreground text-xs font-semibold mb-1">DANH MỤC</p>
-                  <p className="font-semibold text-foreground">{event.categoryNames?.join(", ") || "Sự kiện"}</p>
+                  <p className="text-muted-foreground text-xs font-semibold mb-1">
+                    DANH MỤC
+                  </p>
+                  <p className="font-semibold text-foreground">
+                    {event.categoryNames?.join(", ") || "Sự kiện"}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs font-semibold mb-1">TRẠNG THÁI</p>
+                  <p className="text-muted-foreground text-xs font-semibold mb-1">
+                    TRẠNG THÁI
+                  </p>
                   <span className="inline-block px-3 py-1.5 bg-primary/10 text-primary rounded-full text-xs font-semibold">
-                    Đang tuyển
+                    {getEventStatus()}
                   </span>
                 </div>
               </div>

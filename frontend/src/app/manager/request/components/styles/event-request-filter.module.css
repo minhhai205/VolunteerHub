@@ -84,9 +84,24 @@
 
 /* Thêm vào file event-request-filter.module.css */
 
+.filterWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.filterContainer {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .eventSelect {
-  width: 100%;
+  width: auto;
   max-width: 400px;
+  min-width: 250px;
   padding: 0.75rem 1rem;
   font-size: 1rem;
   border: 2px solid #a8d5ba;
@@ -95,7 +110,6 @@
   color: #333;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-bottom: 1rem;
 }
 
 .eventSelect:hover {
@@ -111,4 +125,20 @@
 
 .eventSelect option {
   padding: 0.5rem;
+}
+
+@media (max-width: 1024px) {
+  .filterWrapper {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filterContainer {
+    justify-content: flex-start;
+  }
+
+  .eventSelect {
+    width: 100%;
+    max-width: 100%;
+  }
 }

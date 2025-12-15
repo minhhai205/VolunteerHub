@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import project.web.backend.dtos.request.event.EventRequestDTO;
 import project.web.backend.dtos.response.ApiSuccessResponse;
 import project.web.backend.dtos.response.PageResponseDTO;
+import project.web.backend.dtos.response.event.EventCreationResponseDTO;
 import project.web.backend.dtos.response.event.EventRegistrationResponseDTO;
 import project.web.backend.dtos.response.event.EventRequestResponseDTO;
 import project.web.backend.dtos.response.event.RegistrationStatusResponseDTO;
@@ -167,6 +168,20 @@ public class EventRequestController {
         return ApiSuccessResponse.<String>builder()
                 .data(eventRequestService.cancelMyRegistrationRequest(eventId))
                 .message("Canceled!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @GetMapping("/create-request")
+    @PreAuthorize("hasAnyRole({'MANAGER'})")
+    public ApiSuccessResponse<PageResponseDTO<List<EventCreationResponseDTO>>> getCreationRequest(
+            Pageable pageable,
+            @RequestParam(required = false, defaultValue = "") String status
+    ) {
+        EventRequestStatus eventRequestStatus = (status.isBlank()) ? null : EventRequestStatus.valueOf(status.toUpperCase());
+        return ApiSuccessResponse.<PageResponseDTO<List<EventCreationResponseDTO>>>builder()
+                .data(eventRequestService.createRequest(eventRequestStatus, pageable))
+                .message("Get creation request!")
                 .status(HttpStatus.OK.value())
                 .build();
     }

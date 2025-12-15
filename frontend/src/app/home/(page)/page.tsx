@@ -39,7 +39,9 @@ interface Event {
 
 export default function Home() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [trendingEvents, setTrendingEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [trendingLoading, setTrendingLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -61,6 +63,30 @@ export default function Home() {
     };
 
     fetchEvents();
+  }, []);
+
+  useEffect(() => {
+    const fetchTrendingEvents = async () => {
+      try {
+        setTrendingLoading(true);
+        const response = await fetch(
+          "http://localhost:8080/api/event/trending",
+          {
+            method: "GET",
+          }
+        ).then((res) => res.json());
+
+        if (response.status === 200) {
+          setTrendingEvents(response.data?.slice(0, 3) || []);
+        }
+      } catch (err) {
+        console.error("Fetch trending events error:", err);
+      } finally {
+        setTrendingLoading(false);
+      }
+    };
+
+    fetchTrendingEvents();
   }, []);
 
   const handleViewEventDetails = (eventId: number) => {
@@ -250,6 +276,67 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Trending Events Section */}
+        <section className={styles.trendingSection}>
+          <div className={styles.trendingContainer}>
+            <div className={styles.trendingHeader}>
+              <h2 className={styles.trendingTitle}>Sự kiện nổi bật</h2>
+              <p className={styles.trendingDescription}>
+                Những sự kiện đang nhận được sự quan tâm nhiều nhất
+              </p>
+            </div>
+
+            <div className={styles.trendingGrid}>
+              {trendingLoading ? (
+                <p className="text-muted-foreground">Đang tải...</p>
+              ) : trendingEvents.length === 0 ? (
+                <p className="text-muted-foreground">
+                  Không có sự kiện nổi bật
+                </p>
+              ) : (
+                trendingEvents.map((event) => (
+                  <Card
+                    key={event.id}
+                    className={styles.trendingCard}
+                    onClick={() => handleViewEventDetails(event.id)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <CardHeader>
+                      <div className={styles.trendingImage}>
+                        {event.imageUrl && (
+                          <Image
+                            src={event.imageUrl}
+                            alt={event.name}
+                            className={styles.trendingImageElement}
+                            width={300}
+                            height={200}
+                          />
+                        )}
+                      </div>
+                      <CardTitle className={styles.trendingCardTitle}>
+                        {event.name}
+                      </CardTitle>
+                      <div className={styles.trendingDate}>
+                        <Calendar className={styles.trendingDateIcon} />
+                        <span>
+                          {formatDateRange(event.startDate, event.endDate)}
+                        </span>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription
+                        className={styles.trendingCardDescription}
+                      >
+                        {event.description}
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className={styles.ctaSection}>
           <div className={styles.ctaBox}>
@@ -266,9 +353,11 @@ export default function Home() {
                   Đăng ký tình nguyện
                 </Button>
               </Link>
-              <Button size="lg" variant="outline">
-                Liên hệ với chúng tôi
-              </Button>
+              <Link href="/contact">
+                <Button size="lg" variant="outline">
+                  Liên hệ với chúng tôi
+                </Button>
+              </Link>
             </div>
           </div>
         </section>

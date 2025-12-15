@@ -242,13 +242,7 @@
   display: flex;
   flex-wrap: wrap; /* Cho phép xuống hàng nếu màn hình quá nhỏ */
   align-items: center;
-  /* Dùng 1 trong 2 tùy chọn dưới đây */
-
-  /* Tùy chọn 1: Căn 3 mục giãn đều ra (giống ảnh mẫu) */
-  justify-content: space-between;
-
-  /* Tùy chọn 2: Căn 3 mục gần nhau với 1 khoảng cách */
-  /* gap: 1.5rem; */
+  gap: 1rem;
 
   margin-top: 1rem; /* Khoảng cách với phần mô tả ở trên */
   width: 100%;
@@ -503,4 +497,145 @@
   border-color: #16a34a;
   color: white;
   box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+}
+/* Action buttons container */
+.actionButtons {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* Icon button styles */
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.iconButton:hover {
+  background: #f0fdf4;
+  border-color: #22c55e;
+  color: #16a34a;
+  box-shadow: 0 2px 4px rgba(34, 197, 94, 0.15);
+  transform: translateY(-1px);
+}
+
+.iconButton:active {
+  transform: translateY(0);
+}
+
+.iconButton.deleteButton {
+  color: #ef4444;
+  border-color: #fecaca;
+}
+
+.iconButton.deleteButton:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #dc2626;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.15);
+}
+
+/* Delete confirmation dialog */
+.dialogOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialogContent {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.dialogTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 1rem 0;
+}
+
+.dialogMessage {
+  font-size: 0.95rem;
+  color: #4b5563;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+.dialogActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.cancelButton {
+  padding: 0.5rem 1.25rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: white;
+  color: #4b5563;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.cancelButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.confirmDeleteButton {
+  padding: 0.5rem 1.25rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+}
+
+.confirmDeleteButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+  transform: translateY(-1px);
+}
+
+.confirmDeleteButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.confirmDeleteButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
