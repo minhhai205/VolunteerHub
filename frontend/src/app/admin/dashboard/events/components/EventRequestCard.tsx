@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Calendar,
@@ -18,12 +19,19 @@ import { EventRequest } from "../hooks/useEventRequest";
 interface EventRequestCardProps {
   eventRequest: EventRequest;
   onViewDetail?: () => void;
+  onApprove?: (id: number) => Promise<boolean>;
+  onReject?: (id: number) => Promise<boolean>;
 }
 
 export function EventRequestCard({
   eventRequest,
   onViewDetail,
+  onApprove,
+  onReject,
 }: EventRequestCardProps) {
+  const [approving, setApproving] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
+
   const renderStatusBadge = () => {
     if (eventRequest.status === "pending") {
       return (
@@ -46,7 +54,6 @@ export function EventRequestCard({
         </Badge>
       );
     }
-    // REJECTED
     return (
       <Badge variant="destructive" aria-label="Đã từ chối">
         Đã từ chối
@@ -55,6 +62,26 @@ export function EventRequestCard({
   };
 
   const isPending = eventRequest.status === "pending";
+
+  const handleApproveClick = async () => {
+    if (!onApprove) return;
+    setApproving(true);
+    try {
+      await onApprove(eventRequest.id);
+    } finally {
+      setApproving(false);
+    }
+  };
+
+  const handleRejectClick = async () => {
+    if (!onReject) return;
+    setRejecting(true);
+    try {
+      await onReject(eventRequest.id);
+    } finally {
+      setRejecting(false);
+    }
+  };
 
   return (
     <Card className="border-yellow-500/30 bg-card transition-all hover:shadow-lg hover:border-yellow-500/50">
@@ -139,15 +166,21 @@ export function EventRequestCard({
                 <Button
                   size="default"
                   className="bg-accent text-accent-foreground hover:bg-accent/90 flex-1 sm:flex-none cursor-pointer"
+                  onClick={handleApproveClick}
+                  disabled={approving || rejecting}
                 >
-                  <Check className="mr-2 h-4 w-4" /> Duyệt sự kiện
+                  <Check className="mr-2 h-4 w-4" />
+                  {approving ? "Đang duyệt..." : "Duyệt sự kiện"}
                 </Button>
                 <Button
                   size="default"
                   variant="destructive"
                   className="flex-1 sm:flex-none cursor-pointer"
+                  onClick={handleRejectClick}
+                  disabled={approving || rejecting}
                 >
-                  <X className="mr-2 h-4 w-4" /> Từ chối
+                  <X className="mr-2 h-4 w-4" />
+                  {rejecting ? "Đang từ chối..." : "Từ chối"}
                 </Button>
               </div>
             ) : (

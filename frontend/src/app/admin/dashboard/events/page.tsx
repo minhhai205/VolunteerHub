@@ -30,11 +30,14 @@ export default function EventsPage() {
   const [page, setPage] = useState<number>(currentPage);
 
   // fetch event requests with pagination
-  const { eventRequests, pagination, isLoading, error } = useEventRequests(
-    page,
-    10,
-    currentStatus
-  );
+  const {
+    eventRequests,
+    pagination,
+    isLoading,
+    error,
+    handleApprove,
+    handleReject,
+  } = useEventRequests(page, 10, currentStatus);
   const totalPages = Math.max(1, pagination.totalPage);
 
   // keep local state in sync when user navigates back/forward
@@ -104,7 +107,11 @@ export default function EventsPage() {
           <EventSearch />
 
           {/* Event list */}
-          <EventList eventRequests={eventRequests} />
+          <EventList
+            eventRequests={eventRequests}
+            onApprove={handleApprove}
+            onReject={handleReject}
+          />
 
           {/* Pagination */}
           <div className="mt-6">

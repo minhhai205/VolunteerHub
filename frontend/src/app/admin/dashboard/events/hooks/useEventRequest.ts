@@ -157,10 +157,12 @@ export function useEventRequests(
       toastManager.success("Event request approved");
       // Remove from local list
       setEventRequests((prev) => prev.filter((req) => req.id !== id));
+      return true;
     } catch (err) {
       toastManager.error(
         err instanceof Error ? err.message : "Failed to approve"
       );
+      return false;
     }
   };
 
@@ -176,10 +178,12 @@ export function useEventRequests(
       toastManager.success("Event request rejected");
       // Remove from local list
       setEventRequests((prev) => prev.filter((req) => req.id !== id));
+      return true;
     } catch (err) {
       toastManager.error(
         err instanceof Error ? err.message : "Failed to reject"
       );
+      return false;
     }
   };
 

@@ -7,9 +7,15 @@ import { EventDetailDialog } from "./EventDetailDialog";
 
 interface EventListProps {
   eventRequests?: EventRequest[];
+  onApprove?: (id: number) => Promise<boolean>;
+  onReject?: (id: number) => Promise<boolean>;
 }
 
-export default function EventList({ eventRequests = [] }: EventListProps) {
+export default function EventList({
+  eventRequests = [],
+  onApprove,
+  onReject,
+}: EventListProps) {
   const [open, setOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<EventRequest | null>(null);
 
@@ -23,6 +29,8 @@ export default function EventList({ eventRequests = [] }: EventListProps) {
             setSelectedEvent(eventRequest);
             setOpen(true);
           }}
+          onApprove={onApprove}
+          onReject={onReject}
         />
       ))}
 
