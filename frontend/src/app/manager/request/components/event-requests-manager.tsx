@@ -149,7 +149,7 @@ export default function EventRequestsManager() {
 
   const handleApprove = async (id: number) => {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `http://localhost:8080/api/event-request/registration/approve/${id}`,
         {
           method: "PATCH",
@@ -185,7 +185,7 @@ export default function EventRequestsManager() {
 
   const handleReject = async (id: number) => {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `http://localhost:8080/api/event-request/registration/reject/${id}`,
         {
           method: "PATCH",
