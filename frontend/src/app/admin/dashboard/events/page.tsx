@@ -107,66 +107,74 @@ export default function EventsPage() {
           <EventSearch />
 
           {/* Event list */}
-          <EventList
-            eventRequests={eventRequests}
-            onApprove={handleApprove}
-            onReject={handleReject}
-          />
+          {!isLoading && eventRequests.length === 0 ? (
+            <div className="py-12 text-center text-muted-foreground">
+              Không có sự kiện nào
+            </div>
+          ) : (
+            <EventList
+              eventRequests={eventRequests}
+              onApprove={handleApprove}
+              onReject={handleReject}
+            />
+          )}
 
           {/* Pagination */}
-          <div className="mt-6">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handlePageChange(page - 1);
-                    }}
-                    aria-disabled={page === 1}
-                    className={
-                      page === 1 ? "pointer-events-none opacity-50" : ""
-                    }
-                  />
-                </PaginationItem>
+          {!isLoading && eventRequests.length > 0 && totalPages > 1 && (
+            <div className="mt-6">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(page - 1);
+                      }}
+                      aria-disabled={page === 1}
+                      className={
+                        page === 1 ? "pointer-events-none opacity-50" : ""
+                      }
+                    />
+                  </PaginationItem>
 
-                {generatePaginationItems(page, totalPages).map(
-                  (item, index) => (
-                    <PaginationItem key={index}>
-                      {item === "ellipsis" ? (
-                        <PaginationEllipsis />
-                      ) : (
-                        <PaginationLink
-                          isActive={item === page}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handlePageChange(item as number);
-                          }}
-                        >
-                          {item}
-                        </PaginationLink>
-                      )}
-                    </PaginationItem>
-                  )
-                )}
+                  {generatePaginationItems(page, totalPages).map(
+                    (item, index) => (
+                      <PaginationItem key={index}>
+                        {item === "ellipsis" ? (
+                          <PaginationEllipsis />
+                        ) : (
+                          <PaginationLink
+                            isActive={item === page}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handlePageChange(item as number);
+                            }}
+                          >
+                            {item}
+                          </PaginationLink>
+                        )}
+                      </PaginationItem>
+                    )
+                  )}
 
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handlePageChange(page + 1);
-                    }}
-                    aria-disabled={page === totalPages}
-                    className={
-                      page === totalPages
-                        ? "pointer-events-none opacity-50"
-                        : ""
-                    }
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(page + 1);
+                      }}
+                      aria-disabled={page === totalPages}
+                      className={
+                        page === totalPages
+                          ? "pointer-events-none opacity-50"
+                          : ""
+                      }
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </div>
       </main>
     </div>
