@@ -54,6 +54,7 @@ export function EventRequestCard({
         </Badge>
       );
     }
+    // REJECTED
     return (
       <Badge variant="destructive" aria-label="Đã từ chối">
         Đã từ chối

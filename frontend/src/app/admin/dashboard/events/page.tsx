@@ -26,7 +26,8 @@ export default function EventsPage() {
   const currentPage = Number(searchParams.get("page")) || 1;
   const currentStatus = (searchParams.get("status") || "pending") as
     | "pending"
-    | "processed";
+    | "rejected"
+    | "approve";
   const [page, setPage] = useState<number>(currentPage);
 
   // fetch event requests with pagination
@@ -87,7 +88,7 @@ export default function EventsPage() {
             </p>
           </div>
 
-          {/* Tabs: Pending / Processed */}
+          {/* Tabs: Pending / Rejected / Approved */}
           <div className="mb-4">
             <Tabs
               value={currentStatus}
@@ -95,7 +96,8 @@ export default function EventsPage() {
             >
               <TabsList className="w-max">
                 <TabsTrigger value="pending">Đang chờ</TabsTrigger>
-                <TabsTrigger value="processed">Đã xử lí</TabsTrigger>
+                <TabsTrigger value="rejected">Đã từ chối</TabsTrigger>
+                <TabsTrigger value="approved">Đã duyệt</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
