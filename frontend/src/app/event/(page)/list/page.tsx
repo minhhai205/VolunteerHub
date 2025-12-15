@@ -3,6 +3,7 @@
 import { Search, Filter, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useEventList } from "../../hooks/useList";
+import { useCategories } from "../../hooks/useCategories";
 import styles from "./list.module.css";
 import { Header } from "@/components/static/Header";
 import EventCard from "./EventCard";
@@ -23,6 +24,8 @@ export default function DashboardPage() {
   const [selectedStatus, setSelectedStatus] = useState("");
   const suggestTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const searchBoxRef = useRef<HTMLDivElement>(null);
+
+  const { categories } = useCategories();
 
   const pageable = {
     page,
@@ -292,12 +295,11 @@ export default function DashboardPage() {
             }}
           >
             <option value="">Danh mục</option>
-            <option value="EDUCATION">Giáo dục</option>
-            <option value="ENVIRONMENT">Môi trường</option>
-            <option value="HEALTH">Sức khỏe</option>
-            <option value="COMMUNITY">Cộng đồng</option>
-            <option value="ELDERLY_CARE">Chăm sóc người cao tuổi</option>
-            <option value="CHILD_DEVELOPMENT">Phát triển trẻ em</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
           </select>
 
           {/* Status Filter */}
