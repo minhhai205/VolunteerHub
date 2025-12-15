@@ -99,7 +99,7 @@ function UsersInnerLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen bg-background">
       <div className="flex flex-1 flex-col">
-        <main className="flex-1 overflow-y-auto p-8 space-y-8">
+        <main className="flex-1 p-8 space-y-8">
           <header>
             <h1 className="text-3xl font-semibold">Quản lý người dùng</h1>
             <p className="text-muted-foreground">

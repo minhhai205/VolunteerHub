@@ -109,6 +109,9 @@ export default function ManagersPage() {
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages) return;
     setPage(newPage);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   // If we determined the current page is invalid and are redirecting, show nothing / loading
