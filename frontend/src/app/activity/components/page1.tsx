@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import styles from "./page1.module.css";
 import { getAccessToken } from "@/lib/token";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface Event {
   id: string;
@@ -63,7 +64,7 @@ export default function EventsPage() {
         if (!token) {
           throw new Error("Không tìm thấy token. Vui lòng đăng nhập lại.");
         }
-        const response = await fetch(
+        const response = await fetchWithAuth(
           "http://localhost:8080/api/event/my-event",
           {
             method: "GET",
