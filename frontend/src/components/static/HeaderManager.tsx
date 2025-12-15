@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import styles from "./Header.module.css";
 import { clearTokens, getAccessToken, getRefreshToken } from "@/lib/token";
+import { getName } from "@/lib/getDataFromToken";
 
 export function Header() {
   const pathname = usePathname();
@@ -25,8 +26,8 @@ export function Header() {
     if (accessToken) {
       setIsLoggedIn(true);
 
-      // Lấy thông tin user từ localStorage hoặc decode từ token
-      const userName = localStorage.getItem("userName") || "User";
+      // Lấy tên từ token
+      const userName = getName() || "User";
       const userAvatar =
         localStorage.getItem("userAvatar") ||
         `https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}`;
@@ -69,7 +70,6 @@ export function Header() {
       if (response.status === 200 || data.status === 200) {
         // Xóa accessToken và thông tin user khỏi localStorage
         clearTokens();
-        localStorage.removeItem("userName");
         localStorage.removeItem("userAvatar");
 
         setIsLoggedIn(false);
