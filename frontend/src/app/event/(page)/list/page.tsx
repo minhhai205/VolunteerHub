@@ -219,6 +219,8 @@ export default function DashboardPage() {
   };
 
   const handleResetFilters = () => {
+    setSearchInput("");
+    setSearch("");
     setSelectedCategory("");
     setSelectedStatus("");
     setPage(0);
@@ -320,7 +322,7 @@ export default function DashboardPage() {
           {/* Filter Toggle Button */}
           <button
             className={styles.filterButton}
-            onClick={() => setShowFilters(!showFilters)}
+            onClick={handleResetFilters}
             title="Xóa bộ lọc"
           >
             <X size={18} />
