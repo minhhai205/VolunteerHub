@@ -36,14 +36,40 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
 
     @Query("""
-            SELECT DISTINCT e FROM Event e
-            WHERE
-            e.name LIKE %:search%
-            OR
-            e.description LIKE %:search%
-            ORDER BY e.startDate DESC, e.endDate DESC
+                SELECT DISTINCT e
+                FROM Event e
+                LEFT JOIN e.categories c
+                WHERE
+                    (
+                        :search IS NULL
+                        OR LOWER(e.name) LIKE LOWER(CONCAT('%', :search, '%'))
+                        OR LOWER(e.description) LIKE LOWER(CONCAT('%', :search, '%'))
+                    )
+                AND (
+                        :categoryId IS NULL
+                        OR c.id = :categoryId
+                    )
+                AND (
+                        :status IS NULL
+                        OR (
+                            :status = 0 AND e.startDate > CURRENT_TIMESTAMP
+                        )
+                        OR (
+                            :status = 1 AND e.startDate <= CURRENT_TIMESTAMP AND e.endDate >= CURRENT_TIMESTAMP
+                        )
+                        OR (
+                            :status = 2 AND e.endDate < CURRENT_TIMESTAMP
+                        )
+                    )
+                ORDER BY e.startDate DESC, e.endDate DESC
             """)
-    Page<Event> findAllWithSearch(Pageable pageable, @Param("search") String search);
+    Page<Event> findAllWithSearch(
+            Pageable pageable,
+            @Param("search") String search,
+            @Param("categoryId") Integer categoryId,
+            @Param("status") Integer status
+    );
+
 
     @EntityGraph(attributePaths = {
             "categories"

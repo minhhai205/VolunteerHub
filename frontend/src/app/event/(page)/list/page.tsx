@@ -312,9 +312,9 @@ export default function DashboardPage() {
             }}
           >
             <option value="">Trạng thái</option>
-            <option value="UPCOMING">Sắp diễn ra</option>
-            <option value="ONGOING">Đang diễn ra</option>
-            <option value="COMPLETED">Đã kết thúc</option>
+            <option value="0">Sắp diễn ra</option>
+            <option value="1">Đang diễn ra</option>
+            <option value="2">Đã kết thúc</option>
           </select>
 
           {/* Filter Toggle Button */}

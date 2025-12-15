@@ -28,7 +28,6 @@ import project.web.backend.utils.enums.WorkStatus;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,10 +44,12 @@ public class EventService {
     private final CategoryRepository categoryRepository;
     private final EventMemberRepository eventMemberRepository;
 
-    public PageResponseDTO<List<EventResponseDTO>> getAllEvents(Pageable pageable, String search) {
+    public PageResponseDTO<List<EventResponseDTO>> getAllEvents(
+            Pageable pageable, String search, Integer categoryId, Integer status
+    ) {
         log.info("------------ Get all events --------------");
 
-        Page<Event> events = eventRepository.findAllWithSearch(pageable, search);
+        Page<Event> events = eventRepository.findAllWithSearch(pageable, search, categoryId, status);
         List<Long> eventsIds = events.stream()
                 .map(Event::getId).toList();
         List<Event> fetchedEvents = eventRepository.findWithCategoriesByIds(eventsIds);
@@ -73,7 +74,7 @@ public class EventService {
     public Set<String> getSuggestions(String search) {
         log.info("------------ Get event suggestions --------------");
 
-        Page<Event> events = eventRepository.findAllWithSearch(PageRequest.of(0, 9), search);
+        Page<Event> events = eventRepository.findAllWithSearch(PageRequest.of(0, 9), search, null, null);
 
         return events.stream().map(Event::getName).collect(Collectors.toSet());
     }
