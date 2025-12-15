@@ -41,6 +41,7 @@ export default function CreateManagerModal({ open, onOpenChange }: Props) {
 
     if (form.password !== form.confirmPassword) {
       setError("Mật khẩu xác nhận không khớp");
+      toast.error("Mật khẩu xác nhận không khớp");
       return;
     }
 
