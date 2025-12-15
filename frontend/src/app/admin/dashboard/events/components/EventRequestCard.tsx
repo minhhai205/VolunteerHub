@@ -8,7 +8,6 @@ import {
   Heart,
   MapPin,
   MessageSquare,
-  Trash2,
   Users,
   X,
 } from "lucide-react";
@@ -25,6 +24,38 @@ export function EventRequestCard({
   eventRequest,
   onViewDetail,
 }: EventRequestCardProps) {
+  const renderStatusBadge = () => {
+    if (eventRequest.status === "pending") {
+      return (
+        <Badge
+          variant="secondary"
+          className="bg-yellow-500/20 text-yellow-600 dark:text-yellow-400"
+          aria-label="Chờ duyệt"
+        >
+          Chờ duyệt
+        </Badge>
+      );
+    }
+    if (eventRequest.status === "approve") {
+      return (
+        <Badge
+          className="bg-green-500/20 text-green-600 dark:text-green-400"
+          aria-label="Đã duyệt"
+        >
+          Đã duyệt
+        </Badge>
+      );
+    }
+    // REJECTED
+    return (
+      <Badge variant="destructive" aria-label="Đã từ chối">
+        Đã từ chối
+      </Badge>
+    );
+  };
+
+  const isPending = eventRequest.status === "pending";
+
   return (
     <Card className="border-yellow-500/30 bg-card transition-all hover:shadow-lg hover:border-yellow-500/50">
       <CardContent className="p-6">
@@ -39,16 +70,7 @@ export function EventRequestCard({
                 {eventRequest.description}
               </p>
             </div>
-            <Badge
-              variant="secondary"
-              className="bg-yellow-500/20 text-yellow-600 dark:text-yellow-400"
-            >
-              {eventRequest.status === "PENDING"
-                ? "Chờ duyệt"
-                : eventRequest.status === "APPROVED"
-                ? "Đã duyệt"
-                : "Từ chối"}
-            </Badge>
+            {renderStatusBadge()}
           </div>
 
           {/* Details */}
@@ -111,22 +133,26 @@ export function EventRequestCard({
                 Chi tiết
               </Button>
             </div>
-            {/* Right side */}
-            <div className="flex gap-3">
-              <Button
-                size="default"
-                className="bg-accent text-accent-foreground hover:bg-accent/90 flex-1 sm:flex-none cursor-pointer"
-              >
-                <Check className="mr-2 h-4 w-4" /> Duyệt sự kiện
-              </Button>
-              <Button
-                size="default"
-                variant="destructive"
-                className="flex-1 sm:flex-none cursor-pointer"
-              >
-                <X className="mr-2 h-4 w-4" /> Từ chối
-              </Button>
-            </div>
+            {/* Right side: only show actions when pending */}
+            {isPending ? (
+              <div className="flex gap-3">
+                <Button
+                  size="default"
+                  className="bg-accent text-accent-foreground hover:bg-accent/90 flex-1 sm:flex-none cursor-pointer"
+                >
+                  <Check className="mr-2 h-4 w-4" /> Duyệt sự kiện
+                </Button>
+                <Button
+                  size="default"
+                  variant="destructive"
+                  className="flex-1 sm:flex-none cursor-pointer"
+                >
+                  <X className="mr-2 h-4 w-4" /> Từ chối
+                </Button>
+              </div>
+            ) : (
+              <div />
+            )}
           </div>
         </div>
       </CardContent>

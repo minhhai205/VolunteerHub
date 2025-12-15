@@ -11,6 +11,7 @@ import {
   PaginationNext,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { generatePaginationItems } from "@/lib/pagination";
 import { useEventRequests } from "./hooks/useEventRequest";
 import SummaryCard from "./components/SummaryCard";
@@ -23,12 +24,16 @@ export default function EventsPage() {
 
   // read page from URL (1-based)
   const currentPage = Number(searchParams.get("page")) || 1;
+  const currentStatus = (searchParams.get("status") || "pending") as
+    | "pending"
+    | "processed";
   const [page, setPage] = useState<number>(currentPage);
 
   // fetch event requests with pagination
   const { eventRequests, pagination, isLoading, error } = useEventRequests(
     page,
-    10
+    10,
+    currentStatus
   );
   const totalPages = Math.max(1, pagination.totalPage);
 
@@ -77,6 +82,19 @@ export default function EventsPage() {
             <p className="text-muted-foreground">
               Duyệt, từ chối hoặc xóa các sự kiện chờ phê duyệt
             </p>
+          </div>
+
+          {/* Tabs: Pending / Processed */}
+          <div className="mb-4">
+            <Tabs
+              value={currentStatus}
+              onValueChange={(val) => router.push(`?page=1&status=${val}`)}
+            >
+              <TabsList className="w-max">
+                <TabsTrigger value="pending">Đang chờ</TabsTrigger>
+                <TabsTrigger value="processed">Đã xử lí</TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
 
           {/* Summary cards */}

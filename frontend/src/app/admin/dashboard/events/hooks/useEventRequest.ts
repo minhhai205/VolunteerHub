@@ -11,7 +11,7 @@ export interface EventRequest {
   endDate: string;
   imageUrl: string;
   category: string[];
-  status: "PENDING" | "APPROVED" | "REJECTED";
+  status: "pending" | "approve" | "rejected";
 }
 
 interface PaginationState {
@@ -31,7 +31,11 @@ interface EventRequestListResponse {
   };
 }
 
-export function useEventRequests(page = 1, pageSize = 10) {
+export function useEventRequests(
+  page = 1,
+  pageSize = 10,
+  statusFilter?: "pending" | "processed"
+) {
   const [eventRequests, setEventRequests] = useState<EventRequest[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +45,7 @@ export function useEventRequests(page = 1, pageSize = 10) {
     totalPage: 1,
   });
 
-  // refetch whenever page / pageSize changes
+  // refetch whenever page / pageSize / statusFilter changes
   useEffect(() => {
     let mounted = true;
 
@@ -54,33 +58,76 @@ export function useEventRequests(page = 1, pageSize = 10) {
         // Convert UI 1-based page to backend 0-based page index
         const apiPage = Math.max(0, page - 1);
 
-        const params = new URLSearchParams();
-        params.set("page", String(apiPage)); // backend expects 0-based
-        params.set("size", String(pageSize));
-
-        const url = `http://localhost:8080/api/event-request/request-list?${params.toString()}`;
-
-        const res = await fetchWithAuth(url, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
-
-        if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-
-        const body = (await res.json()) as EventRequestListResponse;
-
-        if (mounted) {
-          setEventRequests(body.data?.data ?? []);
-          // convert backend 0-based pageNo to UI 1-based pageNo
-          const backendPageNo = body.data?.pageNo ?? apiPage;
-          setPagination({
-            pageNo: backendPageNo + 1,
-            pageSize: body.data?.pageSize ?? pageSize,
-            totalPage: body.data?.totalPage ?? 1,
+        // If processed: backend exposes /processed-list (non-paginated),
+        // so fetch all and paginate client-side.
+        if (statusFilter === "processed") {
+          const url = `http://localhost:8080/api/event-request/processed-list`;
+          const res = await fetchWithAuth(url, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
           });
+
+          if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+
+          const body = await res.json();
+          // body.data expected to be an array of EventRequestResponseDTO
+          const allItems: EventRequest[] = Array.isArray(body?.data)
+            ? body.data
+            : body?.data ?? [];
+
+          if (mounted) {
+            const total = allItems.length;
+            const totalPage = Math.max(1, Math.ceil(total / pageSize));
+            const start = (page - 1) * pageSize;
+            const pageItems = allItems.slice(start, start + pageSize);
+
+            setEventRequests(pageItems);
+            setPagination({
+              pageNo: page,
+              pageSize,
+              totalPage,
+            });
+          }
+        } else {
+          // pending or unspecified: use paginated endpoint /request-list
+          const params = new URLSearchParams();
+          params.set("page", String(apiPage)); // backend expects 0-based
+          params.set("size", String(pageSize));
+          if (statusFilter === "pending") {
+            // backend expects enum name, uppercase
+            params.set("status", "PENDING");
+          }
+
+          const url = `http://localhost:8080/api/event-request/request-list?${params.toString()}`;
+
+          const res = await fetchWithAuth(url, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+          });
+
+          if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+
+          const body = (await res.json()) as EventRequestListResponse;
+
+          if (mounted) {
+            const items = body.data?.data ?? [];
+            // If no statusFilter provided and you want to support client-side filtering,
+            // you can filter here. Currently, pending is handled server-side.
+            setEventRequests(items);
+            // convert backend 0-based pageNo to UI 1-based pageNo
+            const backendPageNo = body.data?.pageNo ?? apiPage;
+            setPagination({
+              pageNo: backendPageNo + 1,
+              pageSize: body.data?.pageSize ?? pageSize,
+              totalPage: body.data?.totalPage ?? 1,
+            });
+          }
         }
       } catch (err: unknown) {
         if (mounted) {
@@ -96,7 +143,7 @@ export function useEventRequests(page = 1, pageSize = 10) {
     return () => {
       mounted = false;
     };
-  }, [page, pageSize]);
+  }, [page, pageSize, statusFilter]);
 
   const handleApprove = async (id: number) => {
     try {
@@ -137,7 +184,7 @@ export function useEventRequests(page = 1, pageSize = 10) {
   };
 
   const refresh = () => {
-    // callers can change page to trigger refetch; provide placeholder refresh if needed
+    // callers can change page or status to trigger refetch; provide placeholder refresh if needed
     setTimeout(() => {}, 0);
   };
 
