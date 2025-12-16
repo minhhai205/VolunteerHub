@@ -44,7 +44,7 @@ export function EventRequestCard({
         </Badge>
       );
     }
-    if (eventRequest.status === "approve") {
+    if (eventRequest.status === "approved") {
       return (
         <Badge
           className="bg-green-500/20 text-green-600 dark:text-green-400"

@@ -27,7 +27,7 @@ export default function EventsPage() {
   const currentStatus = (searchParams.get("status") || "pending") as
     | "pending"
     | "rejected"
-    | "approve";
+    | "approved";
   const [page, setPage] = useState<number>(currentPage);
 
   // fetch event requests with pagination
