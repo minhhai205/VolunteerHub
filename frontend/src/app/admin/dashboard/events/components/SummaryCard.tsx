@@ -1,8 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { AlertCircle, Calendar, Check, Search } from "lucide-react";
+import { AlertCircle, Calendar, Check } from "lucide-react";
+import { useStatistics } from "../hooks/useStatistics";
 
 export default function SummaryCard() {
+  const { adminStats, eventStats, loading } = useStatistics();
+
+  const pending = eventStats?.totalPending ?? 0;
+  const approved = eventStats?.totalApproved ?? 0;
+  const totalEvents = eventStats?.totalEvents ?? adminStats?.totalEvents ?? 0;
+
   return (
     <div className="mb-6 grid gap-4 md:grid-cols-3">
       <Card>
@@ -13,13 +19,14 @@ export default function SummaryCard() {
                 Chờ duyệt
               </p>
               <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
-                5
+                {loading ? "..." : pending}
               </p>
             </div>
             <AlertCircle className="h-8 w-8 text-yellow-600 dark:text-yellow-400" />
           </div>
         </CardContent>
       </Card>
+
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
@@ -27,12 +34,15 @@ export default function SummaryCard() {
               <p className="text-sm font-medium text-muted-foreground">
                 Đã duyệt
               </p>
-              <p className="text-3xl font-bold text-accent">12</p>
+              <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+                {loading ? "..." : approved}
+              </p>
             </div>
             <Check className="h-8 w-8 text-accent" />
           </div>
         </CardContent>
       </Card>
+
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
@@ -40,7 +50,9 @@ export default function SummaryCard() {
               <p className="text-sm font-medium text-muted-foreground">
                 Tổng sự kiện
               </p>
-              <p className="text-3xl font-bold text-foreground">17</p>
+              <p className="text-3xl font-bold text-foreground">
+                {loading ? "..." : totalEvents}
+              </p>
             </div>
             <Calendar className="h-8 w-8 text-muted-foreground" />
           </div>

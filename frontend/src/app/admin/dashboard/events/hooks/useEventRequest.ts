@@ -11,7 +11,7 @@ export interface EventRequest {
   endDate: string;
   imageUrl: string;
   category: string[];
-  status: "PENDING" | "APPROVED" | "REJECTED";
+  status: "pending" | "approve" | "rejected";
 }
 
 interface PaginationState {
@@ -31,7 +31,11 @@ interface EventRequestListResponse {
   };
 }
 
-export function useEventRequests(page = 1, pageSize = 10) {
+export function useEventRequests(
+  page = 1,
+  pageSize = 10,
+  statusFilter?: "pending" | "approve" | "rejected"
+) {
   const [eventRequests, setEventRequests] = useState<EventRequest[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +45,7 @@ export function useEventRequests(page = 1, pageSize = 10) {
     totalPage: 1,
   });
 
-  // refetch whenever page / pageSize changes
+  // refetch whenever page / pageSize / statusFilter changes
   useEffect(() => {
     let mounted = true;
 
@@ -57,6 +61,9 @@ export function useEventRequests(page = 1, pageSize = 10) {
         const params = new URLSearchParams();
         params.set("page", String(apiPage)); // backend expects 0-based
         params.set("size", String(pageSize));
+        if (statusFilter) {
+          params.set("status", statusFilter.toUpperCase());
+        }
 
         const url = `http://localhost:8080/api/event-request/request-list?${params.toString()}`;
 
@@ -73,7 +80,8 @@ export function useEventRequests(page = 1, pageSize = 10) {
         const body = (await res.json()) as EventRequestListResponse;
 
         if (mounted) {
-          setEventRequests(body.data?.data ?? []);
+          const items = body.data?.data ?? [];
+          setEventRequests(items);
           // convert backend 0-based pageNo to UI 1-based pageNo
           const backendPageNo = body.data?.pageNo ?? apiPage;
           setPagination({
@@ -96,7 +104,7 @@ export function useEventRequests(page = 1, pageSize = 10) {
     return () => {
       mounted = false;
     };
-  }, [page, pageSize]);
+  }, [page, pageSize, statusFilter]);
 
   const handleApprove = async (id: number) => {
     try {
@@ -110,10 +118,12 @@ export function useEventRequests(page = 1, pageSize = 10) {
       toastManager.success("Event request approved");
       // Remove from local list
       setEventRequests((prev) => prev.filter((req) => req.id !== id));
+      return true;
     } catch (err) {
       toastManager.error(
         err instanceof Error ? err.message : "Failed to approve"
       );
+      return false;
     }
   };
 
@@ -129,15 +139,17 @@ export function useEventRequests(page = 1, pageSize = 10) {
       toastManager.success("Event request rejected");
       // Remove from local list
       setEventRequests((prev) => prev.filter((req) => req.id !== id));
+      return true;
     } catch (err) {
       toastManager.error(
         err instanceof Error ? err.message : "Failed to reject"
       );
+      return false;
     }
   };
 
   const refresh = () => {
-    // callers can change page to trigger refetch; provide placeholder refresh if needed
+    // callers can change page or status to trigger refetch; provide placeholder refresh if needed
     setTimeout(() => {}, 0);
   };
 

@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import UserCard from "../components/UserCard";
 import { generatePaginationItems } from "@/lib/pagination";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useUserList } from "../hooks/useUserList";
 import { useUserSearch } from "../UserSearchContext";
 import { User } from "@/lib/mockData";
@@ -40,7 +40,6 @@ function UserCardSkeleton() {
 }
 
 export default function VolunteersPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { searchQuery, isSearching } = useUserSearch();
 
@@ -102,42 +101,61 @@ export default function VolunteersPage() {
     };
   }, [users]);
 
+  // keep local state in sync when user navigates back/forward
   useEffect(() => {
     setPage(currentPage);
   }, [currentPage]);
 
+  // listen for popstate to sync when user uses browser back/forward
   useEffect(() => {
-    if (page !== currentPage) {
-      router.push(`?page=${page}`);
-    }
-  }, [page, currentPage, router]);
+    const onPop = () => {
+      const sp = new URLSearchParams(window.location.search);
+      const p = Number(sp.get("page")) || 1;
+      setPage(p);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
+  // update URL (pushState) when local page changes
+  useEffect(() => {
+    if (page !== currentPage && typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("page", String(page));
+      window.history.pushState({}, "", url.toString());
+    }
+  }, [page, currentPage]);
+
+  // if backend reports fewer pages than requested, replace the route and set page
   useEffect(() => {
     if (loading) return;
     const tp = Math.max(1, pagination.totalPage || 1);
-    if (page > tp) {
+    if (page > tp && typeof window !== "undefined") {
       const newPage = tp;
-      router.replace(`?page=${newPage}`);
+      const url = new URL(window.location.href);
+      url.searchParams.set("page", String(newPage));
+      window.history.replaceState({}, "", url.toString());
       setPage(newPage);
     }
-  }, [loading, pagination.totalPage, page, router]);
+  }, [loading, pagination.totalPage, page]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages) return;
     setPage(newPage);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   if (!loading && page > totalPages) {
     return null;
   }
 
-  // Show skeleton when loading or searching
-  const showSkeleton = loading || isSearching;
+  const showSkeleton = isSearching;
 
   return (
     <div className="space-y-4">
       {showSkeleton ? (
-        // Loading skeleton
         <>
           {[...Array(5)].map((_, i) => (
             <UserCardSkeleton key={i} />
