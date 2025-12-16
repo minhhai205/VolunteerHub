@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getAccessToken } from "@/lib/token";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 export interface CommentData {
   id: number;
@@ -19,76 +21,40 @@ export interface PostData {
   image?: string;
   timestamp: string;
   likes: number;
+  commentsCount: number;
   comments: CommentData[];
 }
 
-const mockPosts: PostData[] = [
-  {
-    id: 1,
-    author: {
-      name: "Nguyễn Văn A",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-    },
-    content:
-      "Vừa hoàn thành chương trình tình nguyện tại trường tiểu học Lê Lợi. Rất vui được giúp đỡ các em nhỏ! 🎉",
-    image: "/images/volunteer-event.jpg",
-    timestamp: "2 giờ trước",
-    likes: 24,
-    comments: [
-      {
-        id: 1,
-        author: "Trần Thị B",
-        content: "Tuyệt vời! Các em nhỏ chắc rất vui",
-        timestamp: "1 giờ trước",
-      },
-      {
-        id: 2,
-        author: "Lê Văn C",
-        content: "Công việc tốt lắm!",
-        timestamp: "30 phút trước",
-      },
-    ],
-  },
-  {
-    id: 2,
-    author: {
-      name: "Trần Thị B",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka",
-    },
-    content:
-      "Tuyên bố mở đơn tình nguyện cho dự án cây xanh thành phố. Ai quan tâm thì đăng ký nha!",
-    timestamp: "5 giờ trước",
-    likes: 18,
-    comments: [
-      {
-        id: 3,
-        author: "Nguyễn Văn A",
-        content: "Mình sẽ tham gia!",
-        timestamp: "4 giờ trước",
-      },
-    ],
-  },
-  {
-    id: 3,
-    author: {
-      name: "Lê Văn C",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Gracie",
-    },
-    content:
-      "Cảm ơn tất cả những người đã tham gia sự kiện dọn dẹp bãi biển hôm qua. Chúng ta đã thu gom được 50kg rác!",
-    image: "/images/beach-cleanup.jpg",
-    timestamp: "1 ngày trước",
-    likes: 42,
-    comments: [
-      {
-        id: 4,
-        author: "Nguyễn Văn A",
-        content: "Tuyệt vời! Bảo vệ môi trường là trách nhiệm của chúng ta",
-        timestamp: "23 giờ trước",
-      },
-    ],
-  },
-];
+interface ApiPostMedia {
+  id: number;
+  fileUrl: string;
+}
+
+interface ApiUser {
+  id: number;
+  email: string;
+  fullName: string;
+  phoneNumber: string;
+  status: string;
+}
+
+interface ApiPost {
+  id: number;
+  eventId: number;
+  user: ApiUser;
+  title: string;
+  content: string;
+  medias: ApiPostMedia[];
+  likesCount: number;
+  commentsCount: number;
+  createdAt: string;
+}
+
+interface ApiResponse {
+  status: number;
+  message: string;
+  data: ApiPost[];
+}
 
 export function useRecentPosts() {
   const [posts, setPosts] = useState<PostData[]>([]);
@@ -99,10 +65,50 @@ export function useRecentPosts() {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        // For now, use mock data. Replace with API call when ready
-        setPosts(mockPosts);
+        const token = getAccessToken();
+
+        const response = await fetchWithAuth(
+          "http://localhost:8080/api/post/newest-posts",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch posts");
+        }
+
+        const result: ApiResponse = await response.json();
+
+        if (result.data && Array.isArray(result.data)) {
+          const transformedPosts: PostData[] = result.data.map((post) => ({
+            id: post.id,
+            author: {
+              name: post.user.fullName,
+              avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.user.id}`,
+            },
+            content: post.content,
+            image:
+              post.medias && post.medias.length > 0
+                ? post.medias[0].fileUrl
+                : undefined,
+            timestamp: formatTime(post.createdAt),
+            likes: post.likesCount,
+            commentsCount: post.commentsCount,
+            comments: [],
+          }));
+
+          setPosts(transformedPosts);
+        } else {
+          setPosts([]);
+        }
         setError(null);
       } catch (err) {
+        console.error("Error fetching posts:", err);
         setError(err instanceof Error ? err.message : "An error occurred");
         setPosts([]);
       } finally {
@@ -114,4 +120,25 @@ export function useRecentPosts() {
   }, []);
 
   return { posts, loading, error };
+}
+
+function formatTime(isoString: string): string {
+  const date = new Date(isoString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) {
+    return "Vừa xong";
+  } else if (diffMins < 60) {
+    return `${diffMins} phút trước`;
+  } else if (diffHours < 24) {
+    return `${diffHours} giờ trước`;
+  } else if (diffDays < 7) {
+    return `${diffDays} ngày trước`;
+  } else {
+    return date.toLocaleDateString("vi-VN");
+  }
 }
