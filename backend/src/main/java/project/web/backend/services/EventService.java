@@ -28,6 +28,7 @@ import project.web.backend.utils.enums.WorkStatus;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -379,5 +380,20 @@ public class EventService {
                 }).toList();
         eventMemberRepository.saveAll(eventMembers);
         return "Done";
+    }
+
+
+    @Transactional
+    public String deleteEvent(Long eventId) {
+        Event event = eventRepository.findByIdToDelete(eventId)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+        Date startDate = event.getStartDate();
+        if (startDate.before(new Date())) {
+            throw new AppException(ErrorCode.EVENT_STARTED);
+        }
+        event.getCategories().clear();
+        eventRepository.save(event);
+        eventRepository.delete(event);
+        return "deleted";
     }
 }

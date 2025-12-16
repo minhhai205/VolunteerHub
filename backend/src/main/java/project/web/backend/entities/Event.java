@@ -58,9 +58,17 @@ public class Event extends AbstractEntity {
     @JoinColumn(name = "manager_id")
     private User manager;
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(
+            mappedBy = "event",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
     private Set<EventMember> members;
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(
+            mappedBy = "event",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
     private Set<Post> posts;
 }
