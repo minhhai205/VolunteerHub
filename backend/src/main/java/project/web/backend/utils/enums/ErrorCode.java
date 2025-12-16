@@ -31,7 +31,8 @@ public enum ErrorCode {
     POST_NOT_EXISTED(400, "Post was not existed, please try again", HttpStatus.BAD_REQUEST),
     CURRENT_PASSWORD_DUPLICATED(400, "Your new password and your last are the same" +
             ", please choose other password for security", HttpStatus.BAD_REQUEST),
-    EVENT_MEMBER_NOT_EXISTED(400, "Event member not existed", HttpStatus.BAD_REQUEST);
+    EVENT_MEMBER_NOT_EXISTED(400, "Event member not existed", HttpStatus.BAD_REQUEST),
+    EVENT_STARTED(400, "Event had started, You can't do this action", HttpStatus.BAD_REQUEST);
 
     private final int code;
     private final String message;
