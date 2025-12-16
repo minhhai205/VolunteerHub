@@ -64,19 +64,6 @@ export default function TrendingEventsSection() {
                       </span>
                     </div>
                   </div>
-
-                  <div>
-                    <Link href={`/event/detail/${event.id}`}>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-2"
-                      >
-                        Xem chi tiết
-                        <ArrowRight className="w-4 h-4 ml-1" />
-                      </Button>
-                    </Link>
-                  </div>
                 </div>
               </div>
             </div>
