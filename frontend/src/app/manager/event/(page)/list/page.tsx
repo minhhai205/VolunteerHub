@@ -391,11 +391,15 @@ export default function EventsPage() {
 
       const result = await response.json();
 
-      if (!response.ok || result.status !== 200) {
+      if (!response.ok) {
         throw new Error("Xóa sự kiện thất bại!");
       }
-
-      toastManager.success("Đã xóa sự kiện thành công");
+      // console.log(result.status);
+      if (result.status === 400) {
+        toastManager.error("Chỉ xóa được xóa sự kiện chưa bắt đầu");
+      } else {
+        toastManager.success("Đã xóa sự kiện thành công");
+      }
       setDeleteConfirm({ show: false, eventId: null, eventName: null });
 
       // Refetch the event list
