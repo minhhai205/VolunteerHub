@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import project.web.backend.entities.Event;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,13 +62,17 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                             :status = 2 AND e.endDate < CURRENT_TIMESTAMP
                         )
                     )
+                AND (
+                    :fromDate IS NULL OR e.startDate >= :fromDate
+                )
                 ORDER BY e.startDate DESC, e.endDate DESC
             """)
     Page<Event> findAllWithSearch(
             Pageable pageable,
             @Param("search") String search,
             @Param("categoryId") Integer categoryId,
-            @Param("status") Integer status
+            @Param("status") Integer status,
+            @Param("fromDate") Date fromDate
     );
 
 

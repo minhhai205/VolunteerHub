@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -20,6 +21,7 @@ import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.dtos.response.user.EventMemberResponseDTO;
 import project.web.backend.services.EventService;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -36,10 +38,12 @@ public class EventController {
             Pageable pageable,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Integer categoryId,
-            @RequestParam(required = false) Integer status
+            @RequestParam(required = false) Integer status,
+            @DateTimeFormat(pattern = "yyyy-MM-dd")
+            @RequestParam(required = false) Date fromDate
     ) {
         return ApiSuccessResponse.<PageResponseDTO<List<EventResponseDTO>>>builder()
-                .data(eventService.getAllEvents(pageable, search, categoryId, status))
+                .data(eventService.getAllEvents(pageable, search, categoryId, status, fromDate))
                 .status(HttpStatus.OK.value())
                 .message("Get all events successfully!")
                 .build();

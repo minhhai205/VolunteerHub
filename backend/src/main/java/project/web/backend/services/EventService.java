@@ -51,11 +51,11 @@ public class EventService {
     private String frontEndPort;
 
     public PageResponseDTO<List<EventResponseDTO>> getAllEvents(
-            Pageable pageable, String search, Integer categoryId, Integer status
+            Pageable pageable, String search, Integer categoryId, Integer status, Date fromDate
     ) {
         log.info("------------ Get all events --------------");
 
-        Page<Event> events = eventRepository.findAllWithSearch(pageable, search, categoryId, status);
+        Page<Event> events = eventRepository.findAllWithSearch(pageable, search, categoryId, status, fromDate);
         List<Long> eventsIds = events.stream()
                 .map(Event::getId).toList();
         List<Event> fetchedEvents = eventRepository.findWithCategoriesByIds(eventsIds);
@@ -80,7 +80,7 @@ public class EventService {
     public Set<String> getSuggestions(String search) {
         log.info("------------ Get event suggestions --------------");
 
-        Page<Event> events = eventRepository.findAllWithSearch(PageRequest.of(0, 9), search, null, null);
+        Page<Event> events = eventRepository.findAllWithSearch(PageRequest.of(0, 9), search, null, null, null);
 
         return events.stream().map(Event::getName).collect(Collectors.toSet());
     }
