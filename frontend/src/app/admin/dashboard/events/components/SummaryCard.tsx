@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle, Calendar, Check } from "lucide-react";
+import { AlertCircle, Calendar, Check, XCircle } from "lucide-react";
 import { useStatistics } from "../hooks/useStatistics";
 
 export default function SummaryCard() {
@@ -7,10 +7,11 @@ export default function SummaryCard() {
 
   const pending = eventStats?.totalPending ?? 0;
   const approved = eventStats?.totalApproved ?? 0;
+  const rejected = eventStats?.totalRejected ?? 0;
   const totalEvents = eventStats?.totalEvents ?? adminStats?.totalEvents ?? 0;
 
   return (
-    <div className="mb-6 grid gap-4 md:grid-cols-3">
+    <div className="mb-6 grid gap-4 md:grid-cols-4">
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
@@ -38,7 +39,23 @@ export default function SummaryCard() {
                 {loading ? "..." : approved}
               </p>
             </div>
-            <Check className="h-8 w-8 text-accent" />
+            <Check className="h-8 w-8 text-green-600 dark:text-green-400" />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Đã từ chối
+              </p>
+              <p className="text-3xl font-bold text-red-600 dark:text-red-400">
+                {loading ? "..." : rejected}
+              </p>
+            </div>
+            <XCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
           </div>
         </CardContent>
       </Card>

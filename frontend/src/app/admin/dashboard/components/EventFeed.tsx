@@ -141,9 +141,6 @@ export function EventFeed() {
                   </span>
                 </span>
               </div>
-              <Button variant="ghost" size="sm">
-                Xem chi tiết
-              </Button>
             </div>
           </div>
         </div>
