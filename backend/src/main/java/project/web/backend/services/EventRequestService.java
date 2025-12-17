@@ -22,6 +22,7 @@ import project.web.backend.repositories.*;
 import project.web.backend.utils.commons.SecurityUtil;
 import project.web.backend.utils.enums.ErrorCode;
 import project.web.backend.utils.enums.EventRequestStatus;
+import project.web.backend.utils.enums.WorkStatus;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -213,6 +214,7 @@ public class EventRequestService {
         EventMember eventMember = EventMember.builder()
                 .event(event)
                 .user(user)
+                .status(WorkStatus.PENDING)
                 .build();
         eventMemberRepository.save(eventMember);
         // send push approve to user
