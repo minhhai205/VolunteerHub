@@ -2,6 +2,7 @@ package project.web.backend.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import project.web.backend.repositories.*;
 import project.web.backend.utils.commons.SecurityUtil;
 import project.web.backend.utils.enums.ErrorCode;
 import project.web.backend.utils.enums.EventRequestStatus;
+import project.web.backend.utils.enums.NotificationType;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,6 +42,10 @@ public class EventRequestService {
     private final PushNotificationService pushNotificationService;
     private final EventMemberRepository eventMemberRepository;
     private final EventCreationMapper eventCreationMapper;
+    private final NotificationRepository notificationRepository;
+
+    @Value("${front-end.port}")
+    private String frontEndPort;
 
     public EventRequestResponseDTO createEventRequest(EventRequestDTO eventRequestDTO) {
         log.info("------------ Create new event request --------------");
@@ -59,15 +65,29 @@ public class EventRequestService {
         eventRequestRepository.save(newRequest);
 
         // Send notification
+        String title = "Yêu cầu tạo event!";
+        String content = String.format("%s đã gửi yêu cầu tạo event mới!", currentUser.getFullName());
         NotificationPayload payload = NotificationPayload.builder()
-                .title("Yêu cầu tạo event!")
-                .body(String.format("%s đã gửi yêu cầu tạo event mới!", currentUser.getFullName()))
-                .url("http://localhost:3000/event/list")
+                .title(title)
+                .body(content)
+                .url(frontEndPort + "/admin/dashboard/events")
                 .build();
 
         List<User> admins = userRepository.findAllAdmin();
         List<Long> adminIds = admins.stream().map(User::getId).toList();
+        List<Notification> notifications = new ArrayList<>();
+        admins.forEach(admin -> {
+            Notification notification = Notification.builder()
+                    .sendTo(admin)
+                    .content(content)
+                    .eventRequest(newRequest)
+                    .type(NotificationType.EVENT)
+                    .build();
+            notifications.add(notification);
+        });
+        notificationRepository.saveAll(notifications);
         pushNotificationService.sendNotificationToAll(payload, adminIds);
+
 
         return eventRequestMapper.toResponseDTO(newRequest);
     }

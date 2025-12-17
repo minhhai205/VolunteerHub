@@ -31,7 +31,7 @@ public class Notification extends AbstractEntity {
     @Column(name = "type")
     @EnumPattern(name = "Notification status", regexp = "EVENT|POST|COMMENT")
     private NotificationType type;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     private Event event;
@@ -43,4 +43,8 @@ public class Notification extends AbstractEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")
     private Comment comment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_request_id")
+    private EventCreateRequest eventRequest;
 }
