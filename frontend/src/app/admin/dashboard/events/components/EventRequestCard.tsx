@@ -11,7 +11,14 @@ import {
   MessageSquare,
   Users,
   X,
+  Download,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EventRequest } from "../hooks/useEventRequest";
@@ -21,6 +28,7 @@ interface EventRequestCardProps {
   onViewDetail?: () => void;
   onApprove?: (id: number) => Promise<boolean>;
   onReject?: (id: number) => Promise<boolean>;
+  onExport?: (id: number, format: "csv" | "json") => Promise<void>;
 }
 
 export function EventRequestCard({
@@ -28,6 +36,7 @@ export function EventRequestCard({
   onViewDetail,
   onApprove,
   onReject,
+  onExport,
 }: EventRequestCardProps) {
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
@@ -161,7 +170,8 @@ export function EventRequestCard({
                 Chi tiết
               </Button>
             </div>
-            {/* Right side: only show actions when pending */}
+
+            {/* Right side */}
             {isPending ? (
               <div className="flex gap-3">
                 <Button
@@ -185,11 +195,73 @@ export function EventRequestCard({
                 </Button>
               </div>
             ) : (
-              <div />
+              <div className="flex gap-3 items-center">
+                {eventRequest.status === "approved" && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size="default"
+                        variant="outline"
+                        className="cursor-pointer"
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        Xuất dữ liệu
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="bottom">
+                      <DropdownMenuItem
+                        onClick={() => onExport?.(eventRequest.id, "csv")}
+                      >
+                        CSV
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => onExport?.(eventRequest.id, "json")}
+                      >
+                        JSON
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </div>
             )}
           </div>
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+interface EventListProps {
+  eventRequests?: EventRequest[];
+  onApprove?: (id: number) => Promise<boolean>;
+  onReject?: (id: number) => Promise<boolean>;
+  onExport?: (id: number, format: "csv" | "json") => Promise<void>;
+}
+
+export default function EventList({
+  eventRequests = [],
+  onApprove,
+  onReject,
+  onExport,
+}: EventListProps) {
+  const [selectedEvent, setSelectedEvent] = useState<EventRequest | null>(null);
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="space-y-4">
+      {eventRequests.map((eventRequest) => (
+        <EventRequestCard
+          key={eventRequest.id}
+          eventRequest={eventRequest}
+          onViewDetail={() => {
+            setSelectedEvent(eventRequest);
+            setOpen(true);
+          }}
+          onApprove={onApprove}
+          onReject={onReject}
+          onExport={onExport}
+        />
+      ))}
+    </div>
   );
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import lombok.RequiredArgsConstructor;
 import project.web.backend.services.ExportService;
@@ -23,14 +24,15 @@ public class AdminController {
     private final ExportService exportService;
 
     @GetMapping("/event/{id}/members/export")
-    public ResponseEntity<byte[]> exportFile(
-            @RequestParam String format,
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<StreamingResponseBody> exportFile(@RequestParam String format, @PathVariable Long id) {
         ExportResult result = exportService.exportEventMembers(id, format);
+        StreamingResponseBody body = out -> {
+            out.write(result.getBytes());
+            out.flush();
+        };
         return ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + result.getFilename())
-        .contentType(result.getMediaType())
-        .body(result.getBytes());
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + result.getFilename())
+            .contentType(result.getMediaType())
+            .body(body);
     }
 }
