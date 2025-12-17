@@ -84,6 +84,7 @@ public class PostService {
                     .sendTo(event.getManager())
                     .content(content)
                     .event(event)
+                    .post(post)
                     .type(NotificationType.POST)
                     .build();
             notificationRepository.save(notification);

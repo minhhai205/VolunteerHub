@@ -3,12 +3,14 @@ package project.web.backend.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.web.backend.dtos.request.event.EventRequestDTO;
+import project.web.backend.dtos.request.notification.NotificationPayload;
 import project.web.backend.dtos.request.user.EventMemberFilterRequestDTO;
 import project.web.backend.dtos.request.user.PersonalRatingDTO;
 import project.web.backend.dtos.request.user.WorkRatingRequestDTO;
@@ -24,14 +26,12 @@ import project.web.backend.utils.commons.AppConst;
 import project.web.backend.utils.commons.SecurityUtil;
 import project.web.backend.utils.enums.ErrorCode;
 import project.web.backend.utils.enums.EventRequestStatus;
+import project.web.backend.utils.enums.NotificationType;
 import project.web.backend.utils.enums.WorkStatus;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,6 +44,11 @@ public class EventService {
     private final EventRegistrationRepository eventRegistrationRepository;
     private final CategoryRepository categoryRepository;
     private final EventMemberRepository eventMemberRepository;
+    private final NotificationRepository notificationRepository;
+    private final PushNotificationService pushNotificationService;
+
+    @Value("${front-end.port}")
+    private String frontEndPort;
 
     public PageResponseDTO<List<EventResponseDTO>> getAllEvents(
             Pageable pageable, String search, Integer categoryId, Integer status
@@ -387,6 +392,10 @@ public class EventService {
     public String deleteEvent(Long eventId) {
         Event event = eventRepository.findByIdToDelete(eventId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+
+        List<User> users = eventMemberRepository.findUsersByEventId(eventId);
+        List<Long> userIds = users.stream().map(User::getId).toList();
+
         Date startDate = event.getStartDate();
         if (startDate.before(new Date())) {
             throw new AppException(ErrorCode.EVENT_STARTED);
@@ -394,6 +403,27 @@ public class EventService {
         event.getCategories().clear();
         eventRepository.save(event);
         eventRepository.delete(event);
+
+        // Send notification to all user
+        String title = "Thông báo sự kiện bị hủy!";
+        String content = String.format("Chúng tôi rất đáng tiếc khi phải thông báo với bạn về việc sự kiện %s đã bị hủy!", event.getName());
+        NotificationPayload payload = NotificationPayload.builder()
+                .title(title)
+                .body(content)
+                .url(frontEndPort + "/event/list")
+                .build();
+
+        List<Notification> notifications = new ArrayList<>();
+        users.forEach(user -> {
+            Notification notification = Notification.builder()
+                    .sendTo(user)
+                    .content(content)
+                    .type(NotificationType.POST)
+                    .build();
+            notifications.add(notification);
+        });
+        notificationRepository.saveAll(notifications);
+        pushNotificationService.sendNotificationToAll(payload, userIds);
         return "deleted";
     }
 }

@@ -7,11 +7,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.w3c.dom.stylesheets.LinkStyle;
 import project.web.backend.entities.EventMember;
+import project.web.backend.entities.User;
 import project.web.backend.utils.enums.WorkStatus;
+
 import java.util.List;
-import java.util.Optional;
 
 
 @Repository
@@ -46,7 +46,15 @@ public interface EventMemberRepository extends JpaRepository<EventMember, Long> 
             @Param("eventId") Long eventId,
             Pageable pageable
     );
-    
+
     @Query("SELECT COUNT(em.id) FROM EventMember em")
     Long countAll();
+
+
+    @Query("""
+                SELECT em.user
+                FROM EventMember em
+                WHERE em.event.id = :eventId
+            """)
+    List<User> findUsersByEventId(@Param("eventId") Long eventId);
 }
