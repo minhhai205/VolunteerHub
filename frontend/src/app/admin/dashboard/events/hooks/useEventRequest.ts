@@ -11,7 +11,7 @@ export interface EventRequest {
   endDate: string;
   imageUrl: string;
   category: string[];
-  status: "pending" | "approve" | "rejected";
+  status: "pending" | "approved" | "rejected";
 }
 
 interface PaginationState {
@@ -34,7 +34,7 @@ interface EventRequestListResponse {
 export function useEventRequests(
   page = 1,
   pageSize = 10,
-  statusFilter?: "pending" | "approve" | "rejected"
+  statusFilter?: "pending" | "approved" | "rejected"
 ) {
   const [eventRequests, setEventRequests] = useState<EventRequest[]>([]);
   const [isLoading, setIsLoading] = useState(false);

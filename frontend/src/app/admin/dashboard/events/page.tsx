@@ -17,6 +17,8 @@ import { useEventRequests } from "./hooks/useEventRequest";
 import SummaryCard from "./components/SummaryCard";
 import EventSearch from "./components/EventSearch";
 import EventList from "./components/EventList";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import { toastManager } from "@/components/static/toast/toast";
 
 export default function EventsPage() {
   const router = useRouter();
@@ -27,7 +29,7 @@ export default function EventsPage() {
   const currentStatus = (searchParams.get("status") || "pending") as
     | "pending"
     | "rejected"
-    | "approve";
+    | "approved";
   const [page, setPage] = useState<number>(currentPage);
 
   // fetch event requests with pagination
@@ -67,6 +69,46 @@ export default function EventsPage() {
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages) return;
     setPage(newPage);
+  };
+
+  const handleExport = async (eventId: number, format: "csv" | "json") => {
+    if (!["csv", "json"].includes(format)) {
+      toastManager.error("Định dạng không hợp lệ (chọn csv hoặc json)");
+      return;
+    }
+
+    try {
+      const response = await fetchWithAuth(
+        `http://localhost:8080/api/admin/event/${eventId}/members/export?format=${format}`,
+        { method: "GET" }
+      );
+
+      if (!response.ok) {
+        const text = await response.text().catch(() => null);
+        toastManager.error(
+          `Export thất bại: ${response.status}${text ? " - " + text : ""}`
+        );
+        return;
+      }
+
+      const blob = await response.blob();
+      const cd = response.headers.get("content-disposition") || "";
+      let filename = `event_${eventId}_members.${format}`;
+      const match = cd.match(/filename="?([^"]+)"?/);
+      if (match && match[1]) filename = match[1];
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Export error", err);
+      toastManager.error("Lỗi khi xuất file");
+    }
   };
 
   // If we determined the current page is invalid and are redirecting, show nothing
@@ -118,6 +160,7 @@ export default function EventsPage() {
               eventRequests={eventRequests}
               onApprove={handleApprove}
               onReject={handleReject}
+              onExport={handleExport}
             />
           )}
 
