@@ -163,8 +163,23 @@ public class EventRequestService {
                 .build();
         eventRepository.save(newEvent);
 
-        // send web push to manager
-        // ....
+        // Send notification to manager
+        String title = "Phản hồi yêu cầu tạo event!";
+        String content = String.format("Sự kiện %s đã được admin duyệt!", newEvent.getName());
+        NotificationPayload payload = NotificationPayload.builder()
+                .title(title)
+                .body(content)
+                .url(frontEndPort + "/event/detail/" + newEvent.getId())
+                .build();
+
+        Notification notification = Notification.builder()
+                .sendTo(newEvent.getManager())
+                .content(content)
+                .event(newEvent)
+                .type(NotificationType.EVENT)
+                .build();
+        notificationRepository.save(notification);
+        pushNotificationService.sendNotificationToUser(newEvent.getManager().getId(), payload);
 
         return eventRequestMapper.toResponseDTO(request);
     }
@@ -184,7 +199,23 @@ public class EventRequestService {
 
         eventRequestRepository.save(request);
 
-        // send web push to manager
+        // Send notification to manager
+        String title = "Phản hồi yêu cầu tạo event!";
+        String content = String.format("Sự kiện %s đã bị từ chối!", request.getName());
+        NotificationPayload payload = NotificationPayload.builder()
+                .title(title)
+                .body(content)
+                .url(frontEndPort + "/manager/create-request")
+                .build();
+
+        Notification notification = Notification.builder()
+                .sendTo(request.getManager())
+                .content(content)
+                .eventRequest(request)
+                .type(NotificationType.EVENT)
+                .build();
+        notificationRepository.save(notification);
+        pushNotificationService.sendNotificationToUser(request.getManager().getId(), payload);
 
         return eventRequestMapper.toResponseDTO(request);
     }
@@ -235,7 +266,25 @@ public class EventRequestService {
                 .user(user)
                 .build();
         eventMemberRepository.save(eventMember);
-        // send push approve to user
+
+        // Send notification to user
+        String title = "Phản hồi yêu cầu tham gia sự kiện!";
+        String content = String.format("Yêu cầu tham gia sự kiện %s của bạn đã được chấp nhận!", event.getName());
+        NotificationPayload payload = NotificationPayload.builder()
+                .title(title)
+                .body(content)
+                .url(frontEndPort + "/event/detail/" + event.getId())
+                .build();
+
+        Notification notification = Notification.builder()
+                .sendTo(user)
+                .content(content)
+                .event(event)
+                .type(NotificationType.EVENT)
+                .build();
+        notificationRepository.save(notification);
+        pushNotificationService.sendNotificationToUser(user.getId(), payload);
+
         return eventRequestMapper.toEventRegistrationResponseDTO(eventRegistration);
     }
 
@@ -249,7 +298,25 @@ public class EventRequestService {
         }
         eventRegistration.setStatus(EventRequestStatus.REJECTED);
         eventRegistrationRepository.save(eventRegistration);
-        // send push reject to user
+
+        // Send notification to user
+        String title = "Phản hồi yêu cầu tham gia sự kiện!";
+        String content = String.format("Yêu cầu tham gia sự kiện %s của bạn đã bị từ chối!",
+                eventRegistration.getEvent().getName());
+        NotificationPayload payload = NotificationPayload.builder()
+                .title(title)
+                .body(content)
+                .url(frontEndPort + "/event/detail/" + eventRegistration.getEvent().getId())
+                .build();
+
+        Notification notification = Notification.builder()
+                .sendTo(eventRegistration.getUser())
+                .content(content)
+                .event(eventRegistration.getEvent())
+                .type(NotificationType.EVENT)
+                .build();
+        notificationRepository.save(notification);
+        pushNotificationService.sendNotificationToUser(eventRegistration.getUser().getId(), payload);
         return eventRequestMapper.toEventRegistrationResponseDTO(eventRegistration);
     }
 
