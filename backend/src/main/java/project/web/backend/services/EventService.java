@@ -245,7 +245,24 @@ public class EventService {
                 .build();
         eventRegistrationRepository.save(eventRegistration);
 
-        // send web push to all managers
+        // Send notification to manager
+        String title = "yêu cầu tham gia sự kiện!";
+        String content = String.format("%s đã gửi yêu cầu tham gia sự kiện %s!",
+                currentUser.getFullName(), event.getName());
+        NotificationPayload payload = NotificationPayload.builder()
+                .title(title)
+                .body(content)
+                .url(frontEndPort + "/manager/request")
+                .build();
+
+        Notification notification = Notification.builder()
+                .sendTo(event.getManager())
+                .content(content)
+                .event(event)
+                .type(NotificationType.EVENT)
+                .build();
+        notificationRepository.save(notification);
+        pushNotificationService.sendNotificationToUser(event.getManager().getId(), payload);
         return "Created registration request";
     }
 
@@ -397,7 +414,7 @@ public class EventService {
         List<Long> userIds = users.stream().map(User::getId).toList();
 
         Date startDate = event.getStartDate();
-        if (startDate.before(new Date())) {
+        if (!startDate.after(new Date())) {
             throw new AppException(ErrorCode.EVENT_STARTED);
         }
         event.getCategories().clear();
