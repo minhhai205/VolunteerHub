@@ -10,7 +10,7 @@ import lombok.*;
 @Setter
 @Getter
 @Builder
-public class PushSubscription extends AbstractEntity{
+public class PushSubscription extends AbstractEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,7 +19,7 @@ public class PushSubscription extends AbstractEntity{
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String endpoint;
 
     @Column(nullable = false)
