@@ -24,6 +24,7 @@ export interface Pageable {
 export interface FilterParams {
   category?: string;
   status?: string;
+  fromDate?: string;
 }
 
 export interface PageResponse<T> {
@@ -69,6 +70,9 @@ export function useEventList(
         }
         if (filters?.status) {
           params.append("status", filters.status);
+        }
+        if (filters?.fromDate) {
+          params.append("fromDate", filters.fromDate);
         }
         const url = `http://localhost:8080/api/event/event-list?${params.toString()}`;
 
@@ -117,6 +121,7 @@ export function useEventList(
     pageable.sort,
     filters?.category,
     filters?.status,
+    filters?.fromDate,
   ]);
 
   return {
