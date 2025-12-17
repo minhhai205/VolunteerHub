@@ -205,4 +205,17 @@ public class EventController {
                 .status(HttpStatus.OK.value())
                 .build();
     }
+
+
+    @DeleteMapping("/delete-event/{eventId}")
+    @PreAuthorize("hasAnyRole({'MANAGER'})")
+    public ApiSuccessResponse<String> deleteEvent(
+            @PathVariable @Min(value = 1, message = "Event id must be greater than 0") Long eventId
+    ) {
+        return ApiSuccessResponse.<String>builder()
+                .data(eventService.deleteEvent(eventId))
+                .message("Rated members")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
 }

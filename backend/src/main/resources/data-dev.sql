@@ -258,3 +258,102 @@ SELECT
 FROM users u
 WHERE u.email = 'manager@example.com'
   AND NOT EXISTS (SELECT 1 FROM event_create_requests WHERE name = 'Elderly Home Visit'); -- Changed from 'title'
+
+-- Sample event_members for testing (time-consistent with events above)
+
+-- Beach Cleanup Day (event date 2025-11-20) — completed participants
+INSERT INTO event_members (event_id, user_id, work_status, created_at, updated_at)
+SELECT e.id, u.id, 'COMPLETED', '2025-11-15 09:00:00', NOW()
+FROM events e, users u
+WHERE e.name = 'Beach Cleanup Day' AND u.email = 'user1@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_members em WHERE em.event_id = e.id AND em.user_id = u.id);
+
+INSERT INTO event_members (event_id, user_id, work_status, created_at, updated_at)
+SELECT e.id, u.id, 'COMPLETED', '2025-11-18 14:30:00', NOW()
+FROM events e, users u
+WHERE e.name = 'Beach Cleanup Day' AND u.email = 'user2@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_members em WHERE em.event_id = e.id AND em.user_id = u.id);
+
+INSERT INTO event_members (event_id, user_id, work_status, created_at, updated_at)
+SELECT e.id, u.id, 'COMPLETED', '2025-11-19 08:45:00', NOW()
+FROM events e, users u
+WHERE e.name = 'Beach Cleanup Day' AND u.email = 'user3@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_members em WHERE em.event_id = e.id AND em.user_id = u.id);
+
+INSERT INTO event_members (event_id, user_id, work_status, created_at, updated_at)
+SELECT e.id, u.id, 'COMPLETED', '2025-11-19 10:00:00', NOW()
+FROM events e, users u
+WHERE e.name = 'Beach Cleanup Day' AND u.email = 'user4@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_members em WHERE em.event_id = e.id AND em.user_id = u.id);
+
+INSERT INTO event_members (event_id, user_id, work_status, created_at, updated_at)
+SELECT e.id, u.id, 'COMPLETED', '2025-11-20 08:20:00', NOW()
+FROM events e, users u
+WHERE e.name = 'Beach Cleanup Day' AND u.email = 'user5@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_members em WHERE em.event_id = e.id AND em.user_id = u.id);
+
+
+-- Run for Hope Charity Marathon (event date 2025-12-05) — mix of completed and no-shows
+INSERT INTO event_members (event_id, user_id, work_status, created_at, updated_at)
+SELECT e.id, u.id, 'COMPLETED', '2025-12-01 11:00:00', NOW()
+FROM events e, users u
+WHERE e.name = 'Run for Hope Charity Marathon' AND u.email = 'user6@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_members em WHERE em.event_id = e.id AND em.user_id = u.id);
+
+INSERT INTO event_members (event_id, user_id, work_status, created_at, updated_at)
+SELECT e.id, u.id, 'ABSENT', '2025-11-30 09:30:00', NOW()
+FROM events e, users u
+WHERE e.name = 'Run for Hope Charity Marathon' AND u.email = 'user7@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_members em WHERE em.event_id = e.id AND em.user_id = u.id);
+
+INSERT INTO event_members (event_id, user_id, work_status, created_at, updated_at)
+SELECT e.id, u.id, 'COMPLETED', '2025-12-03 16:15:00', NOW()
+FROM events e, users u
+WHERE e.name = 'Run for Hope Charity Marathon' AND u.email = 'user8@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_members em WHERE em.event_id = e.id AND em.user_id = u.id);
+
+INSERT INTO event_members (event_id, user_id, work_status, created_at, updated_at)
+SELECT e.id, u.id, 'COMPLETED', '2025-12-04 07:50:00', NOW()
+FROM events e, users u
+WHERE e.name = 'Run for Hope Charity Marathon' AND u.email = 'user9@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_members em WHERE em.event_id = e.id AND em.user_id = u.id);
+
+INSERT INTO event_members (event_id, user_id, work_status, created_at, updated_at)
+SELECT e.id, u.id, 'ABSENT', '2025-12-05 08:10:00', NOW()
+FROM events e, users u
+WHERE e.name = 'Run for Hope Charity Marathon' AND u.email = 'user10@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_members em WHERE em.event_id = e.id AND em.user_id = u.id);
+
+
+-- Code for a Cause Workshop (event date 2025-12-10) — some pending (registered before event), some completed
+INSERT INTO event_members (event_id, user_id, work_status, created_at, updated_at)
+SELECT e.id, u.id, 'PENDING', '2025-12-08 13:20:00', NOW()
+FROM events e, users u
+WHERE e.name = 'Code for a Cause Workshop' AND u.email = 'user11@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_members em WHERE em.event_id = e.id AND em.user_id = u.id);
+
+INSERT INTO event_members (event_id, user_id, work_status, created_at, updated_at)
+SELECT e.id, u.id, 'COMPLETED', '2025-12-09 09:00:00', NOW()
+FROM events e, users u
+WHERE e.name = 'Code for a Cause Workshop' AND u.email = 'user12@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_members em WHERE em.event_id = e.id AND em.user_id = u.id);
+
+INSERT INTO event_members (event_id, user_id, work_status, created_at, updated_at)
+SELECT e.id, u.id, 'PENDING', '2025-12-09 19:45:00', NOW()
+FROM events e, users u
+WHERE e.name = 'Code for a Cause Workshop' AND u.email = 'user13@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_members em WHERE em.event_id = e.id AND em.user_id = u.id);
+
+
+-- Future event (Community Park Planting Day 2026-01-15) — registrations (PENDING)
+INSERT INTO event_members (event_id, user_id, work_status, created_at, updated_at)
+SELECT e.id, u.id, 'PENDING', '2025-12-10 12:00:00', NOW()
+FROM events e, users u
+WHERE e.name = 'Community Park Planting Day' AND u.email = 'user14@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_members em WHERE em.event_id = e.id AND em.user_id = u.id);
+
+INSERT INTO event_members (event_id, user_id, work_status, created_at, updated_at)
+SELECT e.id, u.id, 'PENDING', '2025-12-11 15:30:00', NOW()
+FROM events e, users u
+WHERE e.name = 'Community Park Planting Day' AND u.email = 'user15@example.com'
+  AND NOT EXISTS (SELECT 1 FROM event_members em WHERE em.event_id = e.id AND em.user_id = u.id);

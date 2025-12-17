@@ -212,4 +212,15 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             @Param("minMembers") int minMembers
     );
 
+
+    @Query("""
+            SELECT e FROM Event e
+            JOIN FETCH e.categories
+            LEFT JOIN FETCH e.members
+            LEFT JOIN FETCH e.posts p
+            LEFT JOIN FETCH p.comments
+            LEFT JOIN FETCH p.medias
+            WHERE e.id=:eventId
+            """)
+    Optional<Event> findByIdToDelete(@Param("eventId") Long eventId);
 }

@@ -9,12 +9,14 @@ interface EventListProps {
   eventRequests?: EventRequest[];
   onApprove?: (id: number) => Promise<boolean>;
   onReject?: (id: number) => Promise<boolean>;
+  onExport?: (id: number, format: "csv" | "json") => Promise<void>;
 }
 
 export default function EventList({
   eventRequests = [],
   onApprove,
   onReject,
+  onExport,
 }: EventListProps) {
   const [open, setOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<EventRequest | null>(null);
@@ -31,6 +33,7 @@ export default function EventList({
           }}
           onApprove={onApprove}
           onReject={onReject}
+          onExport={onExport}
         />
       ))}
 
