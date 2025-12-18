@@ -122,7 +122,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     })
     @Query("""
             SELECT DISTINCT e FROM Event e
-            INNER JOIN e.members em
+            JOIN FETCH e.members em
             INNER JOIN em.user u
             WHERE u.email=:email
             ORDER BY e.createdAt DESC

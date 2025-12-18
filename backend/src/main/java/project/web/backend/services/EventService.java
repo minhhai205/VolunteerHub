@@ -127,8 +127,12 @@ public class EventService {
         log.info("------------ Get my events --------------");
         List<Event> events = eventRepository.findMyEventWithCategories(
                 SecurityUtil.getCurrentEmail());
-        List<EventResponseDTO> eventResponses = events.stream().map(eventMapper::toResponseDTO).toList();
-
+        List<EventResponseDTO> eventResponses = events.stream().map(event -> {
+                    EventResponseDTO dto = eventMapper.toResponseDTOWithWorkStatus(event);
+                    dto.setWorkStatus(event.getMembers().stream().findFirst().get().getStatus());
+                    return dto;
+                })
+                .toList();
         List<Long> eventsIds = events.stream().map(Event::getId).toList();
 
         findCountMemberAndPostForEvents(eventsIds, eventResponses);
