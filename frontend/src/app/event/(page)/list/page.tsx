@@ -1,6 +1,13 @@
 "use client";
 
-import { Search, Filter, ChevronLeft, ChevronRight, X, Calendar } from "lucide-react";
+import {
+  Search,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  Calendar,
+} from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useEventList } from "../../hooks/useList";
 import { useCategories } from "../../hooks/useCategories";
@@ -326,10 +333,9 @@ export default function DashboardPage() {
           <div className={styles.dateFilterWrapper}>
             <Calendar className={styles.dateIcon} size={18} />
             <span className={styles.dateFilterText}>
-              {fromDate 
+              {fromDate
                 ? `Từ ngày ${new Date(fromDate).toLocaleDateString("vi-VN")}`
-                : "Mọi lúc"
-              }
+                : "Mọi lúc"}
             </span>
             <input
               type="date"
