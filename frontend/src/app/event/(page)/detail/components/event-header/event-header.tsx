@@ -208,17 +208,6 @@ export default function EventHeader({
         );
 
       case "PENDING":
-        // Nếu sự kiện đã bắt đầu, hiển thị thông báo không thể hủy
-        if (hasEventStarted()) {
-          return (
-            <button
-              className={`${styles.registerBtn} ${styles.disabled}`}
-              disabled
-            >
-              Không thể hủy khi sự kiện đã bắt đầu
-            </button>
-          );
-        }
         return (
           <button
             className={`${styles.registerBtn} ${styles.pending}`}
@@ -237,7 +226,7 @@ export default function EventHeader({
               className={`${styles.registerBtn} ${styles.disabled}`}
               disabled
             >
-              Không thể hủy khi sự kiện đã bắt đầu
+              Không thể hủy do sự kiện đã diễn ra
             </button>
           );
         }
