@@ -11,10 +11,13 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.dtos.response.user.EventMemberResponseDTO;
+import project.web.backend.entities.Event;
 import project.web.backend.entities.EventMember;
 import project.web.backend.exceptions.AppException;
 import project.web.backend.repositories.EventMemberRepository;
+import project.web.backend.repositories.EventRepository;
 import project.web.backend.utils.commons.ExportResult;
 import project.web.backend.utils.enums.ErrorCode;
 import project.web.backend.utils.enums.ExportFormat;
@@ -25,6 +28,7 @@ import project.web.backend.utils.enums.ExportFormat;
 public class ExportService {
     private final FileService fileService;
     private final EventMemberRepository eventMemberRepository;
+    private final EventRepository eventRepository;
 
     public ExportResult exportEventMembers(Long id, String format) {
         try {
@@ -81,6 +85,56 @@ public class ExportService {
             throw ae;
         } catch (Exception e) {
             log.error("Failed to export participants", e);
+            throw new RuntimeException("Export failed");
+        }
+    }
+
+    public ExportResult exportAllEvents(String format) {
+        try {
+            ExportFormat exportFormat = ExportFormat.from(format);
+            if (exportFormat == ExportFormat.UNKNOWN) {
+                throw new AppException(ErrorCode.FILE_FORMAT_UNSUPPORTED);
+            }
+
+            // lấy tất cả event (unpaged)
+            List<Event> events = eventRepository.findAllWithSearch(Pageable.unpaged(), null, null, null, null).getContent();
+
+            // map sang DTO để export
+            List<EventResponseDTO> dtos = events.stream().map(e ->
+                EventResponseDTO.builder()
+                    .id(e.getId())
+                    .name(e.getName())
+                    .description(e.getDescription())
+                    .location(e.getLocation())
+                    .imageUrl(e.getImageUrl())
+                    .startDate(e.getStartDate())
+                    .endDate(e.getEndDate())
+                    .build()
+            ).collect(Collectors.toList());
+
+            if (dtos.isEmpty()) {
+                String baseName = "events_all";
+                if (exportFormat == ExportFormat.JSON) {
+                    return ExportResult.builder()
+                            .bytes("[]".getBytes())
+                            .filename(baseName + ".json")
+                            .mediaType(MediaType.APPLICATION_JSON)
+                            .build();
+                } else {
+                    String header = "id,name,description,location,startDate,endDate\n";
+                    return ExportResult.builder()
+                            .bytes(header.getBytes())
+                            .filename(baseName + ".csv")
+                            .mediaType(MediaType.parseMediaType("text/csv"))
+                            .build();
+                }
+            }
+
+            return fileService.export(dtos, exportFormat, "events_all");
+        } catch (AppException ae) {
+            throw ae;
+        } catch (Exception e) {
+            log.error("Failed to export events", e);
             throw new RuntimeException("Export failed");
         }
     }

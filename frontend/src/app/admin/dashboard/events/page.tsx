@@ -19,6 +19,13 @@ import EventSearch from "./components/EventSearch";
 import EventList from "./components/EventList";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
 import { toastManager } from "@/components/static/toast/toast";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 export default function EventsPage() {
   const router = useRouter();
@@ -111,6 +118,43 @@ export default function EventsPage() {
     }
   };
 
+  const handleExportAll = async (format: "csv" | "json") => {
+    if (!["csv", "json"].includes(format)) {
+      toastManager.error("Định dạng không hợp lệ (chọn csv hoặc json)");
+      return;
+    }
+    try {
+      const response = await fetchWithAuth(
+        `http://localhost:8080/api/admin/events/export?format=${format}`,
+        { method: "GET" }
+      );
+      if (!response.ok) {
+        const text = await response.text().catch(() => null);
+        toastManager.error(
+          `Export thất bại: ${response.status}${text ? " - " + text : ""}`
+        );
+        return;
+      }
+      const blob = await response.blob();
+      const cd = response.headers.get("content-disposition") || "";
+      let filename = `events_all.${format}`;
+      const match = cd.match(/filename="?([^"]+)"?/);
+      if (match && match[1]) filename = match[1];
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Export all error", err);
+      toastManager.error("Lỗi khi xuất file");
+    }
+  };
+
   // If we determined the current page is invalid and are redirecting, show nothing
   if (!isLoading && page > totalPages) {
     return null;
@@ -118,16 +162,42 @@ export default function EventsPage() {
 
   return (
     <div className="flex h-screen bg-background">
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1">
         <div className="p-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-semibold text-foreground">
-              Quản lý sự kiện
-            </h1>
-            <p className="text-muted-foreground">
-              Duyệt, từ chối hoặc xóa các sự kiện chờ phê duyệt
-            </p>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-semibold text-foreground">
+                  Quản lý sự kiện
+                </h1>
+                <p className="text-muted-foreground">
+                  Duyệt, từ chối hoặc xóa các sự kiện chờ phê duyệt
+                </p>
+              </div>
+
+              <div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      size="default"
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      Xuất tất cả
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="bottom" align="end">
+                    <DropdownMenuItem onClick={() => handleExportAll("csv")}>
+                      Xuất tất cả (CSV)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleExportAll("json")}>
+                      Xuất tất cả (JSON)
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
           </div>
 
           {/* Tabs: Pending / Rejected / Approved */}

@@ -9,7 +9,6 @@ import {
   Heart,
   MapPin,
   MessageSquare,
-  Users,
   X,
   Download,
 } from "lucide-react";
@@ -63,7 +62,6 @@ export function EventRequestCard({
         </Badge>
       );
     }
-    // REJECTED
     return (
       <Badge variant="destructive" aria-label="Đã từ chối">
         Đã từ chối
@@ -110,8 +108,8 @@ export function EventRequestCard({
             {renderStatusBadge()}
           </div>
 
-          {/* Details */}
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 rounded-lg border border-border/50 bg-muted/30 p-4">
+          {/* Details (kept only location + dates) */}
+          <div className="grid gap-3 sm:grid-cols-2 rounded-lg border border-border/50 bg-muted/30 p-4">
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-accent shrink-0" />
               <span className="text-sm text-foreground">
@@ -132,33 +130,10 @@ export function EventRequestCard({
                 })}
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-accent shrink-0" />
-              <span className="text-sm text-foreground">123 người</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <span>
-                Tạo bởi:{" "}
-                <span className="text-foreground font-medium">Admin</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="flex items-center gap-6 text-sm">
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              <Heart className="h-4 w-4" />
-              <span>25</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              <MessageSquare className="h-4 w-4" />
-              <span>8</span>
-            </div>
           </div>
 
           {/* Buttons */}
           <div className="flex flex-wrap justify-between gap-3 pt-2">
-            {/* Left side */}
             <div>
               <Button
                 size="default"
@@ -171,7 +146,6 @@ export function EventRequestCard({
               </Button>
             </div>
 
-            {/* Right side */}
             {isPending ? (
               <div className="flex gap-3">
                 <Button

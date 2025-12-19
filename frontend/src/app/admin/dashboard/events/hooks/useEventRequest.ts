@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
 import { toastManager } from "@/components/static/toast/toast";
 
@@ -20,15 +20,33 @@ interface PaginationState {
   totalPage: number;
 }
 
-interface EventRequestListResponse {
+/**
+ * Backend response shapes
+ */
+interface PageData<T> {
+  pageNo: number;
+  pageSize: number;
+  totalPage: number;
+  data: T[];
+}
+interface ApiPageResponse<T> {
   status: number;
   message: string;
-  data: {
-    pageNo: number; // backend 0-based
-    pageSize: number;
-    totalPage: number;
-    data: EventRequest[];
-  };
+  data: PageData<T>;
+}
+
+/**
+ * EventResponseDTO (from backend) simplified
+ */
+interface EventResponseDTO {
+  id: number;
+  name: string;
+  description?: string;
+  location?: string;
+  imageUrl?: string;
+  startDate?: string;
+  endDate?: string;
+  categoryNames?: string[] | Set<string>;
 }
 
 export function useEventRequests(
@@ -45,7 +63,6 @@ export function useEventRequests(
     totalPage: 1,
   });
 
-  // refetch whenever page / pageSize / statusFilter changes
   useEffect(() => {
     let mounted = true;
 
@@ -59,36 +76,78 @@ export function useEventRequests(
         const apiPage = Math.max(0, page - 1);
 
         const params = new URLSearchParams();
-        params.set("page", String(apiPage)); // backend expects 0-based
+        params.set("page", String(apiPage));
         params.set("size", String(pageSize));
-        if (statusFilter) {
-          params.set("status", statusFilter.toUpperCase());
-        }
 
-        const url = `http://localhost:8080/api/event-request/request-list?${params.toString()}`;
-
-        const res = await fetchWithAuth(url, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
-
-        if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-
-        const body = (await res.json()) as EventRequestListResponse;
-
-        if (mounted) {
-          const items = body.data?.data ?? [];
-          setEventRequests(items);
-          // convert backend 0-based pageNo to UI 1-based pageNo
-          const backendPageNo = body.data?.pageNo ?? apiPage;
-          setPagination({
-            pageNo: backendPageNo + 1,
-            pageSize: body.data?.pageSize ?? pageSize,
-            totalPage: body.data?.totalPage ?? 1,
+        // If asking for approved events, call events API and map to EventRequest shape
+        if (statusFilter === "approved") {
+          const url = `http://localhost:8080/api/event/event-list?${params.toString()}`;
+          const res = await fetchWithAuth(url, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
           });
+
+          if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+
+          const body = (await res.json()) as ApiPageResponse<EventResponseDTO>;
+
+          if (mounted) {
+            const events = body.data?.data ?? [];
+            const items: EventRequest[] = events.map((e) => ({
+              id: e.id,
+              name: e.name,
+              description: e.description ?? "",
+              location: e.location ?? "",
+              startDate: e.startDate ?? "",
+              endDate: e.endDate ?? "",
+              imageUrl: e.imageUrl ?? "",
+              category: Array.isArray(e.categoryNames)
+                ? e.categoryNames
+                : e.categoryNames
+                ? Array.from(e.categoryNames as Set<string>)
+                : [],
+              status: "approved",
+            }));
+            setEventRequests(items);
+            const backendPageNo = body.data?.pageNo ?? apiPage;
+            setPagination({
+              pageNo: backendPageNo + 1,
+              pageSize: body.data?.pageSize ?? pageSize,
+              totalPage: body.data?.totalPage ?? 1,
+            });
+          }
+        } else {
+          // original behavior: fetch event requests (pending/rejected etc.)
+          if (statusFilter) {
+            params.set("status", statusFilter.toUpperCase());
+          }
+          const url = `http://localhost:8080/api/event-request/request-list?${params.toString()}`;
+
+          const res = await fetchWithAuth(url, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+          });
+
+          if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+
+          const body = (await res.json()) as ApiPageResponse<EventRequest>;
+
+          if (mounted) {
+            const items = body.data?.data ?? [];
+            setEventRequests(items);
+            const backendPageNo = body.data?.pageNo ?? apiPage;
+            setPagination({
+              pageNo: backendPageNo + 1,
+              pageSize: body.data?.pageSize ?? pageSize,
+              totalPage: body.data?.totalPage ?? 1,
+            });
+          }
         }
       } catch (err: unknown) {
         if (mounted) {
@@ -116,7 +175,6 @@ export function useEventRequests(
         throw new Error("Failed to approve request");
       }
       toastManager.success("Event request approved");
-      // Remove from local list
       setEventRequests((prev) => prev.filter((req) => req.id !== id));
       return true;
     } catch (err) {
@@ -137,7 +195,6 @@ export function useEventRequests(
         throw new Error("Failed to reject request");
       }
       toastManager.success("Event request rejected");
-      // Remove from local list
       setEventRequests((prev) => prev.filter((req) => req.id !== id));
       return true;
     } catch (err) {
