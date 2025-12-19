@@ -330,24 +330,31 @@ export default function DashboardPage() {
           </select>
 
           {/* Date Filter */}
-          <div className={styles.dateFilterWrapper}>
-            <Calendar className={styles.dateIcon} size={18} />
-            <span className={styles.dateFilterText}>
-              {fromDate
-                ? `Từ ngày ${new Date(fromDate).toLocaleDateString("vi-VN")}`
-                : "Mọi lúc"}
-            </span>
-            <input
-              type="date"
-              className={styles.dateInputOverlay}
-              value={fromDate}
-              onChange={(e) => {
-                setFromDate(e.target.value);
+          <input
+            type="date"
+            className={styles.dateFilterInput}
+            value={fromDate}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Validate format YYYY-MM-DD with year having exactly 4 digits
+              if (value && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                const date = new Date(value);
+                // Check if date is valid and not in the future
+                if (!isNaN(date.getTime()) && date <= new Date()) {
+                  setFromDate(value);
+                  setPage(0);
+                }
+              } else if (!value) {
+                // Allow clearing the date
+                setFromDate("");
                 setPage(0);
-              }}
-              title="Lọc từ ngày"
-            />
-          </div>
+              }
+            }}
+            title="Lọc từ ngày"
+            placeholder="Ngày bắt đầu"
+            min="1900-01-01"
+            max={new Date().toISOString().split("T")[0]}
+          />
 
           {/* Filter Toggle Button */}
           <button
