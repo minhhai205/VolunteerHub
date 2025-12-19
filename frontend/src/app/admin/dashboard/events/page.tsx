@@ -118,7 +118,7 @@ export default function EventsPage() {
 
   return (
     <div className="flex h-screen bg-background">
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1">
         <div className="p-8">
           {/* Header */}
           <div className="mb-8">
