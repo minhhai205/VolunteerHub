@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Home,
   Inbox,
@@ -31,6 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { usePathname } from "next/navigation";
+import { getName } from "@/lib/getDataFromToken";
 
 const items = [
   {
@@ -52,6 +54,12 @@ const items = [
 
 const AppSidebar = () => {
   const pathname = usePathname() || "";
+  const [userName, setUserName] = useState<string>("Tài khoản");
+
+  useEffect(() => {
+    const name = getName();
+    if (name) setUserName(name);
+  }, []);
 
   const isItemActive = (itemUrl: string) => {
     if (itemUrl === "/admin/dashboard") {
@@ -117,12 +125,12 @@ const AppSidebar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton className="text-lg">
-                  <User2 /> Tên tài khoản <ChevronUp className="ml-auto" />
+                  <User2 /> {userName} <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>Tài khoản</DropdownMenuItem>
-                <DropdownMenuItem>Cài đặt</DropdownMenuItem>
+                {/* <DropdownMenuItem>Tài khoản</DropdownMenuItem>
+                <DropdownMenuItem>Cài đặt</DropdownMenuItem> */}
                 <DropdownMenuItem variant="destructive">
                   Đăng xuất
                 </DropdownMenuItem>

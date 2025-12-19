@@ -16,61 +16,54 @@ import { useTheme } from "next-themes";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { NotificationsDropdown } from "./Notification";
 import { useLogout } from "../hooks/useLogout";
+import { useState, useEffect } from "react";
+import { getName } from "@/lib/getDataFromToken";
 
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
   const { toggleSidebar } = useSidebar();
   const { logout, isLoading } = useLogout();
 
+  const [userName, setUserName] = useState<string>("Tên tài khoản");
+  const [avatarUrl, setAvatarUrl] = useState<string>(
+    "https://avatars.githubusercontent.com/u/1486366"
+  );
+
+  useEffect(() => {
+    const name = getName();
+    if (name) setUserName(name);
+    const stored = localStorage.getItem("userAvatar");
+    if (stored) setAvatarUrl(stored);
+  }, []);
+
+  const initials = (name: string) =>
+    name
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((p) => p[0]?.toUpperCase() ?? "")
+      .join("");
+
   return (
     <nav className="p-4 flex items-center justify-between sticky top-0 bg-background z-10">
       {/* LEFT */}
       <SidebarTrigger />
-      {/* <Button variant="outline" onClick={toggleSidebar}>
-        Custom Button
-      </Button> */}
       {/* RIGHT */}
       <div className="flex items-center gap-4">
-        {/* THEME MENU */}
         <NotificationsDropdown />
-        {/* <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon">
-              <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">Toggle theme</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setTheme("light")}>
-              Light
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTheme("dark")}>
-              Dark
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTheme("system")}>
-              System
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu> */}
-        {/* USER MENU */}
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Avatar>
-              <AvatarImage src="https://avatars.githubusercontent.com/u/1486366" />
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarImage src={avatarUrl} />
+              <AvatarFallback>{initials(userName)}</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent sideOffset={10} align="end">
-            <DropdownMenuLabel>Tên tài khoản</DropdownMenuLabel>
+            <DropdownMenuLabel>{userName}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            {/* <DropdownMenuItem>
               <User className="h-[1.2rem] w-[1.2rem] mr-2" />
               Hồ sơ
-            </DropdownMenuItem>
-            {/* <DropdownMenuItem>
-              <Settings className="h-[1.2rem] w-[1.2rem] mr-2" />
-              Cài đặt
             </DropdownMenuItem> */}
             <DropdownMenuItem variant="destructive" onClick={logout}>
               <LogOut className="h-[1.2rem] w-[1.2rem] mr-2" />
