@@ -15,62 +15,83 @@ WHERE NOT EXISTS (SELECT 1 FROM roles WHERE name = 'ADMIN');
 
 
 -- ======================
--- INSERT SAMPLE USERS
+-- INSERT SAMPLE USERS (POSTGRES)
 -- ======================
-INSERT INTO users (email, password, full_name, status, phone_number, role_id)
+
+INSERT INTO users (
+    email, password, full_name, status, phone_number, role_id,
+    created_at, updated_at
+)
 SELECT
     'user@example.com',
     '$2a$10$t57F0BQCUeyePPAanxw3/OwCjtDAgD4Qejxavm/USimM47.49y2iO',
     'User Sample',
     'ACTIVE',
     '0123456789',
-    r.id
+    r.id,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
 FROM roles r
 WHERE r.name = 'USER'
   AND NOT EXISTS (
     SELECT 1 FROM users u WHERE u.email = 'user@example.com'
 );
 
-INSERT INTO users (email, password, full_name, status, phone_number, role_id)
+INSERT INTO users (
+    email, password, full_name, status, phone_number, role_id,
+    created_at, updated_at
+)
 SELECT
     'manager@example.com',
     '$2a$10$t57F0BQCUeyePPAanxw3/OwCjtDAgD4Qejxavm/USimM47.49y2iO',
     'Manager Sample',
     'ACTIVE',
     '0987654321',
-    r.id
+    r.id,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
 FROM roles r
 WHERE r.name = 'MANAGER'
   AND NOT EXISTS (
     SELECT 1 FROM users u WHERE u.email = 'manager@example.com'
 );
 
-INSERT INTO users (email, password, full_name, status, phone_number, role_id)
+INSERT INTO users (
+    email, password, full_name, status, phone_number, role_id,
+    created_at, updated_at
+)
 SELECT
     'admin@example.com',
     '$2a$10$t57F0BQCUeyePPAanxw3/OwCjtDAgD4Qejxavm/USimM47.49y2iO',
     'Admin Sample',
     'ACTIVE',
     '0909090909',
-    r.id
+    r.id,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
 FROM roles r
 WHERE r.name = 'ADMIN'
   AND NOT EXISTS (
     SELECT 1 FROM users u WHERE u.email = 'admin@example.com'
 );
 
-
 -- ======================
 -- INSERT 25 ADDITIONAL USERS
 -- ======================
-INSERT INTO users (email, password, full_name, status, phone_number, role_id)
+
+INSERT INTO users (
+    email, password, full_name, status, phone_number, role_id,
+    created_at, updated_at
+)
 SELECT
     'user' || n || '@example.com',
     '$2a$10$t57F0BQCUeyePPAanxw3/OwCjtDAgD4Qejxavm/USimM47.49y2iO',
     'User Sample ' || n,
     'ACTIVE',
     '0900' || LPAD(n::text, 6, '0'),
-    r.id
+    r.id,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
 FROM roles r
 CROSS JOIN generate_series(1, 25) AS n
 WHERE r.name = 'USER'
@@ -79,6 +100,7 @@ WHERE r.name = 'USER'
     FROM users u
     WHERE u.email = 'user' || n || '@example.com'
 );
+
 
 
 -- ======================
