@@ -6,6 +6,7 @@ import { Mail, Eye, Lock, Unlock } from "lucide-react";
 import type { User } from "@/lib/mockData";
 import { useUsersModal } from "../UserModelContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useState, useEffect } from "react";
 
 type Props = {
   user: User;
@@ -21,6 +22,7 @@ export default function UserCard({ user, onShowDetail, onRequestLock }: Props) {
       return null;
     }
   })();
+
   const showDetail = (u: User) => {
     if (onShowDetail) return onShowDetail(u);
     fallback?.openDetail(u);
@@ -30,16 +32,48 @@ export default function UserCard({ user, onShowDetail, onRequestLock }: Props) {
     if (onRequestLock) return onRequestLock(u, action);
     fallback?.openLock(u, action);
   };
+
+  // Avatar: nếu user.avatar có thì dùng, nếu không tạo avatar DiceBear với seed từ user.id (nếu có) hoặc tên
+  const [avatarUrl, setAvatarUrl] = useState<string>(() => {
+    if (user.avatar) return user.avatar;
+    const seed =
+      user.id ?? user.fullName ?? Math.random().toString(36).slice(2, 9);
+    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
+      String(seed)
+    )}`;
+  });
+
+  useEffect(() => {
+    if (user.avatar) {
+      setAvatarUrl(user.avatar);
+    } else {
+      const seed =
+        user.id ?? user.fullName ?? Math.random().toString(36).slice(2, 9);
+      setAvatarUrl(
+        `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
+          String(seed)
+        )}`
+      );
+    }
+  }, [user]);
+
+  const initials = (user.fullName || "U")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() ?? "")
+    .join("");
+
   return (
     <Card key={user.id} className="transition-shadow hover:shadow-lg">
       <CardContent className="p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-1 items-start gap-4">
             <Avatar className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-semibold text-primary-foreground">
-              {user.avatar ? (
-                <AvatarImage src={user.avatar} alt={user.fullName} />
+              {avatarUrl ? (
+                <AvatarImage src={avatarUrl} alt={user.fullName} />
               ) : (
-                <AvatarFallback />
+                <AvatarFallback>{initials}</AvatarFallback>
               )}
             </Avatar>
 
