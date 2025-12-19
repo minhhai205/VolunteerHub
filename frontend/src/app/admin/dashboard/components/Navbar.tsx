@@ -50,7 +50,7 @@ const Navbar = () => {
       <SidebarTrigger />
       {/* RIGHT */}
       <div className="flex items-center gap-4">
-        <NotificationsDropdown />
+        {/* <NotificationsDropdown /> */}
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Avatar>
@@ -61,10 +61,6 @@ const Navbar = () => {
           <DropdownMenuContent sideOffset={10} align="end">
             <DropdownMenuLabel>{userName}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {/* <DropdownMenuItem>
-              <User className="h-[1.2rem] w-[1.2rem] mr-2" />
-              Hồ sơ
-            </DropdownMenuItem> */}
             <DropdownMenuItem variant="destructive" onClick={logout}>
               <LogOut className="h-[1.2rem] w-[1.2rem] mr-2" />
               Đăng xuất
