@@ -250,7 +250,7 @@ public class EventService {
         eventRegistrationRepository.save(eventRegistration);
 
         // Send notification to manager
-        String title = "yêu cầu tham gia sự kiện!";
+        String title = "Yêu cầu tham gia sự kiện!";
         String content = String.format("%s đã gửi yêu cầu tham gia sự kiện %s!",
                 currentUser.getFullName(), event.getName());
         NotificationPayload payload = NotificationPayload.builder()
@@ -267,6 +267,26 @@ public class EventService {
                 .build();
         notificationRepository.save(notification);
         pushNotificationService.sendNotificationToUser(event.getManager().getId(), payload);
+
+        // Send notification to user
+        String titleUser = "Yêu cầu tham gia sự kiện!";
+        String contentUser = String.format("Bạn đã gửi yêu cầu tham gia sự kiện %s, admin sẽ phản hồi yêu cầu của bạn sớm nhất!",
+                event.getName());
+        NotificationPayload payloadUser = NotificationPayload.builder()
+                .title(titleUser)
+                .body(contentUser)
+                .url(frontEndPort + "/event/detail/" + event.getId())
+                .build();
+
+        Notification notificationUser = Notification.builder()
+                .sendTo(currentUser)
+                .content(titleUser)
+                .event(event)
+                .type(NotificationType.EVENT)
+                .build();
+        notificationRepository.save(notificationUser);
+        pushNotificationService.sendNotificationToUser(currentUser.getId(), payloadUser);
+
         return "Created registration request";
     }
 

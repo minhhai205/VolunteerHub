@@ -330,24 +330,16 @@ export default function DashboardPage() {
           </select>
 
           {/* Date Filter */}
-          <div className={styles.dateFilterWrapper}>
-            <Calendar className={styles.dateIcon} size={18} />
-            <span className={styles.dateFilterText}>
-              {fromDate
-                ? `Từ ngày ${new Date(fromDate).toLocaleDateString("vi-VN")}`
-                : "Mọi lúc"}
-            </span>
-            <input
-              type="date"
-              className={styles.dateInputOverlay}
-              value={fromDate}
-              onChange={(e) => {
-                setFromDate(e.target.value);
-                setPage(0);
-              }}
-              title="Lọc từ ngày"
-            />
-          </div>
+          <input
+            type="date"
+            className={styles.dateFilterInput}
+            value={fromDate}
+            onChange={(e) => {
+              setFromDate(e.target.value);
+              setPage(0);
+            }}
+            title="Lọc từ ngày"
+          />
 
           {/* Filter Toggle Button */}
           <button
