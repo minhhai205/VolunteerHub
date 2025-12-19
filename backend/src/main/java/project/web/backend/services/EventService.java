@@ -425,6 +425,30 @@ public class EventService {
                     }
                 }).toList();
         eventMemberRepository.saveAll(eventMembers);
+
+        // Send notification to all user
+        List<Notification> notifications = new ArrayList<>();
+        eventMembers.forEach(member -> {
+            String title = "Đánh giá hoàn thành sự kiện!";
+            String content = String.format("Bạn đã được manager đánh giá quá trình tham gia sự kiện %s!",
+                    member.getEvent().getName());
+            NotificationPayload payload = NotificationPayload.builder()
+                    .title(title)
+                    .body(content)
+                    .url(frontEndPort + "/activity")
+                    .build();
+
+            Notification notification = Notification.builder()
+                    .sendTo(member.getUser())
+                    .content(content)
+                    .event(member.getEvent())
+                    .type(NotificationType.EVENT)
+                    .build();
+            notifications.add(notification);
+            pushNotificationService.sendNotificationToUser(member.getUser().getId(), payload);
+        });
+        notificationRepository.saveAll(notifications);
+
         return "Done";
     }
 

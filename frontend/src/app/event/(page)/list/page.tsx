@@ -335,10 +335,25 @@ export default function DashboardPage() {
             className={styles.dateFilterInput}
             value={fromDate}
             onChange={(e) => {
-              setFromDate(e.target.value);
-              setPage(0);
+              const value = e.target.value;
+              // Validate format YYYY-MM-DD with year having exactly 4 digits
+              if (value && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                const date = new Date(value);
+                // Check if date is valid and not in the future
+                if (!isNaN(date.getTime()) && date <= new Date()) {
+                  setFromDate(value);
+                  setPage(0);
+                }
+              } else if (!value) {
+                // Allow clearing the date
+                setFromDate("");
+                setPage(0);
+              }
             }}
             title="Lọc từ ngày"
+            placeholder="Ngày bắt đầu"
+            min="1900-01-01"
+            max={new Date().toISOString().split("T")[0]}
           />
 
           {/* Filter Toggle Button */}
