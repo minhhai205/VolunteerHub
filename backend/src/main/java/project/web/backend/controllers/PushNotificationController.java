@@ -5,7 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import project.web.backend.dtos.request.notification.SubscriptionRequest;
 import project.web.backend.dtos.response.ApiSuccessResponse;
+import project.web.backend.dtos.response.notification.NotificationResponseDTO;
 import project.web.backend.services.PushNotificationService;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,6 +45,15 @@ public class PushNotificationController {
                 .data("Unsubscribed successfully")
                 .status(HttpStatus.OK.value())
                 .message("Unsubscribed successfully")
+                .build();
+    }
+
+    @GetMapping("/my-notifications")
+    public ApiSuccessResponse<List<NotificationResponseDTO>> getNotifications() {
+        return ApiSuccessResponse.<List<NotificationResponseDTO>>builder()
+                .data(pushNotificationService.myNotifications())
+                .status(HttpStatus.OK.value())
+                .message("Get notifications")
                 .build();
     }
 }

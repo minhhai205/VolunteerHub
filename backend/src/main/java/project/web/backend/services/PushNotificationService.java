@@ -8,12 +8,15 @@ import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.web.backend.dtos.request.notification.NotificationPayload;
+import project.web.backend.dtos.response.notification.NotificationResponseDTO;
 import project.web.backend.entities.PushSubscription;
 import project.web.backend.entities.User;
 import project.web.backend.exceptions.AppException;
+import project.web.backend.repositories.NotificationRepository;
 import project.web.backend.repositories.PushSubscriptionRepository;
 import project.web.backend.repositories.UserRepository;
 import project.web.backend.utils.commons.SecurityUtil;
@@ -30,6 +33,7 @@ public class PushNotificationService {
     private final PushService pushService;
     private final Gson gson;
     private final UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
 
 
     public PushNotificationService(
@@ -37,7 +41,8 @@ public class PushNotificationService {
             UserRepository userRepository,
             @Value("${vapid.public.key}") String publicKey,
             @Value("${vapid.private.key}") String privateKey,
-            @Value("${vapid.subject}") String subject) throws Exception {
+            @Value("${vapid.subject}") String subject,
+            NotificationRepository notificationRepository) throws Exception {
 
         this.subscriptionRepository = subscriptionRepository;
         this.userRepository = userRepository;
@@ -49,6 +54,7 @@ public class PushNotificationService {
         pushService.setPublicKey(publicKey);
         pushService.setPrivateKey(privateKey);
         pushService.setSubject(subject);
+        this.notificationRepository = notificationRepository;
     }
 
     /**
@@ -89,7 +95,7 @@ public class PushNotificationService {
     /**
      * Send notification to a user.
      *
-     * @param userId Id user.
+     * @param userId  Id user.
      * @param payload Notification content.
      */
     public void sendNotificationToUser(Long userId, NotificationPayload payload) {
@@ -145,4 +151,12 @@ public class PushNotificationService {
         });
     }
 
+    public List<NotificationResponseDTO> myNotifications() {
+        String email = SecurityUtil.getCurrentEmail();
+        return notificationRepository.getMyNotifications(email, PageRequest.of(0, 5))
+                .stream().map(n -> NotificationResponseDTO.builder()
+                        .id(n.getId())
+                        .content(n.getContent())
+                        .build()).toList();
+    }
 }
