@@ -1,8 +1,14 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { TrendingUp, MessageSquare, Users, ArrowRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  TrendingUp,
+  MessageSquare,
+  Users,
+  Calendar,
+  MapPin,
+} from "lucide-react";
 import Link from "next/link";
 import { useTrendingEvents } from "@/hooks/useTrendingEvents";
 
@@ -24,61 +30,56 @@ export default function TrendingEventsSection() {
         ) : events.length === 0 ? (
           <p className="text-muted-foreground">Không có sự kiện trending</p>
         ) : (
-          events.map((event: any) => (
-            <div
-              key={event.id}
-              className="flex gap-4 items-start rounded-md p-3 hover:shadow-sm transition"
-            >
-              <div className="flex-shrink-0 w-24 h-16 overflow-hidden rounded-md bg-muted/30">
-                <img
-                  src={event.imageUrl || "/placeholder.svg"}
-                  alt={event.name}
-                  className="w-full h-full object-cover"
-                />
+          events.map((event: any, idx: number) => (
+            <div key={event.id} className="space-y-3">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 pr-4">
+                  <h3 className="text-sm font-medium text-foreground truncate">
+                    {event.name}
+                  </h3>
+
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                    {event.description || "Không có mô tả"}
+                  </p>
+                </div>
+
+                <Badge variant="outline" className="ml-4">
+                  Trending
+                </Badge>
               </div>
 
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-foreground truncate">
-                  {event.name}
-                </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  <span>
+                    {event.startDate ?? event.start_date ?? event.date
+                      ? new Date(
+                          event.startDate ?? event.start_date ?? event.date
+                        ).toLocaleDateString("vi-VN")
+                      : "Không rõ"}
+                  </span>
+                </div>
 
-                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                  {event.description || "Không có mô tả"}
-                </p>
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  <span>{event.location || "Không rõ"}</span>
+                </div>
 
-                <div className="mt-3 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4" />
-                      <span>
-                        {event.countMembers ?? event.count_members ?? "—"} thành
-                        viên
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <MessageSquare className="w-4 h-4" />
-                      <span>
-                        {event.countPosts ?? event.count_posts ?? 0} bài trao
-                        đổi
-                      </span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <Link href={`/event/detail/${event.id}`}>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-2"
-                      >
-                        Xem chi tiết
-                        <ArrowRight className="w-4 h-4 ml-1" />
-                      </Button>
-                    </Link>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  <span>
+                    {event.countMembers ??
+                      event.count_members ??
+                      event.count_memberships ??
+                      "—"}{" "}
+                    thành viên
+                  </span>
                 </div>
               </div>
+
+              {idx < events.length - 1 && (
+                <hr className="border-t border-border/30" />
+              )}
             </div>
           ))
         )}

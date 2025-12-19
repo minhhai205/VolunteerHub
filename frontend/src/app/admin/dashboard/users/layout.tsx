@@ -14,7 +14,6 @@ import { toast } from "sonner";
 import { UsersModalProvider, useUsersModal } from "./UserModelContext";
 import { UserSearchProvider, useUserSearch } from "./UserSearchContext";
 import { useLockUser } from "./hooks/useLockUser";
-import { useDebouncedCallback } from "use-debounce";
 import { Button } from "@/components/ui/button";
 import CreateManagerModal from "./components/CreateManagerModal";
 
@@ -36,26 +35,24 @@ function UsersInnerLayout({ children }: { children: React.ReactNode }) {
     closeCreate,
   } = useUsersModal();
 
-  // Debounce search với loading state
-  const debouncedSetSearch = useDebouncedCallback((value: string) => {
-    // Giả lập delay nhỏ để UI mượt hơn
-    setTimeout(() => {
-      setSearchQuery(value);
-      // Đợi thêm một chút trước khi tắt loading
-      setTimeout(() => {
-        setIsSearching(false);
-      }, 200);
-    }, 100);
-  }, 400);
-
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setInputValue(value);
-      setIsSearching(true);
-      debouncedSetSearch(value);
+      setInputValue(e.target.value);
     },
-    [debouncedSetSearch, setIsSearching]
+    []
+  );
+
+  const handleSearchKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        const value = (e.currentTarget as HTMLInputElement).value;
+        setIsSearching(true);
+        setSearchQuery(value);
+        // tắt trạng thái searching sau một khoảng nhỏ
+        setTimeout(() => setIsSearching(false), 300);
+      }
+    },
+    [setIsSearching, setSearchQuery]
   );
 
   const getStatusBadge = (status: User["status"]) =>
@@ -102,7 +99,7 @@ function UsersInnerLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen bg-background">
       <div className="flex flex-1 flex-col">
-        <main className="flex-1 overflow-y-auto p-8 space-y-8">
+        <main className="flex-1 p-8 space-y-8">
           <header>
             <h1 className="text-3xl font-semibold">Quản lý người dùng</h1>
             <p className="text-muted-foreground">
@@ -121,6 +118,7 @@ function UsersInnerLayout({ children }: { children: React.ReactNode }) {
               placeholder="Tìm kiếm người dùng theo tên hoặc email..."
               value={inputValue}
               onChange={handleSearchChange}
+              onKeyDown={handleSearchKeyDown}
               className="pl-10 transition-all duration-200"
             />
           </div>

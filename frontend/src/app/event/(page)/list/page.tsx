@@ -1,8 +1,16 @@
 "use client";
 
-import { Search, Filter, ChevronLeft, ChevronRight, X } from "lucide-react";
+import {
+  Search,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  Calendar,
+} from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useEventList } from "../../hooks/useList";
+import { useCategories } from "../../hooks/useCategories";
 import styles from "./list.module.css";
 import { Header } from "@/components/static/Header";
 import EventCard from "./EventCard";
@@ -21,8 +29,11 @@ export default function DashboardPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [fromDate, setFromDate] = useState("");
   const suggestTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const searchBoxRef = useRef<HTMLDivElement>(null);
+
+  const { categories } = useCategories();
 
   const pageable = {
     page,
@@ -32,6 +43,7 @@ export default function DashboardPage() {
   const filters = {
     category: selectedCategory || undefined,
     status: selectedStatus || undefined,
+    fromDate: fromDate || undefined,
   };
 
   const { events, loading, error, totalPages, totalElements } = useEventList(
@@ -216,8 +228,11 @@ export default function DashboardPage() {
   };
 
   const handleResetFilters = () => {
+    setSearchInput("");
+    setSearch("");
     setSelectedCategory("");
     setSelectedStatus("");
+    setFromDate("");
     setPage(0);
   };
 
@@ -291,13 +306,12 @@ export default function DashboardPage() {
               setPage(0);
             }}
           >
-            <option value="">Danh mục</option>
-            <option value="EDUCATION">Giáo dục</option>
-            <option value="ENVIRONMENT">Môi trường</option>
-            <option value="HEALTH">Sức khỏe</option>
-            <option value="COMMUNITY">Cộng đồng</option>
-            <option value="ELDERLY_CARE">Chăm sóc người cao tuổi</option>
-            <option value="CHILD_DEVELOPMENT">Phát triển trẻ em</option>
+            <option value="">Tất cả danh mục</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
           </select>
 
           {/* Status Filter */}
@@ -309,16 +323,36 @@ export default function DashboardPage() {
               setPage(0);
             }}
           >
-            <option value="">Trạng thái</option>
-            <option value="UPCOMING">Sắp diễn ra</option>
-            <option value="ONGOING">Đang diễn ra</option>
-            <option value="COMPLETED">Đã kết thúc</option>
+            <option value="">Tất cả trạng thái</option>
+            <option value="0">Sắp diễn ra</option>
+            <option value="1">Đang diễn ra</option>
+            <option value="2">Đã kết thúc</option>
           </select>
+
+          {/* Date Filter */}
+          <div className={styles.dateFilterWrapper}>
+            <Calendar className={styles.dateIcon} size={18} />
+            <span className={styles.dateFilterText}>
+              {fromDate
+                ? `Từ ngày ${new Date(fromDate).toLocaleDateString("vi-VN")}`
+                : "Mọi lúc"}
+            </span>
+            <input
+              type="date"
+              className={styles.dateInputOverlay}
+              value={fromDate}
+              onChange={(e) => {
+                setFromDate(e.target.value);
+                setPage(0);
+              }}
+              title="Lọc từ ngày"
+            />
+          </div>
 
           {/* Filter Toggle Button */}
           <button
             className={styles.filterButton}
-            onClick={() => setShowFilters(!showFilters)}
+            onClick={handleResetFilters}
             title="Xóa bộ lọc"
           >
             <X size={18} />

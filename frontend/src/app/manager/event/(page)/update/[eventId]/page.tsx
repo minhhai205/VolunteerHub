@@ -1,7 +1,7 @@
-import { Header } from "@/components/static/Header";
 import styles from "./update-event.module.css";
 import { Footer } from "@/components/static/Footer";
 import { UpdateEventForm } from "./components/update-event-form";
+import { Header } from "@/components/static/HeaderManager";
 
 export default async function UpdateEventPage({
   params,

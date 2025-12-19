@@ -89,6 +89,7 @@ export default function EventsPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const pageSize = 4;
   const [totalPages, setTotalPages] = useState(0);
+  const [refetchTrigger, setRefetchTrigger] = useState(0);
 
   const suggestTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const searchBoxRef = useRef<HTMLDivElement>(null);
@@ -231,7 +232,7 @@ export default function EventsPage() {
     };
 
     fetchEvents();
-  }, [currentPage, pageSize, searchQuery, activeFilter]);
+  }, [currentPage, pageSize, searchQuery, activeFilter, refetchTrigger]);
 
   // Cleanup timeout khi component unmount
   useEffect(() => {
@@ -381,28 +382,28 @@ export default function EventsPage() {
     setIsDeleting(true);
     try {
       const token = getAccessToken();
-      const response = await fetch(
-        `http://localhost:8080/api/event-request/${deleteConfirm.eventId}`,
+      const response = await fetchWithAuth(
+        `http://localhost:8080/api/event/delete-event/${deleteConfirm.eventId}`,
         {
           method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Không thể xóa sự kiện");
-      }
+      const result = await response.json();
 
-      toastManager.success("Đã xóa sự kiện thành công");
+      if (!response.ok) {
+        throw new Error("Xóa sự kiện thất bại!");
+      }
+      // console.log(result.status);
+      if (result.status === 400) {
+        toastManager.error("Chỉ xóa được xóa sự kiện chưa bắt đầu");
+      } else {
+        toastManager.success("Đã xóa sự kiện thành công");
+      }
       setDeleteConfirm({ show: false, eventId: null, eventName: null });
 
-      // Refresh the event list
-      setAllEvents((prev) =>
-        prev.filter((event) => event.id !== deleteConfirm.eventId)
-      );
+      // Refetch the event list
+      setRefetchTrigger((prev) => prev + 1);
     } catch (err) {
       console.error("Error deleting event:", err);
       toastManager.error("Không thể xóa sự kiện. Vui lòng thử lại.");

@@ -87,17 +87,6 @@ export default function NewEventsSection() {
                 </div>
               </div>
 
-              <div className="flex justify-end">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleViewEventDetails(event.id)}
-                  className="flex items-center gap-2"
-                >
-                  Xem chi tiết <ArrowRight className="w-4 h-4" />
-                </Button>
-              </div>
-
               {index < events.length - 1 && (
                 <hr className="border-t border-border/30" />
               )}

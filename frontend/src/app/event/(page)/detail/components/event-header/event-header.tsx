@@ -154,6 +154,14 @@ export default function EventHeader({
     }
   };
 
+  // Check if event has started
+  const hasEventStarted = (): boolean => {
+    if (!event.startDate) return false;
+    const now = new Date();
+    const start = new Date(event.startDate);
+    return now >= start;
+  };
+
   // Render button dựa trên trạng thái
   const renderActionButton = () => {
     // Nếu là MANAGER, hiển thị progress bar
@@ -211,6 +219,17 @@ export default function EventHeader({
         );
 
       case "APPROVED":
+        // Nếu sự kiện đã bắt đầu, hiển thị thông báo không thể hủy
+        if (hasEventStarted()) {
+          return (
+            <button
+              className={`${styles.registerBtn} ${styles.disabled}`}
+              disabled
+            >
+              Không thể hủy do sự kiện đã diễn ra
+            </button>
+          );
+        }
         return (
           <button
             className={`${styles.registerBtn} ${styles.approved}`}

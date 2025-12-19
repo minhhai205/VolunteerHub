@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import project.web.backend.dtos.request.event.EventRequestDTO;
 import project.web.backend.dtos.request.user.EventMemberFilterRequestDTO;
 import project.web.backend.dtos.request.user.WorkRatingRequestDTO;
-import project.web.backend.dtos.response.ApiResponse;
 import project.web.backend.dtos.response.ApiSuccessResponse;
 import project.web.backend.dtos.response.PageResponseDTO;
 import project.web.backend.dtos.response.event.EventNameResponseDTO;
@@ -21,6 +21,7 @@ import project.web.backend.dtos.response.event.EventResponseDTO;
 import project.web.backend.dtos.response.user.EventMemberResponseDTO;
 import project.web.backend.services.EventService;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -35,10 +36,14 @@ public class EventController {
     @GetMapping("/event-list")
     public ApiSuccessResponse<PageResponseDTO<List<EventResponseDTO>>> getAllEvents(
             Pageable pageable,
-            @RequestParam String search
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) Integer status,
+            @DateTimeFormat(pattern = "yyyy-MM-dd")
+            @RequestParam(required = false) Date fromDate
     ) {
         return ApiSuccessResponse.<PageResponseDTO<List<EventResponseDTO>>>builder()
-                .data(eventService.getAllEvents(pageable, search))
+                .data(eventService.getAllEvents(pageable, search, categoryId, status, fromDate))
                 .status(HttpStatus.OK.value())
                 .message("Get all events successfully!")
                 .build();
@@ -200,6 +205,19 @@ public class EventController {
     ) {
         return ApiSuccessResponse.<String>builder()
                 .data(eventService.rating(dto))
+                .message("Rated members")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+
+    @DeleteMapping("/delete-event/{eventId}")
+    @PreAuthorize("hasAnyRole({'MANAGER'})")
+    public ApiSuccessResponse<String> deleteEvent(
+            @PathVariable @Min(value = 1, message = "Event id must be greater than 0") Long eventId
+    ) {
+        return ApiSuccessResponse.<String>builder()
+                .data(eventService.deleteEvent(eventId))
                 .message("Rated members")
                 .status(HttpStatus.OK.value())
                 .build();

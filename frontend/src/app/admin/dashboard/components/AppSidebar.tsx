@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Home,
   Inbox,
@@ -30,6 +31,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { usePathname } from "next/navigation";
+import { getName } from "@/lib/getDataFromToken";
 
 const items = [
   {
@@ -50,13 +53,28 @@ const items = [
 ];
 
 const AppSidebar = () => {
+  const pathname = usePathname() || "";
+  const [userName, setUserName] = useState<string>("Tài khoản");
+
+  useEffect(() => {
+    const name = getName();
+    if (name) setUserName(name);
+  }, []);
+
+  const isItemActive = (itemUrl: string) => {
+    if (itemUrl === "/admin/dashboard") {
+      return pathname === itemUrl;
+    }
+    return pathname.startsWith(itemUrl);
+  };
+
   return (
     <Sidebar collapsible="icon" className="text-xl">
       <SidebarHeader className="py-4">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="text-xl">
-              <Link href="/admin/dashboard">
+              <Link href="/admin/dashboard" className="flex items-center gap-2">
                 <Image
                   src="/UET.svg.png"
                   alt="Logo"
@@ -70,24 +88,33 @@ const AppSidebar = () => {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      {/* <SidebarSeparator /> */}
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="text-lg">
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                  {item.title === "Sự kiện" && (
-                    <SidebarMenuBadge>24</SidebarMenuBadge>
-                  )}
-                </SidebarMenuItem>
-              ))}
+              {items.map((item) => {
+                const active = isItemActive(item.url);
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      className={`text-lg ${
+                        active
+                          ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
+                          : "hover:bg-slate-100 dark:hover:bg-slate-800"
+                      } rounded px-2 py-1`}
+                    >
+                      <Link
+                        href={item.url}
+                        className="flex items-center gap-2 text-inherit"
+                      >
+                        <item.icon className="flex-shrink-0" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -98,12 +125,12 @@ const AppSidebar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton className="text-lg">
-                  <User2 /> Tên tài khoản <ChevronUp className="ml-auto" />
+                  <User2 /> {userName} <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>Tài khoản</DropdownMenuItem>
-                <DropdownMenuItem>Cài đặt</DropdownMenuItem>
+                {/* <DropdownMenuItem>Tài khoản</DropdownMenuItem>
+                <DropdownMenuItem>Cài đặt</DropdownMenuItem> */}
                 <DropdownMenuItem variant="destructive">
                   Đăng xuất
                 </DropdownMenuItem>

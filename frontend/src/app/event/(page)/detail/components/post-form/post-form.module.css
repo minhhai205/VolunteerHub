@@ -30,8 +30,8 @@
   width: 2.75rem;
   height: 2.75rem;
   border-radius: 50%;
-  background: var(--primary);
-  color: white;
+  background: #d0e8e6;
+  color: #00695c;
   display: flex;
   align-items: center;
   justify-content: center;

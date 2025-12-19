@@ -1,11 +1,12 @@
 "use client";
 
 import type React from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Send, ImageIcon, X } from "lucide-react";
 import styles from "./post-form.module.css";
 import type { PostMedia } from "../../../../hooks/useDetail";
 import { uploadToCloudinary } from "@/lib/upload";
+import { getName } from "@/lib/getDataFromToken";
 
 interface PostFormProps {
   onSubmit: (content: string, medias?: string[]) => void;
@@ -16,7 +17,13 @@ export default function PostForm({ onSubmit }: PostFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [userName, setUserName] = useState<string>("U");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const name = getName() || "User";
+    setUserName(name.charAt(0).toUpperCase());
+  }, []);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -72,7 +79,7 @@ export default function PostForm({ onSubmit }: PostFormProps) {
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.header}>
         <div className={styles.avatar}>
-          <span>A</span>
+          <span>{userName}</span>
         </div>
         <textarea
           value={content}

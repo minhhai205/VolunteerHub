@@ -41,20 +41,21 @@ export default function CreateManagerModal({ open, onOpenChange }: Props) {
 
     if (form.password !== form.confirmPassword) {
       setError("Mật khẩu xác nhận không khớp");
+      toast.error("Mật khẩu xác nhận không khớp");
       return;
     }
 
     setLoading(true);
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-      const res = await fetchWithAuth(`${apiUrl}/api/admin/users`, {
+      const res = await fetchWithAuth(`${apiUrl}/api/user/create`, {
         method: "POST",
         body: JSON.stringify({
           fullName: form.fullName,
           email: form.email,
           password: form.password,
           phoneNumber: form.phoneNumber,
-          role: "MANAGER",
+          roleName: "MANAGER",
         }),
       });
 

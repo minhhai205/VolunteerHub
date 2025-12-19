@@ -2,6 +2,7 @@ package project.web.backend.dtos.response.event;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
+import project.web.backend.utils.enums.WorkStatus;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -35,4 +36,7 @@ public class EventResponseDTO implements Serializable {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long countPosts;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private WorkStatus workStatus;
 }

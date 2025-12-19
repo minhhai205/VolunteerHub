@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import styles from "./page1.module.css";
 import { getAccessToken } from "@/lib/token";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface Event {
   id: string;
@@ -13,6 +14,7 @@ interface Event {
   endDate: string;
   participants: number;
   status: "upcoming" | "ongoing" | "completed";
+  workStatus?: "pending" | "completed" | "absent";
 }
 
 interface ApiEvent {
@@ -26,6 +28,7 @@ interface ApiEvent {
   categoryNames: string[];
   countMembers: number;
   countPosts: number;
+  workStatus?: string;
 }
 
 const getEventStatus = (
@@ -63,7 +66,7 @@ export default function EventsPage() {
         if (!token) {
           throw new Error("Không tìm thấy token. Vui lòng đăng nhập lại.");
         }
-        const response = await fetch(
+        const response = await fetchWithAuth(
           "http://localhost:8080/api/event/my-event",
           {
             method: "GET",
@@ -97,6 +100,10 @@ export default function EventsPage() {
           endDate: apiEvent.endDate,
           participants: apiEvent.countMembers,
           status: getEventStatus(apiEvent.startDate, apiEvent.endDate),
+          workStatus: (apiEvent.workStatus || "pending") as
+            | "pending"
+            | "completed"
+            | "absent",
         }));
 
         setAllEvents(mappedEvents);
@@ -134,6 +141,19 @@ export default function EventsPage() {
         return "Đã kết thúc";
       default:
         return status;
+    }
+  };
+
+  const getWorkStatusText = (workStatus?: string) => {
+    switch (workStatus) {
+      case "pending":
+        return "Đang tham gia";
+      case "completed":
+        return "Đã hoàn thành";
+      case "absent":
+        return "Vắng mặt";
+      default:
+        return "Đang tham gia";
     }
   };
 
@@ -232,13 +252,22 @@ export default function EventsPage() {
                     <div className={styles.eventContent}>
                       <div className={styles.eventHeader}>
                         <h2 className={styles.eventTitle}>{event.title}</h2>
-                        <span
-                          className={`${styles.eventStatus} ${
-                            styles[event.status]
-                          }`}
-                        >
-                          {getStatusText(event.status)}
-                        </span>
+                        <div className={styles.headerRightContent}>
+                          <span
+                            className={`${styles.eventStatus} ${
+                              styles[event.status]
+                            }`}
+                          >
+                            {getStatusText(event.status)}
+                          </span>
+                          <div
+                            className={`${styles.workStatusBar} ${
+                              styles[event.workStatus || "pending"]
+                            }`}
+                          >
+                            {getWorkStatusText(event.workStatus)}
+                          </div>
+                        </div>
                       </div>
                       <p className={styles.eventDescription}>
                         {event.description}

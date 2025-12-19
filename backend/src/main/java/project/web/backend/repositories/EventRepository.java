@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import project.web.backend.entities.Event;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,14 +37,44 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
 
     @Query("""
-            SELECT DISTINCT e FROM Event e
-            WHERE
-            e.name LIKE %:search%
-            OR
-            e.description LIKE %:search%
-            ORDER BY e.startDate DESC, e.endDate DESC
+                SELECT DISTINCT e
+                FROM Event e
+                LEFT JOIN e.categories c
+                WHERE
+                    (
+                        :search IS NULL
+                        OR LOWER(e.name) LIKE LOWER(CONCAT('%', :search, '%'))
+                        OR LOWER(e.description) LIKE LOWER(CONCAT('%', :search, '%'))
+                    )
+                AND (
+                        :categoryId IS NULL
+                        OR c.id = :categoryId
+                    )
+                AND (
+                        :status IS NULL
+                        OR (
+                            :status = 0 AND e.startDate > CURRENT_TIMESTAMP
+                        )
+                        OR (
+                            :status = 1 AND e.startDate <= CURRENT_TIMESTAMP AND e.endDate >= CURRENT_TIMESTAMP
+                        )
+                        OR (
+                            :status = 2 AND e.endDate < CURRENT_TIMESTAMP
+                        )
+                    )
+                AND (
+                    :fromDate IS NULL OR e.startDate >= :fromDate
+                )
+                ORDER BY e.startDate DESC, e.endDate DESC
             """)
-    Page<Event> findAllWithSearch(Pageable pageable, @Param("search") String search);
+    Page<Event> findAllWithSearch(
+            Pageable pageable,
+            @Param("search") String search,
+            @Param("categoryId") Integer categoryId,
+            @Param("status") Integer status,
+            @Param("fromDate") Date fromDate
+    );
+
 
     @EntityGraph(attributePaths = {
             "categories"
@@ -91,7 +122,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     })
     @Query("""
             SELECT DISTINCT e FROM Event e
-            INNER JOIN e.members em
+            JOIN FETCH e.members em
             INNER JOIN em.user u
             WHERE u.email=:email
             ORDER BY e.createdAt DESC
@@ -186,4 +217,15 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             @Param("minMembers") int minMembers
     );
 
+
+    @Query("""
+            SELECT e FROM Event e
+            JOIN FETCH e.categories
+            LEFT JOIN FETCH e.members
+            LEFT JOIN FETCH e.posts p
+            LEFT JOIN FETCH p.comments
+            LEFT JOIN FETCH p.medias
+            WHERE e.id=:eventId
+            """)
+    Optional<Event> findByIdToDelete(@Param("eventId") Long eventId);
 }

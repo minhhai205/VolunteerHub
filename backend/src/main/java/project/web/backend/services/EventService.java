@@ -3,12 +3,14 @@ package project.web.backend.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.web.backend.dtos.request.event.EventRequestDTO;
+import project.web.backend.dtos.request.notification.NotificationPayload;
 import project.web.backend.dtos.request.user.EventMemberFilterRequestDTO;
 import project.web.backend.dtos.request.user.PersonalRatingDTO;
 import project.web.backend.dtos.request.user.WorkRatingRequestDTO;
@@ -24,14 +26,12 @@ import project.web.backend.utils.commons.AppConst;
 import project.web.backend.utils.commons.SecurityUtil;
 import project.web.backend.utils.enums.ErrorCode;
 import project.web.backend.utils.enums.EventRequestStatus;
+import project.web.backend.utils.enums.NotificationType;
 import project.web.backend.utils.enums.WorkStatus;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,11 +44,18 @@ public class EventService {
     private final EventRegistrationRepository eventRegistrationRepository;
     private final CategoryRepository categoryRepository;
     private final EventMemberRepository eventMemberRepository;
+    private final NotificationRepository notificationRepository;
+    private final PushNotificationService pushNotificationService;
 
-    public PageResponseDTO<List<EventResponseDTO>> getAllEvents(Pageable pageable, String search) {
+    @Value("${front-end.port}")
+    private String frontEndPort;
+
+    public PageResponseDTO<List<EventResponseDTO>> getAllEvents(
+            Pageable pageable, String search, Integer categoryId, Integer status, Date fromDate
+    ) {
         log.info("------------ Get all events --------------");
 
-        Page<Event> events = eventRepository.findAllWithSearch(pageable, search);
+        Page<Event> events = eventRepository.findAllWithSearch(pageable, search, categoryId, status, fromDate);
         List<Long> eventsIds = events.stream()
                 .map(Event::getId).toList();
         List<Event> fetchedEvents = eventRepository.findWithCategoriesByIds(eventsIds);
@@ -73,7 +80,7 @@ public class EventService {
     public Set<String> getSuggestions(String search) {
         log.info("------------ Get event suggestions --------------");
 
-        Page<Event> events = eventRepository.findAllWithSearch(PageRequest.of(0, 9), search);
+        Page<Event> events = eventRepository.findAllWithSearch(PageRequest.of(0, 9), search, null, null, null);
 
         return events.stream().map(Event::getName).collect(Collectors.toSet());
     }
@@ -120,8 +127,12 @@ public class EventService {
         log.info("------------ Get my events --------------");
         List<Event> events = eventRepository.findMyEventWithCategories(
                 SecurityUtil.getCurrentEmail());
-        List<EventResponseDTO> eventResponses = events.stream().map(eventMapper::toResponseDTO).toList();
-
+        List<EventResponseDTO> eventResponses = events.stream().map(event -> {
+                    EventResponseDTO dto = eventMapper.toResponseDTOWithWorkStatus(event);
+                    dto.setWorkStatus(event.getMembers().stream().findFirst().get().getStatus());
+                    return dto;
+                })
+                .toList();
         List<Long> eventsIds = events.stream().map(Event::getId).toList();
 
         findCountMemberAndPostForEvents(eventsIds, eventResponses);
@@ -238,7 +249,24 @@ public class EventService {
                 .build();
         eventRegistrationRepository.save(eventRegistration);
 
-        // send web push to all managers
+        // Send notification to manager
+        String title = "yêu cầu tham gia sự kiện!";
+        String content = String.format("%s đã gửi yêu cầu tham gia sự kiện %s!",
+                currentUser.getFullName(), event.getName());
+        NotificationPayload payload = NotificationPayload.builder()
+                .title(title)
+                .body(content)
+                .url(frontEndPort + "/manager/request")
+                .build();
+
+        Notification notification = Notification.builder()
+                .sendTo(event.getManager())
+                .content(content)
+                .event(event)
+                .type(NotificationType.EVENT)
+                .build();
+        notificationRepository.save(notification);
+        pushNotificationService.sendNotificationToUser(event.getManager().getId(), payload);
         return "Created registration request";
     }
 
@@ -378,5 +406,45 @@ public class EventService {
                 }).toList();
         eventMemberRepository.saveAll(eventMembers);
         return "Done";
+    }
+
+
+    @Transactional
+    public String deleteEvent(Long eventId) {
+        Event event = eventRepository.findByIdToDelete(eventId)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+
+        List<User> users = eventMemberRepository.findUsersByEventId(eventId);
+        List<Long> userIds = users.stream().map(User::getId).toList();
+
+        Date startDate = event.getStartDate();
+        if (!startDate.after(new Date())) {
+            throw new AppException(ErrorCode.EVENT_STARTED);
+        }
+        event.getCategories().clear();
+        eventRepository.save(event);
+        eventRepository.delete(event);
+
+        // Send notification to all user
+        String title = "Thông báo sự kiện bị hủy!";
+        String content = String.format("Chúng tôi rất đáng tiếc khi phải thông báo với bạn về việc sự kiện %s đã bị hủy!", event.getName());
+        NotificationPayload payload = NotificationPayload.builder()
+                .title(title)
+                .body(content)
+                .url(frontEndPort + "/event/list")
+                .build();
+
+        List<Notification> notifications = new ArrayList<>();
+        users.forEach(user -> {
+            Notification notification = Notification.builder()
+                    .sendTo(user)
+                    .content(content)
+                    .type(NotificationType.POST)
+                    .build();
+            notifications.add(notification);
+        });
+        notificationRepository.saveAll(notifications);
+        pushNotificationService.sendNotificationToAll(payload, userIds);
+        return "deleted";
     }
 }

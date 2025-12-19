@@ -11,11 +11,21 @@ import {
   PaginationNext,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { generatePaginationItems } from "@/lib/pagination";
 import { useEventRequests } from "./hooks/useEventRequest";
 import SummaryCard from "./components/SummaryCard";
 import EventSearch from "./components/EventSearch";
 import EventList from "./components/EventList";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import { toastManager } from "@/components/static/toast/toast";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 export default function EventsPage() {
   const router = useRouter();
@@ -23,13 +33,21 @@ export default function EventsPage() {
 
   // read page from URL (1-based)
   const currentPage = Number(searchParams.get("page")) || 1;
+  const currentStatus = (searchParams.get("status") || "pending") as
+    | "pending"
+    | "rejected"
+    | "approved";
   const [page, setPage] = useState<number>(currentPage);
 
   // fetch event requests with pagination
-  const { eventRequests, pagination, isLoading, error } = useEventRequests(
-    page,
-    10
-  );
+  const {
+    eventRequests,
+    pagination,
+    isLoading,
+    error,
+    handleApprove,
+    handleReject,
+  } = useEventRequests(page, 10, currentStatus);
   const totalPages = Math.max(1, pagination.totalPage);
 
   // keep local state in sync when user navigates back/forward
@@ -60,6 +78,83 @@ export default function EventsPage() {
     setPage(newPage);
   };
 
+  const handleExport = async (eventId: number, format: "csv" | "json") => {
+    if (!["csv", "json"].includes(format)) {
+      toastManager.error("Định dạng không hợp lệ (chọn csv hoặc json)");
+      return;
+    }
+
+    try {
+      const response = await fetchWithAuth(
+        `http://localhost:8080/api/admin/event/${eventId}/members/export?format=${format}`,
+        { method: "GET" }
+      );
+
+      if (!response.ok) {
+        const text = await response.text().catch(() => null);
+        toastManager.error(
+          `Export thất bại: ${response.status}${text ? " - " + text : ""}`
+        );
+        return;
+      }
+
+      const blob = await response.blob();
+      const cd = response.headers.get("content-disposition") || "";
+      let filename = `event_${eventId}_members.${format}`;
+      const match = cd.match(/filename="?([^"]+)"?/);
+      if (match && match[1]) filename = match[1];
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Export error", err);
+      toastManager.error("Lỗi khi xuất file");
+    }
+  };
+
+  const handleExportAll = async (format: "csv" | "json") => {
+    if (!["csv", "json"].includes(format)) {
+      toastManager.error("Định dạng không hợp lệ (chọn csv hoặc json)");
+      return;
+    }
+    try {
+      const response = await fetchWithAuth(
+        `http://localhost:8080/api/admin/events/export?format=${format}`,
+        { method: "GET" }
+      );
+      if (!response.ok) {
+        const text = await response.text().catch(() => null);
+        toastManager.error(
+          `Export thất bại: ${response.status}${text ? " - " + text : ""}`
+        );
+        return;
+      }
+      const blob = await response.blob();
+      const cd = response.headers.get("content-disposition") || "";
+      let filename = `events_all.${format}`;
+      const match = cd.match(/filename="?([^"]+)"?/);
+      if (match && match[1]) filename = match[1];
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Export all error", err);
+      toastManager.error("Lỗi khi xuất file");
+    }
+  };
+
   // If we determined the current page is invalid and are redirecting, show nothing
   if (!isLoading && page > totalPages) {
     return null;
@@ -67,16 +162,56 @@ export default function EventsPage() {
 
   return (
     <div className="flex h-screen bg-background">
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1">
         <div className="p-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-semibold text-foreground">
-              Quản lý sự kiện
-            </h1>
-            <p className="text-muted-foreground">
-              Duyệt, từ chối hoặc xóa các sự kiện chờ phê duyệt
-            </p>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-semibold text-foreground">
+                  Quản lý sự kiện
+                </h1>
+                <p className="text-muted-foreground">
+                  Duyệt, từ chối hoặc xóa các sự kiện chờ phê duyệt
+                </p>
+              </div>
+
+              <div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      size="default"
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      Xuất tất cả
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="bottom" align="end">
+                    <DropdownMenuItem onClick={() => handleExportAll("csv")}>
+                      Xuất tất cả (CSV)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleExportAll("json")}>
+                      Xuất tất cả (JSON)
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+          </div>
+
+          {/* Tabs: Pending / Rejected / Approved */}
+          <div className="mb-4">
+            <Tabs
+              value={currentStatus}
+              onValueChange={(val) => router.push(`?page=1&status=${val}`)}
+            >
+              <TabsList className="w-max">
+                <TabsTrigger value="pending">Đang chờ</TabsTrigger>
+                <TabsTrigger value="rejected">Đã từ chối</TabsTrigger>
+                <TabsTrigger value="approved">Đã duyệt</TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
 
           {/* Summary cards */}
@@ -86,62 +221,75 @@ export default function EventsPage() {
           <EventSearch />
 
           {/* Event list */}
-          <EventList eventRequests={eventRequests} />
+          {!isLoading && eventRequests.length === 0 ? (
+            <div className="py-12 text-center text-muted-foreground">
+              Không có sự kiện nào
+            </div>
+          ) : (
+            <EventList
+              eventRequests={eventRequests}
+              onApprove={handleApprove}
+              onReject={handleReject}
+              onExport={handleExport}
+            />
+          )}
 
           {/* Pagination */}
-          <div className="mt-6">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handlePageChange(page - 1);
-                    }}
-                    aria-disabled={page === 1}
-                    className={
-                      page === 1 ? "pointer-events-none opacity-50" : ""
-                    }
-                  />
-                </PaginationItem>
+          {!isLoading && eventRequests.length > 0 && totalPages > 1 && (
+            <div className="mt-6">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(page - 1);
+                      }}
+                      aria-disabled={page === 1}
+                      className={
+                        page === 1 ? "pointer-events-none opacity-50" : ""
+                      }
+                    />
+                  </PaginationItem>
 
-                {generatePaginationItems(page, totalPages).map(
-                  (item, index) => (
-                    <PaginationItem key={index}>
-                      {item === "ellipsis" ? (
-                        <PaginationEllipsis />
-                      ) : (
-                        <PaginationLink
-                          isActive={item === page}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handlePageChange(item as number);
-                          }}
-                        >
-                          {item}
-                        </PaginationLink>
-                      )}
-                    </PaginationItem>
-                  )
-                )}
+                  {generatePaginationItems(page, totalPages).map(
+                    (item, index) => (
+                      <PaginationItem key={index}>
+                        {item === "ellipsis" ? (
+                          <PaginationEllipsis />
+                        ) : (
+                          <PaginationLink
+                            isActive={item === page}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handlePageChange(item as number);
+                            }}
+                          >
+                            {item}
+                          </PaginationLink>
+                        )}
+                      </PaginationItem>
+                    )
+                  )}
 
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handlePageChange(page + 1);
-                    }}
-                    aria-disabled={page === totalPages}
-                    className={
-                      page === totalPages
-                        ? "pointer-events-none opacity-50"
-                        : ""
-                    }
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(page + 1);
+                      }}
+                      aria-disabled={page === totalPages}
+                      className={
+                        page === totalPages
+                          ? "pointer-events-none opacity-50"
+                          : ""
+                      }
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </div>
       </main>
     </div>

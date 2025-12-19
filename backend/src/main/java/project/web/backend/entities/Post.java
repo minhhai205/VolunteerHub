@@ -35,12 +35,24 @@ public class Post extends AbstractEntity {
     @Column(name = "content")
     private String content;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(
+            mappedBy = "post",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
     private Set<Comment> comments;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(
+            mappedBy = "post",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private Set<PostMedia> medias;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(
+            mappedBy = "post",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private Set<Like> likes;
 }

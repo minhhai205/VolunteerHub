@@ -19,6 +19,9 @@ public interface EventMapper {
     @Mapping(target = "categoryNames", source = "categories", qualifiedByName = "mapCategoryNames")
     EventResponseDTO toResponseDTO(Event event);
 
+    @Mapping(target = "categoryNames", source = "categories", qualifiedByName = "mapCategoryNames")
+    EventResponseDTO toResponseDTOWithWorkStatus(Event event);
+
     @Named("mapCategoryNames")
     default Set<String> mapCategoryNames(Set<Category> categories) {
         if (categories == null) return Collections.emptySet();

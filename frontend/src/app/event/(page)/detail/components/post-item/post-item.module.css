@@ -24,8 +24,8 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background: var(--primary);
-  color: var(--primary-foreground);
+  background: #d0e8e6;
+  color: #00695c;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -175,8 +175,8 @@
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background: var(--secondary);
-  color: var(--primary);
+  background: #d0e8e6;
+  color: #00695c;
   display: flex;
   align-items: center;
   justify-content: center;

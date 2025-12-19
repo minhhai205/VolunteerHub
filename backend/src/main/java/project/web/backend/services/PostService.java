@@ -1,14 +1,14 @@
 package project.web.backend.services;
 
 
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.web.backend.dtos.request.notification.NotificationPayload;
 import project.web.backend.dtos.request.post.CreatePostRequestDTO;
 import project.web.backend.dtos.request.post.UpdatePostRequestDTO;
 import project.web.backend.dtos.response.PageResponseDTO;
@@ -20,6 +20,7 @@ import project.web.backend.mappers.PostMapper;
 import project.web.backend.repositories.*;
 import project.web.backend.utils.commons.SecurityUtil;
 import project.web.backend.utils.enums.ErrorCode;
+import project.web.backend.utils.enums.NotificationType;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,6 +34,11 @@ public class PostService {
     private final PostMediaRepository postMediaRepository;
     private final PostMapper postMapper;
     private final LikeRepository likeRepository;
+    private final NotificationRepository notificationRepository;
+    private final PushNotificationService pushNotificationService;
+
+    @Value("${front-end.port}")
+    private String frontEndPort;
 
     @Transactional
     public PostBasicResponseDTO create(CreatePostRequestDTO dto) {
@@ -63,7 +69,28 @@ public class PostService {
         } else {
             postRepository.save(post);
         }
-        // web push api
+
+        // Send notification to user
+        if (!Objects.equals(currentUser.getId(), event.getManager().getId())) {
+            String title = "Bài viết mới!";
+            String content = String.format("%s đã tạo bài viết mới trong sự kiện %s!", currentUser.getFullName(), event.getName());
+            NotificationPayload payload = NotificationPayload.builder()
+                    .title(title)
+                    .body(content)
+                    .url(frontEndPort + "/event/detail/" + event.getId())
+                    .build();
+
+            Notification notification = Notification.builder()
+                    .sendTo(event.getManager())
+                    .content(content)
+                    .event(event)
+                    .post(post)
+                    .type(NotificationType.POST)
+                    .build();
+            notificationRepository.save(notification);
+            pushNotificationService.sendNotificationToUser(event.getManager().getId(), payload);
+        }
+
         return postMapper.toBasicDTO(post);
     }
 
