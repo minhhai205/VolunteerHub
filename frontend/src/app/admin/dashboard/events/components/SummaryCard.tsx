@@ -1,9 +1,18 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Calendar, Check, XCircle } from "lucide-react";
 import { useStatistics } from "../hooks/useStatistics";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 export default function SummaryCard() {
-  const { adminStats, eventStats, loading } = useStatistics();
+  const { adminStats, eventStats, loading, refresh } = useStatistics();
+  const searchParams = useSearchParams();
+  const status = searchParams?.get("status") ?? "";
+
+  useEffect(() => {
+    // refetch stats whenever tab/status query param changes
+    refresh();
+  }, [status, refresh]);
 
   const pending = eventStats?.totalPending ?? 0;
   const approved = eventStats?.totalApproved ?? 0;
