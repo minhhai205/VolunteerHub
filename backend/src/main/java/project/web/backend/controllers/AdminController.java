@@ -35,4 +35,17 @@ public class AdminController {
             .contentType(result.getMediaType())
             .body(body);
     }
+
+    @GetMapping("/events/export")
+    public ResponseEntity<StreamingResponseBody> exportAllEvents(@RequestParam String format) {
+        ExportResult result = exportService.exportAllEvents(format);
+        StreamingResponseBody body = out -> {
+            out.write(result.getBytes());
+            out.flush();
+        };
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + result.getFilename())
+            .contentType(result.getMediaType())
+            .body(body);
+    }
 }
