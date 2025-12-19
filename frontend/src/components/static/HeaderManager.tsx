@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Heart, Menu, LogOut, User, Settings, ChevronDown } from "lucide-react";
+import {
+  Heart,
+  Menu,
+  LogOut,
+  User,
+  Settings,
+  ChevronDown,
+  Bell,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import styles from "./Header.module.css";
@@ -14,6 +22,11 @@ export function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showManagementMenu, setShowManagementMenu] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<
+    Array<{ id: number; content: string }>
+  >([]);
+  const [notificationCount, setNotificationCount] = useState(0);
   const [user, setUser] = useState({
     name: "",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=user",
@@ -36,10 +49,39 @@ export function Header() {
         name: userName,
         avatar: userAvatar,
       });
+
+      // Fetch notifications
+      fetchNotifications(accessToken);
     } else {
       setIsLoggedIn(false);
     }
   }, []);
+
+  const fetchNotifications = async (token: string) => {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const response = await fetch(
+        `${apiUrl}/api/notifications/my-notifications`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.data && Array.isArray(data.data)) {
+          setNotifications(data.data);
+          setNotificationCount(data.data.length);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -209,6 +251,45 @@ export function Header() {
             </Link>
           ) : (
             <div className={styles.userInfoWrapper}>
+              {/* Notification Bell */}
+              <div className={styles.notificationWrapper}>
+                <button
+                  className={styles.bellButton}
+                  onClick={() => setShowNotifications(!showNotifications)}
+                >
+                  <Bell size={20} className={styles.bellIcon} />
+                  {notificationCount > 0 && (
+                    <span className={styles.notificationBadge}>
+                      {notificationCount}
+                    </span>
+                  )}
+                </button>
+
+                {showNotifications && (
+                  <div className={styles.notificationDropdown}>
+                    <div className={styles.notificationHeader}>
+                      <h3 className={styles.notificationTitle}>Thông báo</h3>
+                    </div>
+                    <div className={styles.notificationList}>
+                      {notifications.length > 0 ? (
+                        notifications.map((notif) => (
+                          <div
+                            key={notif.id}
+                            className={styles.notificationItem}
+                          >
+                            {notif.content}
+                          </div>
+                        ))
+                      ) : (
+                        <div className={styles.notificationEmpty}>
+                          Không có thông báo
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <span className={styles.userName}>{user.name}</span>
 
               <div className={styles.userMenuContainer}>
