@@ -142,7 +142,7 @@ export function CreateEventForm() {
       }
 
       // --- SUCCESS TOAST ---
-      toastManager.success("Đã tạo sự kiện thành công");
+      toastManager.success("Gửi yêu cầu tạo sự kiện thành công");
 
       setFormData({
         name: "",
@@ -415,7 +415,7 @@ export function CreateEventForm() {
             disabled={loading}
             className={styles.submitButton}
           >
-            {loading ? "Đang xử lý..." : "Tạo sự kiện"}
+            {loading ? "Đang xử lý..." : "Gửi yêu cầu"}
           </Button>
         </div>
       </div>

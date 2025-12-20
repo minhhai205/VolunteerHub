@@ -1,5 +1,5 @@
 .cardGreen {
-  background-color: #f7fff2;
+  background-color: #fffdfd;
   border: 1px solid hsl(var(--color-border));
   border-radius: 0.75rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
