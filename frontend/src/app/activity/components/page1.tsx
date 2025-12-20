@@ -70,10 +70,6 @@ export default function EventsPage() {
           "http://localhost:8080/api/event/my-event",
           {
             method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
           }
         );
 

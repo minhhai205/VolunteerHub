@@ -21,8 +21,7 @@ export default function EventRequestList({ requests }: EventRequestListProps) {
   return (
     <div className={styles.listContainer}>
       <div className={styles.tableHeader}>
-        <div className={styles.columnUserName}>Tên Người Đăng Ký</div>
-        <div className={styles.columnEmail}>Email</div>
+        <div className={styles.columnNumber}>Số Thứ Tự</div>
         <div className={styles.columnEventName}>Tên Sự Kiện</div>
         <div className={styles.columnDate}>Ngày Đăng Ký</div>
         <div className={styles.columnStatus}>Trạng Thái</div>
@@ -30,8 +29,12 @@ export default function EventRequestList({ requests }: EventRequestListProps) {
       </div>
 
       <div className={styles.listContent}>
-        {requests.map((request) => (
-          <EventRequestCard key={request.id} request={request} />
+        {requests.map((request, index) => (
+          <EventRequestCard
+            key={request.id}
+            request={request}
+            index={index + 1}
+          />
         ))}
       </div>
     </div>
