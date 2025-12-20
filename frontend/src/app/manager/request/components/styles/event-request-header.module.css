@@ -35,11 +35,11 @@
 
 .statItem {
   background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-  padding: 1.5rem 2rem;
+  padding: 1rem 1.25rem;
   border-radius: 1rem;
   text-align: center;
   border: 2px solid #a5d6a7;
-  min-width: 150px;
+  min-width: 120px;
 }
 
 .statLabel {
