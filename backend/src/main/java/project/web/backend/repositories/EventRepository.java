@@ -44,7 +44,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                     (
                         :search IS NULL
                         OR LOWER(e.name) LIKE LOWER(CONCAT('%', :search, '%'))
-                        OR LOWER(e.description) LIKE LOWER(CONCAT('%', :search, '%'))
                     )
                 AND (
                         :categoryId IS NULL
