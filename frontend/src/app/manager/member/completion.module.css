@@ -2,14 +2,14 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
-  background-color: #f0f9f0;
+  background-color: #f4fbf1;
   min-height: 100vh;
 }
 
 .backgroundContainer {
   width: 100%;
   min-height: 100vh;
-  background-color: #f0f9f0;
+  background-color: #f4fbf1;
   /* Prevent layout shift from scrollbar appearing/disappearing */
   scrollbar-gutter: stable;
 }
