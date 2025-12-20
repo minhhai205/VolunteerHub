@@ -15,6 +15,7 @@ interface Event {
   title: string;
   description: string;
   image: string;
+  location: string;
   startDate: string;
   endDate: string;
   participants: number;
@@ -177,7 +178,7 @@ export default function EventsPage() {
         const response = await fetchWithAuth(
           `http://localhost:8080/api/event/manager/my-event?${params.toString()}`,
           {
-            method: "GET"
+            method: "GET",
           }
         );
 
@@ -206,6 +207,7 @@ export default function EventsPage() {
           title: apiEvent.name,
           description: apiEvent.description,
           image: apiEvent.imageUrl || "/placeholder.svg",
+          location: apiEvent.location,
           startDate: apiEvent.startDate,
           endDate: apiEvent.endDate,
           participants: apiEvent.countMembers,
@@ -733,7 +735,7 @@ export default function EventsPage() {
                                 <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                                 <circle cx="12" cy="10" r="3" />
                               </svg>
-                              <span>Địa điểm tổ chức</span>
+                              <span>{event.location}</span>
                             </div>
                             <div className={styles.metaItem}>
                               <svg
