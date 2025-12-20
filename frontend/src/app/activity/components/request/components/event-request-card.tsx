@@ -28,7 +28,7 @@ export default function EventRequestCard({
   const getStatusClass = (status: string) => {
     const statusLower = status.toLowerCase();
     switch (statusLower) {
-      case "approve":
+      case "approved":
         return styles.statusApproved;
       case "rejected":
         return styles.statusRejected;
@@ -40,7 +40,7 @@ export default function EventRequestCard({
   const getStatusLabel = (status: string) => {
     const statusLower = status.toLowerCase();
     switch (statusLower) {
-      case "approve":
+      case "approved":
         return "Đã Duyệt";
       case "rejected":
         return "Từ Chối";
