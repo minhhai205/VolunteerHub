@@ -1,11 +1,6 @@
 .pageWrapper {
   min-height: 100vh;
-  background: linear-gradient(
-    to bottom right,
-    rgb(240 253 244),
-    rgb(236 253 245),
-    rgb(240 253 250)
-  );
+  background: #f4fbf1;
 }
 
 .container {
