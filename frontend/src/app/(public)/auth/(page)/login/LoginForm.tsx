@@ -132,33 +132,10 @@ export function LoginForm() {
         </div>
       </div>
 
-      {/* Remember & Forgot */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="remember"
-            checked={rememberMe}
-            onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-          />
-          <Label
-            htmlFor="remember"
-            className="text-sm font-normal cursor-pointer"
-          >
-            Ghi nhớ đăng nhập
-          </Label>
-        </div>
-        <Link
-          href="/forgot-password"
-          className="text-sm font-medium text-primary hover:underline"
-        >
-          Quên mật khẩu?
-        </Link>
-      </div>
-
       {/* Submit */}
       <Button
         type="submit"
-        className="w-full h-12 text-base group"
+        className="w-full h-12 text-base group mt-4"
         size="lg"
         disabled={loading}
       >

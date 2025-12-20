@@ -21,7 +21,6 @@ export default function Sidebar({ activePage, onPageChange }: SidebarProps) {
           }`}
           onClick={() => onPageChange("page1")}
         >
-          <span className={styles.navIcon}>📋</span>
           <span className={styles.navLabel}>Hoạt Động Của Tôi</span>
         </button>
 
@@ -31,7 +30,6 @@ export default function Sidebar({ activePage, onPageChange }: SidebarProps) {
           }`}
           onClick={() => onPageChange("page2")}
         >
-          <span className={styles.navIcon}>🏆</span>
           <span className={styles.navLabel}>Yêu cầu của tôi</span>
         </button>
       </nav>

@@ -50,7 +50,7 @@ const Navbar = () => {
       <SidebarTrigger />
       {/* RIGHT */}
       <div className="flex items-center gap-4">
-        {/* <NotificationsDropdown /> */}
+        <NotificationsDropdown />
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Avatar>

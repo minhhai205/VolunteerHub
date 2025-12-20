@@ -355,7 +355,7 @@ export default function CompletionPage() {
       <div className={styles.backgroundContainer}>
         <div className={styles.container}>
           <CompletionHeader
-            title="Đánh Dấu Hoàn Thành"
+            title="Quản lý đánh giá"
             subtitle="Cập nhật trạng thái tham gia của tình nguyện viên sau sự kiện"
           />
 

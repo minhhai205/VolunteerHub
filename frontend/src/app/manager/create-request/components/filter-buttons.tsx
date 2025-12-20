@@ -25,7 +25,7 @@ export function FilterButtons({
 }: FilterButtonsProps) {
   const filterButtons = [
     { value: "all" as const, label: "Tất cả" },
-    { value: "pending" as const, label: `Chưa duyệt (${pendingCount})` },
+    { value: "pending" as const, label: "Chưa duyệt" },
     { value: "approved" as const, label: "Đã duyệt" },
     { value: "rejected" as const, label: "Đã từ chối" },
   ];
