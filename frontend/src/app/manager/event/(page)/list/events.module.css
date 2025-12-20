@@ -122,29 +122,39 @@
 .filterGroup {
   display: flex;
   gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .filterButton {
   padding: 0.625rem 1.25rem;
-  border: 1px solid oklch(0.88 0.02 145);
+  border: 2px solid;
   border-radius: 0.5rem;
-  background: oklch(1 0 0);
-  color: oklch(0.5 0.03 155);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  background-color: #ffffff;
+  color: #81c784;
+  border-color: #81c784;
 }
 
-.filterButton:hover {
-  border-color: oklch(0.55 0.12 155);
-  color: oklch(0.55 0.12 155);
+/* .filterButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: #66bb6a;
+  color: #66bb6a;
+} */
+
+.filterButton:active {
+  transform: translateY(0);
 }
 
 .filterButton.active {
-  background: oklch(0.55 0.12 155);
-  color: white;
-  border-color: oklch(0.55 0.12 155);
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background-color: #e8f5e9;
+  border-color: #388e3c;
+  color: #388e3c;
 }
 
 .eventList {
@@ -154,25 +164,26 @@
 }
 
 .eventCard {
-  background: oklch(1 0 0);
-  border: 1px solid oklch(0.88 0.02 145);
-  border-radius: 0.75rem;
-  padding: 1.25rem;
+  background: #ffffff;
+  border: 0.5px solid #e8eae8;
+  border-radius: 0.625rem;
+  padding: 1rem;
   display: flex;
-  gap: 1.5rem;
-  transition: all 0.2s;
+  flex-direction: row;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   cursor: pointer;
-  background-color: #f3ffeb;
 }
 
 .eventCard:hover {
-  border-color: oklch(0.55 0.12 155);
-  box-shadow: 0 4px 12px oklch(0.55 0.12 155 / 0.08);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-color: #d0d8d0;
 }
 
 .eventImage {
-  width: 160px;
-  height: 120px;
+  width: 8rem;
+  height: 8rem;
   border-radius: 0.5rem;
   object-fit: cover;
   flex-shrink: 0;
@@ -235,35 +246,37 @@
   overflow: hidden;
 }
 
-/* Container bọc cả 3 mục: Bắt đầu, Kết thúc, Tham gia 
-  Class này sẽ xếp 3 mục con (.metaItem) lên cùng 1 hàng
-*/
+.eventFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+  gap: 1rem;
+}
+
 .eventMeta {
   display: flex;
-  flex-wrap: wrap; /* Cho phép xuống hàng nếu màn hình quá nhỏ */
-  align-items: center;
-  gap: 1rem;
-
-  margin-top: 1rem; /* Khoảng cách với phần mô tả ở trên */
-  width: 100%;
+  justify-content: flex-start;
+  gap: 0;
+  font-size: 0.875rem;
+  flex: 0.8;
 }
 
 .metaItem {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem; /* Bạn có thể điều chỉnh 0.9rem, 0.875rem, v.v. */
-  color: #333;
+  font-size: 0.875rem;
+  color: #6b7280;
+  flex: 0.8;
 }
 
 .metaIcon {
   flex-shrink: 0;
+  color: #22c55e;
 }
 
-.metaLabel {
-  font-weight: 600;
-  margin-right: 4px;
-}
+/* Xóa metaLabel vì không dùng nữa */
 
 .emptyState {
   text-align: center;
@@ -301,6 +314,37 @@
 
   .title {
     font-size: 1.875rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .eventMeta {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .eventCard {
+    flex-direction: column;
+  }
+
+  .eventImage {
+    width: 100%;
+    height: 12rem;
+  }
+
+  .eventFooter {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .eventMeta {
+    grid-template-columns: 1fr;
+  }
+
+  .actionButtons {
+    width: 100%;
+    justify-content: flex-start;
   }
 }
 
@@ -503,8 +547,8 @@
   display: flex;
   gap: 0.75rem;
   align-items: center;
-  margin-left: auto;
-  white-space: nowrap;
+  justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 /* Icon button styles */

@@ -18,6 +18,7 @@ interface Event {
   startDate: string;
   endDate: string;
   participants: number;
+  posts: number;
   status: "upcoming" | "ongoing" | "completed";
 }
 
@@ -212,6 +213,7 @@ export default function EventsPage() {
           startDate: apiEvent.startDate,
           endDate: apiEvent.endDate,
           participants: apiEvent.countMembers,
+          posts: apiEvent.countPosts,
           status: getEventStatus(apiEvent.startDate, apiEvent.endDate),
         }));
 
@@ -688,88 +690,90 @@ export default function EventsPage() {
                         <p className={styles.eventDescription}>
                           {event.description}
                         </p>
-                        <div className={styles.eventMeta}>
-                          <div className={styles.metaItem}>
-                            <svg
-                              className={styles.metaIcon}
-                              width="16"
-                              height="16"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            >
-                              <rect
-                                x="3"
-                                y="4"
-                                width="18"
-                                height="18"
-                                rx="2"
-                                ry="2"
-                              />
-                              <line x1="16" y1="2" x2="16" y2="6" />
-                              <line x1="8" y1="2" x2="8" y2="6" />
-                              <line x1="3" y1="10" x2="21" y2="10" />
-                            </svg>
-                            <span>
-                              <span className={styles.metaLabel}>Bắt đầu:</span>{" "}
-                              {new Date(event.startDate).toLocaleDateString(
-                                "vi-VN"
-                              )}
-                            </span>
-                          </div>
-                          <div className={styles.metaItem}>
-                            <svg
-                              className={styles.metaIcon}
-                              width="16"
-                              height="16"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            >
-                              <rect
-                                x="3"
-                                y="4"
-                                width="18"
-                                height="18"
-                                rx="2"
-                                ry="2"
-                              />
-                              <line x1="16" y1="2" x2="16" y2="6" />
-                              <line x1="8" y1="2" x2="8" y2="6" />
-                              <line x1="3" y1="10" x2="21" y2="10" />
-                            </svg>
-                            <span>
-                              <span className={styles.metaLabel}>
-                                Kết thúc:
-                              </span>{" "}
-                              {new Date(event.endDate).toLocaleDateString(
-                                "vi-VN"
-                              )}
-                            </span>
-                          </div>
-                          <div className={styles.metaItem}>
-                            <svg
-                              className={styles.metaIcon}
-                              width="16"
-                              height="16"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            >
-                              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                              <circle cx="9" cy="7" r="4" />
-                              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                            </svg>
-                            <span>
-                              <span className={styles.metaLabel}>
-                                Tham gia:
-                              </span>{" "}
-                              {event.participants} người
-                            </span>
+                        <div className={styles.eventFooter}>
+                          <div className={styles.eventMeta}>
+                            <div className={styles.metaItem}>
+                              <svg
+                                className={styles.metaIcon}
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                              >
+                                <rect
+                                  x="3"
+                                  y="4"
+                                  width="18"
+                                  height="18"
+                                  rx="2"
+                                  ry="2"
+                                />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                              </svg>
+                              <span>
+                                {new Date(event.startDate).toLocaleDateString(
+                                  "vi-VN"
+                                )}{" "}
+                                -{" "}
+                                {new Date(event.endDate).toLocaleDateString(
+                                  "vi-VN"
+                                )}
+                              </span>
+                            </div>
+                            <div className={styles.metaItem}>
+                              <svg
+                                className={styles.metaIcon}
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                              >
+                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                                <circle cx="12" cy="10" r="3" />
+                              </svg>
+                              <span>Địa điểm tổ chức</span>
+                            </div>
+                            <div className={styles.metaItem}>
+                              <svg
+                                className={styles.metaIcon}
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                              >
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                              </svg>
+                              <span>{event.participants} tình nguyện viên</span>
+                            </div>
+                            <div className={styles.metaItem}>
+                              <svg
+                                className={styles.metaIcon}
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                              >
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                                <polyline points="10 9 9 9 8 9" />
+                              </svg>
+                              <span>{event.posts} bài viết</span>
+                            </div>
                           </div>
                           <div className={styles.actionButtons}>
                             <button
