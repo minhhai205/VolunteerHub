@@ -24,7 +24,7 @@ export function EventRequestHeader({
       <div className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.headerText}>
-            <h1>Các Yêu Cầu Tạo Sự Kiện Của Tôi</h1>
+            <h1>Các yêu cầu tạo sự kiện của tôi</h1>
             <p>Theo dõi trạng thái các yêu cầu tạo sự kiện đã gửi</p>
           </div>
           <StatsCard label="Tổng đơn" count={totalCount} />

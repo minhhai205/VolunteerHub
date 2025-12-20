@@ -177,11 +177,7 @@ export default function EventsPage() {
         const response = await fetchWithAuth(
           `http://localhost:8080/api/event/manager/my-event?${params.toString()}`,
           {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
+            method: "GET"
           }
         );
 
