@@ -11,13 +11,62 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { mockNotifications } from "@/lib/mockData";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
+type AdminNotification = {
+  id: string;
+  title?: string;
+  message?: string;
+  time?: string;
+  read?: boolean;
+  link?: string;
+};
+
 export function NotificationsDropdown() {
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const [notifications, setNotifications] = useState<AdminNotification[]>([]);
   const unreadCount = notifications.filter((n) => !n.read).length;
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (!token) return;
+
+    const fetchNotifications = async () => {
+      try {
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+        const res = await fetch(
+          `${apiUrl}/api/notifications/my-notifications`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!res.ok) return;
+        const data = await res.json();
+        const items = Array.isArray(data?.data) ? data.data : [];
+
+        const mapped: AdminNotification[] = items.map((it: any) => ({
+          id: it.id?.toString() ?? String(Math.random()),
+          title: it.title ?? it.content ?? "Thông báo",
+          message: it.message ?? it.content ?? "",
+          time: it.time ?? it.createdAt ?? "",
+          read: typeof it.read === "boolean" ? it.read : false,
+          link: it.link ?? it.url ?? "",
+        }));
+
+        setNotifications(mapped);
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
 
   const markAsRead = (id: string) => {
     setNotifications((prev) =>
