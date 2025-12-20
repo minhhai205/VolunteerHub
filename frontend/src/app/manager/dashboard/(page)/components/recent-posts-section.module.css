@@ -1,6 +1,6 @@
 /* Nền xanh lá nhạt cho toàn card tổng */
 .cardGreen {
-  background-color: #f7fff2;
+  background-color: #fffdfd;
   border: 1px solid hsl(var(--color-border));
   border-radius: 0.75rem;
 }
