@@ -39,6 +39,7 @@ public interface EventMemberRepository extends JpaRepository<EventMember, Long> 
                     (:status IS NULL OR em.status = :status)
                 AND
                     (:eventId IS NULL OR e.id = :eventId)
+                                ORDER BY em.createdAt DESC
             """)
     Page<EventMember> findByFilter(
             @Param("search") String search,
