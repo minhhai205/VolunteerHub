@@ -16,15 +16,19 @@ interface Request {
 
 interface EventRequestCardProps {
   request: Request;
+  index: number;
 }
 
-export default function EventRequestCard({ request }: EventRequestCardProps) {
+export default function EventRequestCard({
+  request,
+  index,
+}: EventRequestCardProps) {
   const router = useRouter();
 
   const getStatusClass = (status: string) => {
     const statusLower = status.toLowerCase();
     switch (statusLower) {
-      case "approve":
+      case "approved":
         return styles.statusApproved;
       case "rejected":
         return styles.statusRejected;
@@ -36,7 +40,7 @@ export default function EventRequestCard({ request }: EventRequestCardProps) {
   const getStatusLabel = (status: string) => {
     const statusLower = status.toLowerCase();
     switch (statusLower) {
-      case "approve":
+      case "approved":
         return "Đã Duyệt";
       case "rejected":
         return "Từ Chối";
@@ -56,36 +60,28 @@ export default function EventRequestCard({ request }: EventRequestCardProps) {
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${day}-${month}-${year} ${hours}:${minutes}`;
   };
 
   return (
     <div className={styles.card}>
-      <div className={styles.columnUserName}>
-        <span className={styles.label}>Người Đăng Ký</span>
-        <span className={styles.value}>{request.userName}</span>
-      </div>
-
-      <div className={styles.columnEmail}>
-        <span className={styles.label}>Email</span>
-        <span className={styles.value}>{request.userEmail}</span>
+      <div className={styles.columnNumber}>
+        <span className={styles.value}>{index}</span>
       </div>
 
       <div className={styles.columnEventName}>
-        <span className={styles.label}>Tên Sự Kiện</span>
         <span className={styles.value}>{request.eventName}</span>
       </div>
 
       <div className={styles.columnDate}>
-        <span className={styles.label}>Ngày Đăng Ký</span>
-        {/* ✅ Gọi hàm formatDate ở đây */}
         <span className={styles.value}>
           {formatDate(request.registeredDate)}
         </span>
       </div>
 
       <div className={styles.columnStatus}>
-        <span className={styles.label}>Trạng Thái</span>
         <span
           className={`${styles.statusBadge} ${getStatusClass(request.status)}`}
         >
@@ -94,7 +90,6 @@ export default function EventRequestCard({ request }: EventRequestCardProps) {
       </div>
 
       <div className={styles.columnActions}>
-        <span className={styles.label}>Hành Động</span>
         <Button
           onClick={handleViewEventDetail}
           className={styles.viewButton}

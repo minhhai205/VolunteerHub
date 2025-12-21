@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { User, Mail, Lock, ArrowRight, Phone } from "lucide-react";
 import { saveTokens } from "@/lib/token";
-import { registerPushAfterLogin } from '@/lib/notification';
+import { registerPushAfterLogin } from "@/lib/notification";
+import { toast } from "sonner";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -67,8 +68,8 @@ export function RegisterForm() {
 
       // Đăng ký nhận Push Notification
       registerPushAfterLogin(result.data.accessToken);
-
-      router.push("/"); // chuyển về trang chủ
+      toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
+      router.push("/auth/login"); // chuyển về trang chủ
     } catch (err) {
       console.error("❌ Register error:", err);
       setError(err instanceof Error ? err.message : "Registration failed!");

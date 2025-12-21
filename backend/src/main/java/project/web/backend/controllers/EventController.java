@@ -218,7 +218,7 @@ public class EventController {
     ) {
         return ApiSuccessResponse.<String>builder()
                 .data(eventService.deleteEvent(eventId))
-                .message("Rated members")
+                .message("Deleted event")
                 .status(HttpStatus.OK.value())
                 .build();
     }

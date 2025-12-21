@@ -81,7 +81,7 @@ public class EventRequestService {
             Notification notification = Notification.builder()
                     .sendTo(admin)
                     .content(content)
-                    .eventRequest(newRequest)
+//                    .eventRequest(newRequest)
                     .type(NotificationType.EVENT)
                     .build();
             notifications.add(notification);
@@ -176,7 +176,7 @@ public class EventRequestService {
         Notification notification = Notification.builder()
                 .sendTo(newEvent.getManager())
                 .content(content)
-                .event(newEvent)
+//                .event(newEvent)
                 .type(NotificationType.EVENT)
                 .build();
         notificationRepository.save(notification);
@@ -212,7 +212,7 @@ public class EventRequestService {
         Notification notification = Notification.builder()
                 .sendTo(request.getManager())
                 .content(content)
-                .eventRequest(request)
+//                .eventRequest(request)
                 .type(NotificationType.EVENT)
                 .build();
         notificationRepository.save(notification);
@@ -281,7 +281,7 @@ public class EventRequestService {
         Notification notification = Notification.builder()
                 .sendTo(user)
                 .content(content)
-                .event(event)
+//                .event(event)
                 .type(NotificationType.EVENT)
                 .build();
         notificationRepository.save(notification);
@@ -314,7 +314,7 @@ public class EventRequestService {
         Notification notification = Notification.builder()
                 .sendTo(eventRegistration.getUser())
                 .content(content)
-                .event(eventRegistration.getEvent())
+//                .event(eventRegistration.getEvent())
                 .type(NotificationType.EVENT)
                 .build();
         notificationRepository.save(notification);

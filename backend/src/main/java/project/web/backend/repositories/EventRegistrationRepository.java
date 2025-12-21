@@ -21,6 +21,7 @@ public interface EventRegistrationRepository extends JpaRepository<EventRegistra
             WHERE (:status IS NULL OR er.status = :status)
             AND m.email=:email
             AND (:eventId IS NULL OR e.id = :eventId)
+                        ORDER BY er.createdAt DESC
             """)
     Page<EventRegistration> getAll(
             Pageable pageable,

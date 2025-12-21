@@ -31,6 +31,7 @@ public interface EventMemberRepository extends JpaRepository<EventMember, Long> 
                 SELECT em FROM EventMember em
                 JOIN FETCH em.event e
                 JOIN FETCH em.user u
+                JOIN e.manager m
                 WHERE
                     (:search IS NULL OR :search = ''
                         OR u.fullName LIKE CONCAT('%', :search, '%')
@@ -39,11 +40,14 @@ public interface EventMemberRepository extends JpaRepository<EventMember, Long> 
                     (:status IS NULL OR em.status = :status)
                 AND
                     (:eventId IS NULL OR e.id = :eventId)
+                AND (:email IS NULL OR :email = '' OR m.email=:email)
+                                ORDER BY em.createdAt DESC
             """)
     Page<EventMember> findByFilter(
             @Param("search") String search,
             @Param("status") WorkStatus status,
             @Param("eventId") Long eventId,
+            @Param("email") String email,
             Pageable pageable
     );
 

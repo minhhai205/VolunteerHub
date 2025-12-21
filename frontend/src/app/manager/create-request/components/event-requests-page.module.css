@@ -1,11 +1,6 @@
 .pageWrapper {
   min-height: 100vh;
-  background: linear-gradient(
-    to bottom right,
-    rgb(240 253 244),
-    rgb(236 253 245),
-    rgb(240 253 250)
-  );
+  background: #f4fbf1;
 }
 
 .container {
@@ -26,18 +21,16 @@
 }
 
 .headerText h1 {
-  font-size: 2.25rem;
-  line-height: 2.5rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  color: rgb(20 83 45);
+  color: #016405;
   margin-bottom: 0.5rem;
-  text-wrap: balance;
 }
 
 .headerText p {
-  color: rgb(21 128 61);
-  font-size: 1.125rem;
-  line-height: 1.75rem;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .cardsGrid {

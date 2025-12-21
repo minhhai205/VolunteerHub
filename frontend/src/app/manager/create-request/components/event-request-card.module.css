@@ -1,149 +1,127 @@
-.card {
-  overflow: hidden;
-  border: 2px solid rgb(220 252 231);
-  transition: all 0.3s;
-  background-color: white;
+.eventCard {
+  background: #ffffff;
+  border: 0.5px solid #e8eae8;
+  border-radius: 0.625rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+}
+
+.eventCard:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-color: #d0d8d0;
+}
+
+.eventImage {
+  width: 8rem;
+  height: 8rem;
   border-radius: 0.5rem;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: oklch(0.95 0.02 145);
 }
 
-.card:hover {
-  border-color: rgb(134 239 172);
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-}
-
-.cardInner {
-  position: relative;
-}
-
-.statusBadge {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  z-index: 10;
-}
-
-.contentWrapper {
+.eventContent {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
 }
 
-@media (min-width: 768px) {
-  .contentWrapper {
-    flex-direction: row;
-  }
+.eventHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
-.imageContainer {
-  position: relative;
-  width: 100%;
-  height: 8rem;
-  background-color: rgb(220 252 231);
+.eventTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: oklch(0.25 0.02 155);
+  margin: 0;
+}
+
+.eventStatus {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
   flex-shrink: 0;
 }
 
-@media (min-width: 768px) {
-  .imageContainer {
-    width: 10rem;
-  }
+.statusPending {
+  background: #fef3c7;
+  color: #92400e;
 }
 
-.image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.statusApproved {
+  background: #dcfce7;
+  color: #166534;
 }
 
-.idBadge {
-  position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  background-color: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(4px);
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
+.statusRejected {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
-.idText {
+.eventDescription {
+  color: oklch(0.5 0.03 155);
   font-size: 0.875rem;
-  line-height: 1.25rem;
-  font-weight: 600;
-  color: rgb(20 83 45);
-}
-
-.content {
-  padding: 1.25rem;
-  flex: 1;
-}
-
-.title {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-  font-weight: 700;
-  color: rgb(20 83 45);
-  margin-bottom: 0.5rem;
-  text-wrap: balance;
-}
-
-.description {
-  color: rgb(21 128 61);
-  margin-bottom: 0.75rem;
-  line-height: 1.625;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  line-height: 1.6;
+  margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.metaInfo {
+.categoriesBadges {
   display: flex;
   flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.categoryTag {
+  display: inline-block;
+  background-color: #f0fdf4;
+  color: #166534;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+}
+
+.eventFooter {
+  display: flex;
   align-items: center;
-  gap: 1.5rem 1.5rem;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  gap: 1rem;
+}
+
+.eventMeta {
+  display: flex;
+  justify-content: flex-start;
+  gap: 2rem;
   font-size: 0.875rem;
-  line-height: 1.25rem;
+  flex-wrap: wrap;
 }
 
 .metaItem {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: rgb(21 128 61);
+  font-size: 0.875rem;
+  color: #6b7280;
 }
 
 .metaIcon {
-  width: 1rem;
-  height: 1rem;
   flex-shrink: 0;
-}
-
-.metaText {
-  font-weight: 500;
-}
-
-.emptyState {
-  text-align: center;
-  padding: 4rem 0;
-}
-
-.emptyIcon {
-  color: rgb(134 239 172);
-  margin-bottom: 1rem;
-  width: 4rem;
-  height: 4rem;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.emptyTitle {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-  font-weight: 600;
-  color: rgb(20 83 45);
-  margin-bottom: 0.5rem;
-}
-
-.emptyDescription {
-  color: rgb(21 128 61);
+  color: #22c55e;
 }

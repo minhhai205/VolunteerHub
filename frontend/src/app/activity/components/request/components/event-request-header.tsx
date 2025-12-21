@@ -13,12 +13,6 @@ export default function EventRequestHeader({
         <h1 className={styles.title}>Yêu cầu của tôi</h1>
         <p className={styles.subtitle}>Trạng thái các yêu cầu tôi đã gửi</p>
       </div>
-      <div className={styles.stats}>
-        <div className={styles.statItem}>
-          <span className={styles.statLabel}>Tổng đơn</span>
-          <span className={styles.statValue}>{totalRequests}</span>
-        </div>
-      </div>
     </div>
   );
 }

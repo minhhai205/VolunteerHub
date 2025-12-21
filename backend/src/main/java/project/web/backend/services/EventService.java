@@ -262,7 +262,7 @@ public class EventService {
         Notification notification = Notification.builder()
                 .sendTo(event.getManager())
                 .content(content)
-                .event(event)
+//                .event(event)
                 .type(NotificationType.EVENT)
                 .build();
         notificationRepository.save(notification);
@@ -281,7 +281,7 @@ public class EventService {
         Notification notificationUser = Notification.builder()
                 .sendTo(currentUser)
                 .content(titleUser)
-                .event(event)
+//                .event(event)
                 .type(NotificationType.EVENT)
                 .build();
         notificationRepository.save(notificationUser);
@@ -382,8 +382,9 @@ public class EventService {
         String search = dto.getSearch();
         WorkStatus status = dto.getStatus();
         Long eventId = dto.getEventId();
+        String email = SecurityUtil.getCurrentEmail();
 
-        Page<EventMember> eventMembers = eventMemberRepository.findByFilter(search, status, eventId, pageable);
+        Page<EventMember> eventMembers = eventMemberRepository.findByFilter(search, status, eventId, email, pageable);
         List<EventMemberResponseDTO> dtos = eventMembers.stream()
                 .map(em -> {
                     Long workingHour = Duration.between(
@@ -441,7 +442,7 @@ public class EventService {
             Notification notification = Notification.builder()
                     .sendTo(member.getUser())
                     .content(content)
-                    .event(member.getEvent())
+//                    .event(member.getEvent())
                     .type(NotificationType.EVENT)
                     .build();
             notifications.add(notification);

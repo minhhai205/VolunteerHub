@@ -71,4 +71,18 @@ public class Event extends AbstractEntity {
             orphanRemoval = true
     )
     private Set<Post> posts;
+
+    @OneToMany(
+            mappedBy = "event",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
+    private Set<EventRegistration> eventRegistrations;
+
+    @OneToMany(
+            mappedBy = "event",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
+    private Set<AchievementRecord> records;
 }

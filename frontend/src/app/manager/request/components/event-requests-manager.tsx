@@ -169,7 +169,7 @@ export default function EventRequestsManager() {
         toastManager.success("Đã duyệt đơn đăng ký");
         setRequests(
           requests.map((req) =>
-            req.id === id ? { ...req, status: "approve" } : req
+            req.id === id ? { ...req, status: "approved" } : req
           )
         );
       } else {

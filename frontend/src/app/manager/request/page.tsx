@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div>
       <Header />
-      <main className="min-h-screen bg-[#F7FFF2]">
+      <main className="min-h-screen bg-[#f4fbf1]">
         <EventRequestsManager />
       </main>
       <Footer />

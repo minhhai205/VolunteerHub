@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 type AdminNotification = {
   id: string;
@@ -35,7 +36,7 @@ export function NotificationsDropdown() {
       try {
         const apiUrl =
           process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-        const res = await fetch(
+        const res = await fetchWithAuth(
           `${apiUrl}/api/notifications/my-notifications`,
           {
             method: "GET",
