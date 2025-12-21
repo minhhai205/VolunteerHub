@@ -262,7 +262,7 @@ public class EventService {
         Notification notification = Notification.builder()
                 .sendTo(event.getManager())
                 .content(content)
-                .event(event)
+//                .event(event)
                 .type(NotificationType.EVENT)
                 .build();
         notificationRepository.save(notification);
@@ -281,7 +281,7 @@ public class EventService {
         Notification notificationUser = Notification.builder()
                 .sendTo(currentUser)
                 .content(titleUser)
-                .event(event)
+//                .event(event)
                 .type(NotificationType.EVENT)
                 .build();
         notificationRepository.save(notificationUser);
@@ -441,7 +441,7 @@ public class EventService {
             Notification notification = Notification.builder()
                     .sendTo(member.getUser())
                     .content(content)
-                    .event(member.getEvent())
+//                    .event(member.getEvent())
                     .type(NotificationType.EVENT)
                     .build();
             notifications.add(notification);

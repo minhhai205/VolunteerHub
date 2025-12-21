@@ -68,9 +68,9 @@ public class CommentService {
             Notification notification = Notification.builder()
                     .sendTo(post.getEvent().getManager())
                     .content(content)
-                    .event(post.getEvent())
-                    .post(post)
-                    .comment(comment)
+//                    .event(post.getEvent())
+//                    .post(post)
+//                    .comment(comment)
                     .type(NotificationType.POST)
                     .build();
             notificationRepository.save(notification);
