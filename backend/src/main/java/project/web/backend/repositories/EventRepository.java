@@ -224,6 +224,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             LEFT JOIN FETCH e.posts p
             LEFT JOIN FETCH p.comments
             LEFT JOIN FETCH p.medias
+            LEFT JOIN FETCH p.likes
             LEFT JOIN FETCH e.eventRegistrations
             LEFT JOIN FETCH e.records
             WHERE e.id=:eventId
