@@ -40,7 +40,7 @@ public class ExportService {
 
             // Fetch all members for event (use unpaged to get all)
             List<EventMember> members = eventMemberRepository
-                    .findByFilter(null, null, id, Pageable.unpaged())
+                    .findByFilter(null, null, id, "", Pageable.unpaged())
                     .getContent();
 
             // Map to export DTO
@@ -101,15 +101,15 @@ public class ExportService {
 
             // map sang DTO để export
             List<EventResponseDTO> dtos = events.stream().map(e ->
-                EventResponseDTO.builder()
-                    .id(e.getId())
-                    .name(e.getName())
-                    .description(e.getDescription())
-                    .location(e.getLocation())
-                    .imageUrl(e.getImageUrl())
-                    .startDate(e.getStartDate())
-                    .endDate(e.getEndDate())
-                    .build()
+                    EventResponseDTO.builder()
+                            .id(e.getId())
+                            .name(e.getName())
+                            .description(e.getDescription())
+                            .location(e.getLocation())
+                            .imageUrl(e.getImageUrl())
+                            .startDate(e.getStartDate())
+                            .endDate(e.getEndDate())
+                            .build()
             ).collect(Collectors.toList());
 
             if (dtos.isEmpty()) {

@@ -382,8 +382,9 @@ public class EventService {
         String search = dto.getSearch();
         WorkStatus status = dto.getStatus();
         Long eventId = dto.getEventId();
+        String email = SecurityUtil.getCurrentEmail();
 
-        Page<EventMember> eventMembers = eventMemberRepository.findByFilter(search, status, eventId, pageable);
+        Page<EventMember> eventMembers = eventMemberRepository.findByFilter(search, status, eventId, email, pageable);
         List<EventMemberResponseDTO> dtos = eventMembers.stream()
                 .map(em -> {
                     Long workingHour = Duration.between(
