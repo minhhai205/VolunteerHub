@@ -3,8 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./events.module.css";
-import { Header } from "@/components/static/HeaderManager";
-import { Footer } from "@/components/static/Footer";
 import { getAccessToken } from "@/lib/token";
 import { Search, Edit, Trash2, Eye } from "lucide-react";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
@@ -45,7 +43,7 @@ interface PageResponse {
 
 const getEventStatus = (
   startDate: string,
-  endDate: string
+  endDate: string,
 ): "upcoming" | "ongoing" | "completed" => {
   const now = new Date();
   const start = new Date(startDate);
@@ -97,7 +95,7 @@ export default function EventsPage() {
   const searchBoxRef = useRef<HTMLDivElement>(null);
 
   const getStatusParam = (
-    filter: "all" | "upcoming" | "ongoing" | "completed"
+    filter: "all" | "upcoming" | "ongoing" | "completed",
   ): string => {
     switch (filter) {
       case "all":
@@ -132,7 +130,7 @@ export default function EventsPage() {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (response.ok) {
@@ -179,7 +177,7 @@ export default function EventsPage() {
           `http://localhost:8080/api/event/manager/my-event?${params.toString()}`,
           {
             method: "GET",
-          }
+          },
         );
 
         if (!response.ok) {
@@ -353,7 +351,7 @@ export default function EventsPage() {
   };
 
   const handleFilterChange = (
-    filter: "all" | "upcoming" | "ongoing" | "completed"
+    filter: "all" | "upcoming" | "ongoing" | "completed",
   ) => {
     setActiveFilter(filter);
     setCurrentPage(0);
@@ -386,7 +384,7 @@ export default function EventsPage() {
         `http://localhost:8080/api/event/delete-event/${deleteConfirm.eventId}`,
         {
           method: "DELETE",
-        }
+        },
       );
 
       const result = await response.json();
@@ -478,8 +476,6 @@ export default function EventsPage() {
 
   return (
     <div className={styles.page}>
-      <Header />
-
       <main className={styles.main}>
         <div
           className={styles.header}
@@ -562,9 +558,9 @@ export default function EventsPage() {
                       index === selectedSuggestionIndex && isKeyboardNavigation
                         ? styles.suggestItemActive
                         : index === selectedSuggestionIndex &&
-                          !isKeyboardNavigation
-                        ? styles.suggestItemHover
-                        : ""
+                            !isKeyboardNavigation
+                          ? styles.suggestItemHover
+                          : ""
                     }`}
                     onClick={() => {
                       handleSearchSubmit(suggestion);
@@ -714,11 +710,11 @@ export default function EventsPage() {
                               </svg>
                               <span>
                                 {new Date(event.startDate).toLocaleDateString(
-                                  "vi-VN"
+                                  "vi-VN",
                                 )}{" "}
                                 -{" "}
                                 {new Date(event.endDate).toLocaleDateString(
-                                  "vi-VN"
+                                  "vi-VN",
                                 )}
                               </span>
                             </div>
@@ -917,8 +913,6 @@ export default function EventsPage() {
           </div>
         </div>
       )}
-
-      <Footer />
     </div>
   );
 }

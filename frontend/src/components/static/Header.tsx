@@ -11,6 +11,7 @@ import { getName } from "@/lib/getDataFromToken";
 
 export function Header() {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [user, setUser] = useState({
@@ -38,6 +39,7 @@ export function Header() {
     } else {
       setIsLoggedIn(false);
     }
+    setMounted(true);
   }, []);
 
   const handleLogout = async () => {
@@ -132,18 +134,13 @@ export function Header() {
           >
             Hoạt động
           </Link>
-          <Link
-            href="/contact"
-            className={`${styles.navLink} ${
-              isActive("/contact") ? styles.navLinkActive : ""
-            }`}
-          >
-            Liên hệ
-          </Link>
         </nav>
 
         {/* CTA and Mobile Menu */}
-        <div className={styles.actions}>
+        <div
+          className={styles.actions}
+          style={{ visibility: mounted ? "visible" : "hidden" }}
+        >
           {!isLoggedIn ? (
             <Link href="/auth/login">
               <Button className={styles.ctaButton}>Đăng nhập</Button>

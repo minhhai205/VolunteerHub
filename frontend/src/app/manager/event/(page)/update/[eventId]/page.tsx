@@ -1,7 +1,5 @@
 import styles from "./update-event.module.css";
-import { Footer } from "@/components/static/Footer";
 import { UpdateEventForm } from "./components/update-event-form";
-import { Header } from "@/components/static/HeaderManager";
 
 export default async function UpdateEventPage({
   params,
@@ -12,7 +10,6 @@ export default async function UpdateEventPage({
 
   return (
     <div className={styles.pageWrapper}>
-      <Header />
       <main className={styles.main}>
         <div className={styles.container}>
           <div className={styles.header}>
@@ -22,7 +19,6 @@ export default async function UpdateEventPage({
           <UpdateEventForm eventId={eventId} />
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
