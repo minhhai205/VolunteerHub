@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import { useParams } from "next/navigation";
 import { Footer } from "@/components/static/Footer";
+import { Header as UserHeader } from "@/components/static/Header";
+import { Header as ManagerHeader } from "@/components/static/HeaderManager";
 import EventHeader from "../event-header/event-header";
 import EventInfo from "../event-info/event-info";
 import EventAbout from "../event-about/event-about";
@@ -10,15 +12,21 @@ import EventDiscussion from "../event-discussion/event-discussion";
 import { fetchEventData, Event } from "../../../../hooks/useDetail";
 import { getUserRole } from "@/lib/getDataFromToken";
 
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
 export default function EventDetailPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<string | null>(null);
-  const [HeaderComponent, setHeaderComponent] =
-    useState<React.ComponentType | null>(null);
 
   const params = useParams();
   const eventId = params.eventId as string;
+
+  // Load role TRƯỚC khi paint
+  useIsomorphicLayoutEffect(() => {
+    setRole(getUserRole() || "USER");
+  }, []);
 
   // Load event data
   useEffect(() => {
@@ -36,23 +44,9 @@ export default function EventDetailPage() {
     loadData();
   }, [eventId]);
 
-  // Load user role and select header
-  useEffect(() => {
-    const role = getUserRole();
-    setRole(role);
+  const HeaderComponent = role === "MANAGER" ? ManagerHeader : UserHeader;
 
-    if (role === "MANAGER") {
-      import("@/components/static/HeaderManager").then((mod) =>
-        setHeaderComponent(() => mod.Header)
-      );
-    } else {
-      import("@/components/static/Header").then((mod) =>
-        setHeaderComponent(() => mod.Header)
-      );
-    }
-  }, []);
-
-  if (loading || !HeaderComponent) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">

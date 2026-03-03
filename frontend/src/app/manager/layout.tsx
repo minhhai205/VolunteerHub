@@ -8,10 +8,10 @@ export default function ManagerLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ProtectedRoute allowedScopes={["MANAGER"]}>
+    <>
       <Header />
-      {children}
+      <ProtectedRoute allowedScopes={["MANAGER"]}>{children}</ProtectedRoute>
       <Footer />
-    </ProtectedRoute>
+    </>
   );
 }

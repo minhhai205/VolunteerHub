@@ -12,9 +12,7 @@ import { useState, useEffect, useRef } from "react";
 import { useEventList } from "../../hooks/useList";
 import { useCategories } from "../../hooks/useCategories";
 import styles from "./list.module.css";
-import { Header } from "@/components/static/Header";
 import EventCard from "./EventCard";
-import { Footer } from "@/components/static/Footer";
 
 export default function DashboardPage() {
   const [searchInput, setSearchInput] = useState(""); // Giá trị input
@@ -49,7 +47,7 @@ export default function DashboardPage() {
   const { events, loading, error, totalPages, totalElements } = useEventList(
     search,
     pageable,
-    filters
+    filters,
   );
 
   // Show loading skeleton và scroll to top khi page hoặc search thay đổi
@@ -87,7 +85,7 @@ export default function DashboardPage() {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (response.ok) {
@@ -238,7 +236,6 @@ export default function DashboardPage() {
 
   return (
     <div className={styles.pageContainer}>
-      <Header />
       <main className={styles.mainContent}>
         {/* Tiêu đề trang */}
         <div className={styles.dashboardHeader}>
@@ -273,9 +270,9 @@ export default function DashboardPage() {
                       index === selectedSuggestionIndex && isKeyboardNavigation
                         ? styles.suggestItemActive
                         : index === selectedSuggestionIndex &&
-                          !isKeyboardNavigation
-                        ? styles.suggestItemHover
-                        : ""
+                            !isKeyboardNavigation
+                          ? styles.suggestItemHover
+                          : ""
                     }`}
                     onClick={() => {
                       handleSearchSubmit(suggestion);
@@ -462,7 +459,6 @@ export default function DashboardPage() {
           )}
         </section>
       </main>
-      <Footer />
     </div>
   );
 }

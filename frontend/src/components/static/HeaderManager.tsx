@@ -12,14 +12,16 @@ import {
   Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
+
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 import styles from "./Header.module.css";
 import { clearTokens, getAccessToken, getRefreshToken } from "@/lib/token";
 import { getName } from "@/lib/getDataFromToken";
 
 export function Header() {
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showManagementMenu, setShowManagementMenu] = useState(false);
@@ -33,8 +35,8 @@ export function Header() {
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=user",
   });
 
-  // Kiểm tra accessToken khi component mount
-  useEffect(() => {
+  // Kiểm tra accessToken TRƯỚC khi browser paint → không bị giật
+  useIsomorphicLayoutEffect(() => {
     const accessToken = localStorage.getItem("access_token");
 
     if (accessToken) {
@@ -50,13 +52,17 @@ export function Header() {
         name: userName,
         avatar: userAvatar,
       });
-
-      // Fetch notifications
-      fetchNotifications(accessToken);
     } else {
       setIsLoggedIn(false);
     }
-    setMounted(true);
+  }, []);
+
+  // Fetch notifications riêng (async, chạy sau paint)
+  useEffect(() => {
+    const accessToken = localStorage.getItem("access_token");
+    if (accessToken) {
+      fetchNotifications(accessToken);
+    }
   }, []);
 
   const fetchNotifications = async (token: string) => {
@@ -237,10 +243,7 @@ export function Header() {
         </nav>
 
         {/* CTA and Mobile Menu */}
-        <div
-          className={styles.actions}
-          style={{ visibility: mounted ? "visible" : "hidden" }}
-        >
+        <div className={styles.actions}>
           {!isLoggedIn ? (
             <Link href="/auth/login">
               <Button className={styles.ctaButton}>Đăng nhập</Button>
