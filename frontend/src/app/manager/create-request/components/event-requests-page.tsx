@@ -55,7 +55,7 @@ export function EventRequestsPage() {
       const token = getAccessToken();
 
       // Tạo URL với các query params
-      let url = `http://localhost:8080/api/event-request/create-request?page=${page}&size=${pageSize}`;
+      let url = `${process.env.NEXT_PUBLIC_API_URL}/api/event-request/create-request?page=${page}&size=${pageSize}`;
 
       // Thêm status vào URL nếu filter không phải "all"
       if (filterStatus !== "all") {

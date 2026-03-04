@@ -32,12 +32,12 @@ export function useStatistics() {
       };
 
       const [resAdmin, resEvent] = await Promise.all([
-        fetchWithAuth("http://localhost:8080/api/dashboard/admin/statistics", {
+        fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/dashboard/admin/statistics`, {
           method: "GET",
           headers,
         }),
         fetchWithAuth(
-          "http://localhost:8080/api/dashboard/admin/event/statistics",
+          `${process.env.NEXT_PUBLIC_API_URL}/api/dashboard/admin/event/statistics`,
           { method: "GET", headers }
         ),
       ]);

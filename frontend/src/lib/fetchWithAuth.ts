@@ -6,10 +6,11 @@ import {
   clearTokens,
 } from "@/lib/token";
 import { showUnauthorizedDialog } from "@/lib/unauthorizedDialog";
+import { API_BASE_URL } from "@/lib/apiConfig";
 
 export async function fetchWithAuth(
   input: RequestInfo,
-  init?: RequestInit
+  init?: RequestInit,
 ): Promise<Response> {
   let accessToken = checkAndGetAccessToken() ?? "";
 
@@ -74,7 +75,7 @@ async function refreshAccessToken(): Promise<boolean> {
   if (!refreshToken) return false;
 
   try {
-    const response = await fetch("http://localhost:8080/api/auth/refresh", {
+    const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken }),
@@ -108,9 +109,9 @@ function handleUnAuthorized() {
   if (typeof window !== "undefined") {
     const currentPath = window.location.pathname + window.location.search;
     const redirectUrl = `/auth/login?redirect=${encodeURIComponent(
-      currentPath
+      currentPath,
     )}`;
-    
+
     showUnauthorizedDialog(redirectUrl);
   }
 }

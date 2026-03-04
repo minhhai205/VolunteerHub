@@ -12,7 +12,10 @@ import {
   Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
+
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 import styles from "./Header.module.css";
 import { clearTokens, getAccessToken, getRefreshToken } from "@/lib/token";
 import { getName } from "@/lib/getDataFromToken";
@@ -32,8 +35,8 @@ export function Header() {
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=user",
   });
 
-  // Kiểm tra accessToken khi component mount
-  useEffect(() => {
+  // Kiểm tra accessToken TRƯỚC khi browser paint → không bị giật
+  useIsomorphicLayoutEffect(() => {
     const accessToken = localStorage.getItem("access_token");
 
     if (accessToken) {
@@ -49,17 +52,22 @@ export function Header() {
         name: userName,
         avatar: userAvatar,
       });
-
-      // Fetch notifications
-      fetchNotifications(accessToken);
     } else {
       setIsLoggedIn(false);
     }
   }, []);
 
+  // Fetch notifications riêng (async, chạy sau paint)
+  useEffect(() => {
+    const accessToken = localStorage.getItem("access_token");
+    if (accessToken) {
+      fetchNotifications(accessToken);
+    }
+  }, []);
+
   const fetchNotifications = async (token: string) => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const response = await fetch(
         `${apiUrl}/api/notifications/my-notifications`,
         {
@@ -68,7 +76,7 @@ export function Header() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.ok) {
@@ -93,7 +101,7 @@ export function Header() {
         return;
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       // Gọi API logout với DTO
       const response = await fetch(`${apiUrl}/api/auth/logout`, {
         method: "POST",
@@ -232,15 +240,6 @@ export function Header() {
               </div>
             )}
           </div>
-
-          <Link
-            href="/contact"
-            className={`${styles.navLink} ${
-              isActive("/contact") ? styles.navLinkActive : ""
-            }`}
-          >
-            Liên hệ
-          </Link>
         </nav>
 
         {/* CTA and Mobile Menu */}

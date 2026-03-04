@@ -35,7 +35,7 @@ export function NotificationsDropdown() {
     const fetchNotifications = async () => {
       try {
         const apiUrl =
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+          process.env.NEXT_PUBLIC_API_URL;
         const res = await fetchWithAuth(
           `${apiUrl}/api/notifications/my-notifications`,
           {

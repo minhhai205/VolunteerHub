@@ -1,11 +1,14 @@
 // components/auth/ProtectedRoute.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getAccessToken } from "@/lib/token";
 import { toastManager } from "../static/toast/toast";
 import { showUnauthorizedDialog } from "@/lib/unauthorizedDialog";
+
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 interface ProtectedRouteProps {
   allowedScopes?: string[]; // ["ADMIN"], ["MANAGER"], []
@@ -19,7 +22,8 @@ export default function ProtectedRoute({
   const router = useRouter();
   const [authorized, setAuthorized] = useState(false);
 
-  useEffect(() => {
+  // Dùng useLayoutEffect để check auth TRƯỚC khi browser paint → không bị nháy trắng
+  useIsomorphicLayoutEffect(() => {
     const token = getAccessToken();
 
     console.log(token);
@@ -29,7 +33,7 @@ export default function ProtectedRoute({
       if (typeof window !== "undefined") {
         const currentPath = window.location.pathname + window.location.search;
         const redirectUrl = `/auth/login?redirect=${encodeURIComponent(
-          currentPath
+          currentPath,
         )}`;
 
         showUnauthorizedDialog(redirectUrl);

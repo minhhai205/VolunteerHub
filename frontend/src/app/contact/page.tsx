@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useLayoutEffect, useEffect } from "react";
 import { Footer } from "@/components/static/Footer";
+import { Header as UserHeader } from "@/components/static/Header";
+import { Header as ManagerHeader } from "@/components/static/HeaderManager";
 import ContactForm from "./contact-form";
 import Facts from "./facts";
 import Hero from "./hero";
@@ -10,28 +12,17 @@ import Map from "./map";
 import Team from "./team";
 import { getUserRole } from "@/lib/getDataFromToken";
 
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
 export default function ContactPage() {
-  const [HeaderComponent, setHeaderComponent] =
-    useState<React.ComponentType | null>(null);
+  const [role, setRole] = useState<string | null>(null);
 
-  // Load user role and select header
-  useEffect(() => {
-    const role = getUserRole();
-
-    if (role === "MANAGER") {
-      import("@/components/static/HeaderManager").then((mod) =>
-        setHeaderComponent(() => mod.Header)
-      );
-    } else {
-      import("@/components/static/Header").then((mod) =>
-        setHeaderComponent(() => mod.Header)
-      );
-    }
+  useIsomorphicLayoutEffect(() => {
+    setRole(getUserRole() || "USER");
   }, []);
 
-  if (!HeaderComponent) {
-    return null;
-  }
+  const HeaderComponent = role === "MANAGER" ? ManagerHeader : UserHeader;
 
   return (
     <main className="w-full">

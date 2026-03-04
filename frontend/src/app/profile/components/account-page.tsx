@@ -139,7 +139,7 @@ export default function AccountPage() {
 
         const [infoResponse, workingResponse] = await Promise.all([
           fetchWithAuth(
-            `http://localhost:8080/api/user/information/${userEmail}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/user/information/${userEmail}`,
             {
               method: "GET",
               headers: {
@@ -149,7 +149,7 @@ export default function AccountPage() {
             }
           ),
           fetchWithAuth(
-            `http://localhost:8080/api/user/working-information/${userEmail}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/user/working-information/${userEmail}`,
             {
               method: "GET",
               headers: {

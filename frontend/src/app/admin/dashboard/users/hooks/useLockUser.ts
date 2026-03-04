@@ -30,7 +30,7 @@ export function useLockUser() {
       const payload = { lock };
 
       const res = await fetchWithAuth(
-        `http://localhost:8080/api/user/lock-user/${userId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/user/lock-user/${userId}`,
         {
           method: "PATCH",
           headers: {

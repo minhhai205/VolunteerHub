@@ -1,19 +1,18 @@
-import { Header } from "@/components/static/HeaderManager"
-import { EventStats } from "./components/event-stats"
-import { NewEventsSection } from "./components/new-events-section"
-import { TrendingEventsSection } from "./components/trending-events-section"
-import { RecentPostsSection } from "./components/recent-posts-section"
-import { Footer } from "@/components/static/Footer"
-import styles from "./page.module.css"
+import { EventStats } from "./components/event-stats";
+import { NewEventsSection } from "./components/new-events-section";
+import { TrendingEventsSection } from "./components/trending-events-section";
+import { RecentPostsSection } from "./components/recent-posts-section";
+import styles from "./page.module.css";
 
 export default function DashboardPage() {
   return (
     <div className={styles.container}>
-      <Header />
       <main className={styles.mainContent}>
         <div className={styles.header}>
           <h1 className={styles.title}>Dashboard</h1>
-          <p className={styles.subtitle}>Quản lý sự kiện và tình nguyện viên của bạn</p>
+          <p className={styles.subtitle}>
+            Quản lý sự kiện và tình nguyện viên của bạn
+          </p>
         </div>
 
         <EventStats />
@@ -25,7 +24,6 @@ export default function DashboardPage() {
           <RecentPostsSection />
         </div>
       </main>
-      <Footer />
     </div>
-  )
+  );
 }

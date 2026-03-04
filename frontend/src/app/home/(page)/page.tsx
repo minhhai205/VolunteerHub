@@ -48,7 +48,7 @@ export default function Home() {
     const fetchEvents = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:8080/api/event/newest", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/event/newest`, {
           method: "GET",
         }).then((res) => res.json());
 
@@ -70,7 +70,7 @@ export default function Home() {
       try {
         setTrendingLoading(true);
         const response = await fetch(
-          "http://localhost:8080/api/event/trending",
+          `${process.env.NEXT_PUBLIC_API_URL}/api/event/trending`,
           {
             method: "GET",
           }

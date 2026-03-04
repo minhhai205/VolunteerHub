@@ -15,8 +15,6 @@ import BulkActions from "./components/BulkActions";
 import VolunteerTable from "./components/VolunteerTable";
 import type { Volunteer } from "./components/VolunteerTable";
 import styles from "./completion.module.css";
-import { Header } from "@/components/static/HeaderManager";
-import { Footer } from "@/components/static/Footer";
 import { getAccessToken } from "@/lib/token";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
 import {
@@ -131,7 +129,7 @@ export default function CompletionPage() {
   const updateWorkRating = async (dtos: WorkRatingDTO[]) => {
     try {
       const token = getAccessToken();
-      const url = `http://localhost:8080/api/event/work-rating`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/event/work-rating`;
 
       const requestBody: WorkRatingRequest = { dtos };
 
@@ -164,7 +162,7 @@ export default function CompletionPage() {
   // Fetch events from API
   const fetchEvents = async () => {
     try {
-      const url = `http://localhost:8080/api/event/manager/my-event`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/event/manager/my-event`;
 
       const response = await fetchWithAuth(url, {
         method: "GET",
@@ -198,7 +196,7 @@ export default function CompletionPage() {
 
     try {
       const params = buildQueryParams(dto);
-      const url = `http://localhost:8080/api/event/event-members?${params.toString()}`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/event/event-members?${params.toString()}`;
 
       const response = await fetchWithAuth(url, {
         method: "GET",
@@ -234,7 +232,7 @@ export default function CompletionPage() {
     } catch (err) {
       console.error("Error fetching event members:", err);
       setError(
-        err instanceof Error ? err.message : "Đã xảy ra lỗi khi tải dữ liệu"
+        err instanceof Error ? err.message : "Đã xảy ra lỗi khi tải dữ liệu",
       );
     } finally {
       setLoading(false);
@@ -300,7 +298,7 @@ export default function CompletionPage() {
       setError(
         err instanceof Error
           ? err.message
-          : "Đã xảy ra lỗi khi cập nhật hàng loạt"
+          : "Đã xảy ra lỗi khi cập nhật hàng loạt",
       );
     } finally {
       setLoading(false);
@@ -327,7 +325,7 @@ export default function CompletionPage() {
     } catch (err) {
       console.error("Error in single update:", err);
       setError(
-        err instanceof Error ? err.message : "Đã xảy ra lỗi khi cập nhật"
+        err instanceof Error ? err.message : "Đã xảy ra lỗi khi cập nhật",
       );
     } finally {
       setLoading(false);
@@ -351,7 +349,6 @@ export default function CompletionPage() {
 
   return (
     <>
-      <Header></Header>
       <div className={styles.backgroundContainer}>
         <div className={styles.container}>
           <CompletionHeader
@@ -482,7 +479,7 @@ export default function CompletionPage() {
                                     {pageNum}
                                   </Button>
                                 );
-                              }
+                              },
                             )}
                           </div>
 
@@ -514,7 +511,6 @@ export default function CompletionPage() {
           </div>
         </div>
       </div>
-      <Footer></Footer>
     </>
   );
 }

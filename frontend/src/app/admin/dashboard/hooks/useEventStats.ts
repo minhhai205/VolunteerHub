@@ -20,7 +20,7 @@ export function useEventStats() {
       try {
         setLoading(true);
         const res = await fetchWithAuth(
-          "http://localhost:8080/api/dashboard/admin/statistics"
+          `${process.env.NEXT_PUBLIC_API_URL}/api/dashboard/admin/statistics`
         );
         if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
         const body = await res.json();
