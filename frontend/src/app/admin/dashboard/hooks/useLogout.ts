@@ -20,7 +20,7 @@ export function useLogout() {
     try {
       // 1. Call the backend API to invalidate the tokens on the server
       // This endpoint expects an accessToken and refreshToken in the body
-      const response = await fetch("http://localhost:8080/api/auth/logout", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ accessToken, refreshToken }),

@@ -68,7 +68,7 @@ export function useRecentPosts() {
         const token = getAccessToken();
 
         const response = await fetchWithAuth(
-          "http://localhost:8080/api/post/newest-posts",
+          `${process.env.NEXT_PUBLIC_API_URL}/api/post/newest-posts`,
           {
             method: "GET",
             headers: {

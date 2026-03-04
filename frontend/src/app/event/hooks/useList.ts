@@ -74,7 +74,7 @@ export function useEventList(
         if (filters?.fromDate) {
           params.append("fromDate", filters.fromDate);
         }
-        const url = `http://localhost:8080/api/event/event-list?${params.toString()}`;
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/api/event/event-list?${params.toString()}`;
 
         const response = await fetchWithAuth(url, {
           method: "GET",

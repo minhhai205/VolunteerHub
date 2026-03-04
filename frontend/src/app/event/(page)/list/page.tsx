@@ -79,7 +79,7 @@ export default function DashboardPage() {
       });
 
       const response = await fetch(
-        `http://localhost:8080/api/event/suggestions?${params.toString()}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/event/suggestions?${params.toString()}`,
         {
           method: "GET",
           headers: {

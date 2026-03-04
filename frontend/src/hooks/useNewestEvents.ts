@@ -26,7 +26,7 @@ export function useNewestEvents() {
         setLoading(true);
 
         const response = await fetchWithAuth(
-          "http://localhost:8080/api/event/newest",
+          `${process.env.NEXT_PUBLIC_API_URL}/api/event/newest`,
           { method: "GET" }
         ).then((res) => res.json());
 

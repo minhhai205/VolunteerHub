@@ -86,7 +86,7 @@ export default function EventsPage() {
 
     try {
       const response = await fetchWithAuth(
-        `http://localhost:8080/api/admin/event/${eventId}/members/export?format=${format}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/event/${eventId}/members/export?format=${format}`,
         { method: "GET" }
       );
 
@@ -125,7 +125,7 @@ export default function EventsPage() {
     }
     try {
       const response = await fetchWithAuth(
-        `http://localhost:8080/api/admin/events/export?format=${format}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/events/export?format=${format}`,
         { method: "GET" }
       );
       if (!response.ok) {

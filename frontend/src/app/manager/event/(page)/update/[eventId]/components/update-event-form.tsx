@@ -62,17 +62,17 @@ export function UpdateEventForm({ eventId }: { eventId: string }) {
       try {
         const token = getAccessToken();
         const response = await fetch(
-          `http://localhost:8080/api/event/${eventId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/event/${eventId}`,
           {
             headers: {
               ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
-          }
+          },
         );
 
         if (!response.ok) {
           throw new Error(
-            `Không thể tải thông tin sự kiện: ${response.statusText}`
+            `Không thể tải thông tin sự kiện: ${response.statusText}`,
           );
         }
 
@@ -90,7 +90,7 @@ export function UpdateEventForm({ eventId }: { eventId: string }) {
         };
         const categoryNames =
           eventData.categories?.map(
-            (cat: { name: string; description: string }) => cat.name
+            (cat: { name: string; description: string }) => cat.name,
           ) || [];
 
         setFormData({
@@ -112,7 +112,9 @@ export function UpdateEventForm({ eventId }: { eventId: string }) {
       } catch (err) {
         console.error("Lỗi khi tải sự kiện:", err);
         setError(
-          err instanceof Error ? err.message : "Không thể tải thông tin sự kiện"
+          err instanceof Error
+            ? err.message
+            : "Không thể tải thông tin sự kiện",
         );
       } finally {
         setFetchingEvent(false);
@@ -169,10 +171,10 @@ export function UpdateEventForm({ eventId }: { eventId: string }) {
       }
 
       const startDateISO = new Date(
-        `${formData.startDate}T${formData.startTime}`
+        `${formData.startDate}T${formData.startTime}`,
       ).toISOString();
       const endDateISO = new Date(
-        `${formData.endDate}T${formData.endTime}`
+        `${formData.endDate}T${formData.endTime}`,
       ).toISOString();
 
       const apiPayload = {
@@ -189,7 +191,7 @@ export function UpdateEventForm({ eventId }: { eventId: string }) {
 
       // Sử dụng PUT method và endpoint update
       const response = await fetch(
-        `http://localhost:8080/api/event/update/${eventId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/event/update/${eventId}`,
         {
           method: "PATCH",
           headers: {
@@ -197,13 +199,13 @@ export function UpdateEventForm({ eventId }: { eventId: string }) {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           body: JSON.stringify(apiPayload),
-        }
+        },
       );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
         throw new Error(
-          errorData?.message || `Lỗi từ server: ${response.statusText}`
+          errorData?.message || `Lỗi từ server: ${response.statusText}`,
         );
       }
 

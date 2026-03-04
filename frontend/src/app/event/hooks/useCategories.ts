@@ -26,7 +26,7 @@ export function useCategories() {
         const token = localStorage.getItem("access_token");
 
         const response = await fetchWithAuth(
-          "http://localhost:8080/api/category/all",
+          `${process.env.NEXT_PUBLIC_API_URL}/api/category/all`,
           {
             method: "GET",
           }

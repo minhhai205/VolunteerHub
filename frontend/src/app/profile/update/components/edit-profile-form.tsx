@@ -48,7 +48,7 @@ export default function EditProfileForm({ onSave }: EditProfileFormProps) {
       try {
         setLoading(true);
         const res = await fetchWithAuth(
-          `http://localhost:8080/api/user/information/${email}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/user/information/${email}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -93,7 +93,7 @@ export default function EditProfileForm({ onSave }: EditProfileFormProps) {
     try {
       setLoading(true);
       const res = await fetchWithAuth(
-        "http://localhost:8080/api/user/update-information",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/user/update-information`,
         {
           method: "PATCH",
           headers: {

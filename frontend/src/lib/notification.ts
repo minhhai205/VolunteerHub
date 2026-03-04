@@ -2,7 +2,7 @@
 
 const PUBLIC_VAPID_KEY =
   "BIrPFl6lvT6iF6J-oc1kkIy-Fciqz5aW9Ox7zsiwmlaEh3FjqPa_opGOacL4vze6pd4gbtslzFdF5ilwpq0sHec";
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 /**
  * Convert base64 string to Uint8Array for VAPID key.
@@ -44,7 +44,7 @@ export async function registerPushAfterLogin(token: string): Promise<void> {
 
     // Đăng ký với PushManager
     const keyArray = new Uint8Array(
-      urlBase64ToUint8Array(PUBLIC_VAPID_KEY).buffer as ArrayBuffer
+      urlBase64ToUint8Array(PUBLIC_VAPID_KEY).buffer as ArrayBuffer,
     );
     const subscription: PushSubscription =
       await registration.pushManager.subscribe({

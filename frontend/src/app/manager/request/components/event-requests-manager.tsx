@@ -48,7 +48,7 @@ export default function EventRequestsManager() {
   const fetchEvents = async () => {
     try {
       const response = await fetchWithAuth(
-        "http://localhost:8080/api/event/manager/my-event-name",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/event/manager/my-event-name`,
         {
           method: "GET",
           headers: {
@@ -80,7 +80,7 @@ export default function EventRequestsManager() {
     try {
       setLoading(true);
 
-      let url = `http://localhost:8080/api/event-request/registration-list?page=${page}&size=${size}`;
+      let url = `${process.env.NEXT_PUBLIC_API_URL}/api/event-request/registration-list?page=${page}&size=${size}`;
 
       if (status) {
         url += `&status=${status}`;
@@ -150,7 +150,7 @@ export default function EventRequestsManager() {
   const handleApprove = async (id: number) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/event-request/registration/approve/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/event-request/registration/approve/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -186,7 +186,7 @@ export default function EventRequestsManager() {
   const handleReject = async (id: number) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/event-request/registration/reject/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/event-request/registration/reject/${id}`,
         {
           method: "PATCH",
           headers: {

@@ -47,7 +47,7 @@ export default function CreateManagerModal({ open, onOpenChange }: Props) {
 
     setLoading(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const res = await fetchWithAuth(`${apiUrl}/api/user/create`, {
         method: "POST",
         body: JSON.stringify({

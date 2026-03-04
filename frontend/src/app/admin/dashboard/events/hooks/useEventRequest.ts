@@ -81,7 +81,7 @@ export function useEventRequests(
 
         // If asking for approved events, call events API and map to EventRequest shape
         if (statusFilter === "approved") {
-          const url = `http://localhost:8080/api/event/event-list?${params.toString()}`;
+          const url = `${process.env.NEXT_PUBLIC_API_URL}/api/event/event-list?${params.toString()}`;
           const res = await fetchWithAuth(url, {
             method: "GET",
             headers: {
@@ -124,7 +124,7 @@ export function useEventRequests(
           if (statusFilter) {
             params.set("status", statusFilter.toUpperCase());
           }
-          const url = `http://localhost:8080/api/event-request/request-list?${params.toString()}`;
+          const url = `${process.env.NEXT_PUBLIC_API_URL}/api/event-request/request-list?${params.toString()}`;
 
           const res = await fetchWithAuth(url, {
             method: "GET",
@@ -168,7 +168,7 @@ export function useEventRequests(
   const handleApprove = async (id: number) => {
     try {
       const response = await fetchWithAuth(
-        `http://localhost:8080/api/event-request/approve/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/event-request/approve/${id}`,
         { method: "PATCH" }
       );
       if (!response.ok) {
@@ -188,7 +188,7 @@ export function useEventRequests(
   const handleReject = async (id: number) => {
     try {
       const response = await fetchWithAuth(
-        `http://localhost:8080/api/event-request/reject/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/event-request/reject/${id}`,
         { method: "PATCH" }
       );
       if (!response.ok) {

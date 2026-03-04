@@ -33,7 +33,7 @@ interface ApiEvent {
 
 const getEventStatus = (
   startDate: string,
-  endDate: string
+  endDate: string,
 ): "upcoming" | "ongoing" | "completed" => {
   const now = new Date();
   const start = new Date(startDate);
@@ -67,10 +67,10 @@ export default function EventsPage() {
           throw new Error("Không tìm thấy token. Vui lòng đăng nhập lại.");
         }
         const response = await fetchWithAuth(
-          "http://localhost:8080/api/event/my-event",
+          `${process.env.NEXT_PUBLIC_API_URL}/api/event/my-event`,
           {
             method: "GET",
-          }
+          },
         );
 
         if (!response.ok) {
@@ -294,7 +294,7 @@ export default function EventsPage() {
                           <span>
                             <span className={styles.metaLabel}>Bắt đầu:</span>{" "}
                             {new Date(event.startDate).toLocaleDateString(
-                              "vi-VN"
+                              "vi-VN",
                             )}
                           </span>
                         </div>
@@ -323,7 +323,7 @@ export default function EventsPage() {
                           <span>
                             <span className={styles.metaLabel}>Kết thúc:</span>{" "}
                             {new Date(event.endDate).toLocaleDateString(
-                              "vi-VN"
+                              "vi-VN",
                             )}
                           </span>
                         </div>
@@ -350,7 +350,7 @@ export default function EventsPage() {
                         <button
                           className={styles.detailButton}
                           onClick={() =>
-                            (window.location.href = `http://localhost:3000/event/detail/${event.id}`)
+                            (window.location.href = `/event/detail/${event.id}`)
                           }
                         >
                           Xem chi tiết

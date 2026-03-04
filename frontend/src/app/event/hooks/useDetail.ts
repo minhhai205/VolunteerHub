@@ -2,8 +2,7 @@
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
 import { getUserRole } from "@/lib/getDataFromToken";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/api`;
 
 /* ---------- Interfaces ---------- */
 export interface User {
@@ -112,7 +111,7 @@ export async function fetchEventData(eventId: string): Promise<Event> {
 
     if (response.status !== 200) {
       const error: any = new Error(
-        response.message || "Failed to fetch event detail"
+        response.message || "Failed to fetch event detail",
       );
       error.status = response.status;
       throw error;
@@ -129,14 +128,14 @@ export async function fetchEventData(eventId: string): Promise<Event> {
  * Lấy trạng thái đăng ký của user cho event
  */
 export async function fetchRegistrationStatus(
-  eventId: string
+  eventId: string,
 ): Promise<"NOT_REGISTERED" | "PENDING" | "APPROVED" | "REJECTED"> {
   try {
     const res = await fetchWithAuth(
       `${API_BASE_URL}/event-request/registration-status/${eventId}`,
       {
         method: "GET",
-      }
+      },
     );
 
     const response = await res.json();
@@ -164,7 +163,7 @@ export async function registerForEvent(eventId: string): Promise<boolean> {
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
 
     const response = await res.json();
@@ -189,7 +188,7 @@ export async function cancelRegistration(eventId: string): Promise<boolean> {
       `${API_BASE_URL}/event-request/registration/cancel-registration/${eventId}`,
       {
         method: "PATCH",
-      }
+      },
     );
 
     const response = await res.json();
@@ -230,12 +229,12 @@ export async function leaveEvent(eventId: string): Promise<boolean> {
 export async function fetchPosts(
   eventId: string,
   pageNo: number = 0,
-  pageSize: number = 2
+  pageSize: number = 2,
 ): Promise<PaginatedPostResponse> {
   try {
     const response = await fetchWithAuth(
       `${API_BASE_URL}/post/post-list/${eventId}?page=${pageNo}&size=${pageSize}`,
-      { method: "GET" }
+      { method: "GET" },
     ).then((res) => res.json());
 
     if (response.status === 200) {
@@ -268,7 +267,7 @@ export async function fetchPosts(
 export async function createPost(
   eventId: string,
   content: string,
-  medias?: string[]
+  medias?: string[],
 ): Promise<Post> {
   const payload = {
     eventId,
@@ -302,7 +301,7 @@ export async function likePost(post: Post): Promise<Post> {
       `${API_BASE_URL}/post/reaction/${post.id}`,
       {
         method: "POST",
-      }
+      },
     ).then((res) => res.json());
 
     if (response.status !== 200) {
@@ -321,12 +320,12 @@ export async function likePost(post: Post): Promise<Post> {
 export async function fetchComments(
   postId: number,
   pageNo: number = 0,
-  pageSize: number = 2
+  pageSize: number = 2,
 ): Promise<PaginatedCommentResponse> {
   try {
     const response = await fetchWithAuth(
       `${API_BASE_URL}/comment/comment-list/${postId}?page=${pageNo}&size=${pageSize}`,
-      { method: "GET" }
+      { method: "GET" },
     ).then((res) => res.json());
 
     if (response.status === 200) {
@@ -359,7 +358,7 @@ export async function fetchComments(
 
 export async function addComment(
   postId: number,
-  content: string
+  content: string,
 ): Promise<Comment> {
   try {
     const response = await fetchWithAuth(
@@ -368,7 +367,7 @@ export async function addComment(
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ postId, content }),
-      }
+      },
     );
 
     const result = await response.json();

@@ -67,7 +67,7 @@ export function Header() {
 
   const fetchNotifications = async (token: string) => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const response = await fetch(
         `${apiUrl}/api/notifications/my-notifications`,
         {
@@ -101,7 +101,7 @@ export function Header() {
         return;
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       // Gọi API logout với DTO
       const response = await fetch(`${apiUrl}/api/auth/logout`, {
         method: "POST",

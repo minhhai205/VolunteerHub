@@ -129,7 +129,7 @@ export default function CompletionPage() {
   const updateWorkRating = async (dtos: WorkRatingDTO[]) => {
     try {
       const token = getAccessToken();
-      const url = `http://localhost:8080/api/event/work-rating`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/event/work-rating`;
 
       const requestBody: WorkRatingRequest = { dtos };
 
@@ -162,7 +162,7 @@ export default function CompletionPage() {
   // Fetch events from API
   const fetchEvents = async () => {
     try {
-      const url = `http://localhost:8080/api/event/manager/my-event`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/event/manager/my-event`;
 
       const response = await fetchWithAuth(url, {
         method: "GET",
@@ -196,7 +196,7 @@ export default function CompletionPage() {
 
     try {
       const params = buildQueryParams(dto);
-      const url = `http://localhost:8080/api/event/event-members?${params.toString()}`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/event/event-members?${params.toString()}`;
 
       const response = await fetchWithAuth(url, {
         method: "GET",

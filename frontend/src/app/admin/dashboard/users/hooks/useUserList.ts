@@ -52,7 +52,7 @@ export function useUserList(
         if (role) params.set("role", role);
         if (search.trim()) params.set("search", search.trim());
 
-        const url = `http://localhost:8080/api/user/user-list?${params.toString()}`;
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/api/user/user-list?${params.toString()}`;
 
         const res = await fetchWithAuth(url, {
           method: "GET",

@@ -61,7 +61,7 @@ export function ChatPopup() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8080/api/chat", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "text/plain",

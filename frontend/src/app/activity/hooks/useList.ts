@@ -25,7 +25,7 @@ export function useEventList() {
       try {
         const token = localStorage.getItem("access_token");
         const response = await fetchWithAuth(
-          "http://localhost:8080/api/event/event-list",
+          `${process.env.NEXT_PUBLIC_API_URL}/api/event/event-list`,
           {
             method: "GET",
             headers: {

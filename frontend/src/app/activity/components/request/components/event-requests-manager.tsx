@@ -31,7 +31,7 @@ export default function EventRequestsManager() {
     try {
       setLoading(true);
       const response = await fetchWithAuth(
-        "http://localhost:8080/api/event-request/my-registration",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/event-request/my-registration`,
         {
           method: "GET",
           headers: {

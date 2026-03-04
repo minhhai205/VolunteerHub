@@ -42,7 +42,7 @@ export function RegisterForm() {
     }
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const res = await fetch(`${apiUrl}/api/auth/register`, {
         method: "POST",
         headers: {

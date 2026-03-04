@@ -123,7 +123,7 @@ export function CreateEventForm() {
       const token = getAccessToken();
 
       const response = await fetch(
-        "http://localhost:8080/api/event-request/create",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/event-request/create`,
         {
           method: "POST",
           headers: {

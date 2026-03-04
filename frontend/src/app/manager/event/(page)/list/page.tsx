@@ -124,7 +124,7 @@ export default function EventsPage() {
       });
 
       const response = await fetch(
-        `http://localhost:8080/api/event/suggestions?${params.toString()}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/event/suggestions?${params.toString()}`,
         {
           method: "GET",
           headers: {
@@ -174,7 +174,7 @@ export default function EventsPage() {
         params.append("status", getStatusParam(activeFilter));
 
         const response = await fetchWithAuth(
-          `http://localhost:8080/api/event/manager/my-event?${params.toString()}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/event/manager/my-event?${params.toString()}`,
           {
             method: "GET",
           },
@@ -381,7 +381,7 @@ export default function EventsPage() {
     try {
       const token = getAccessToken();
       const response = await fetchWithAuth(
-        `http://localhost:8080/api/event/delete-event/${deleteConfirm.eventId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/event/delete-event/${deleteConfirm.eventId}`,
         {
           method: "DELETE",
         },
@@ -774,7 +774,7 @@ export default function EventsPage() {
                               className={styles.iconButton}
                               title="Xem chi tiết"
                               onClick={() =>
-                                (window.location.href = `http://localhost:3000/event/detail/${event.id}`)
+                                (window.location.href = `/event/detail/${event.id}`)
                               }
                             >
                               <Eye size={18} />
