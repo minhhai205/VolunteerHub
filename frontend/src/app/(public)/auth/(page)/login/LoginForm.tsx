@@ -1,9 +1,9 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,11 +24,19 @@ import { toastManager } from "@/components/static/toast/toast";
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const prefillEmail = searchParams.get("email");
+    const prefillPassword = searchParams.get("password");
+    if (prefillEmail) setEmail(prefillEmail);
+    if (prefillPassword) setPassword(prefillPassword);
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +44,7 @@ export function LoginForm() {
     setError(null);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
       const res = await fetch(`${apiUrl}/api/auth/login`, {
         method: "POST",
         headers: {
@@ -84,7 +92,7 @@ export function LoginForm() {
     } catch (err) {
       console.error("Login error:", err);
       toastManager.error(
-        err instanceof Error ? err.message : "Đăng nhập thất bại!"
+        err instanceof Error ? err.message : "Đăng nhập thất bại!",
       );
       setError(err instanceof Error ? err.message : "Đăng nhập thất bại!");
     } finally {

@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { LoginForm } from "./LoginForm"
 import { AuthLayout } from "../../AuthLayout"
 
@@ -9,7 +10,9 @@ export default function LoginPage() {
       imageSrc="/images/login.jpg"
       imageAlt="Volunteers working together"
     >
-      <LoginForm />
+      <Suspense>
+        <LoginForm />
+      </Suspense>
     </AuthLayout>
   )
 }
